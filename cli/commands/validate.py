@@ -4,9 +4,10 @@ import argparse
 from collections import defaultdict
 from pathlib import Path
 
+from cli.argparse_utils import CliArgumentParser
 from cli.errors import EXIT_OK
 from cli.errors import EXIT_VALIDATION_FAILED
-from cli.errors import UsageError
+from cli.errors import EXIT_USAGE_ERROR
 from cli.output import CommandResult
 from cli.output import Diagnostic
 from cli.repo import parse_accepted_document
@@ -42,7 +43,7 @@ REJECTED_COLUMNS = ["url", "title", "reason"]
 
 
 def build_parser() -> argparse.ArgumentParser:
-    return argparse.ArgumentParser(prog="youpu validate", add_help=False)
+    return CliArgumentParser(prog="youpu validate", add_help=False)
 
 
 def validate_accepted(repo_root: Path) -> list[Diagnostic]:
@@ -369,7 +370,18 @@ def validate_rejected_duplicates(repo_root: Path) -> list[Diagnostic]:
 
 def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
     parser = build_parser()
-    args = parser.parse_args(command_args)
+    try:
+        parser.parse_args(command_args)
+    except (SystemExit, ValueError):
+        return (
+            CommandResult(
+                ok=False,
+                command="validate",
+                summary="Validation failed",
+                diagnostics=[Diagnostic(level="error", message="invalid arguments", code="usage_error")],
+            ),
+            EXIT_USAGE_ERROR,
+        )
 
     diagnostics: list[Diagnostic] = []
     diagnostics.extend(validate_accepted(repo_root))
@@ -384,6 +396,5 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
         command="validate",
         summary="Validation passed" if ok else "Validation failed",
         diagnostics=diagnostics,
-        data={"scope": "all"},
     )
     return result, (EXIT_OK if ok else EXIT_VALIDATION_FAILED)

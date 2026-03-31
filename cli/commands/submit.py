@@ -4,6 +4,7 @@ import argparse
 import subprocess
 from pathlib import Path
 
+from cli.argparse_utils import CliArgumentParser
 from cli.commands import ingest as ingest_command
 from cli.commands import validate as validate_command
 from cli.errors import EXIT_OK
@@ -12,11 +13,11 @@ from cli.errors import EXIT_USAGE_ERROR
 from cli.errors import EXIT_VALIDATION_FAILED
 from cli.output import CommandResult
 from cli.output import Diagnostic
-from cli.repo import ensure_imports_layout
+from cli.repo import get_imports_layout
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="youpu submit", add_help=False)
+    parser = CliArgumentParser(prog="youpu submit", add_help=False)
     parser.add_argument("--check-only", action="store_true")
     parser.add_argument("--message", default=None)
     parser.add_argument("--push", action="store_true")
@@ -24,7 +25,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def pending_import_diagnostics(repo_root: Path) -> list[Diagnostic]:
-    layout = ensure_imports_layout(repo_root)
+    layout = get_imports_layout(repo_root)
     diagnostics: list[Diagnostic] = []
 
     accepted_files = sorted(layout.accepted.glob("*.md"))
@@ -52,7 +53,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
     parser = build_parser()
     try:
         args = parser.parse_args(command_args)
-    except SystemExit:
+    except (SystemExit, ValueError):
         return (
             CommandResult(
                 ok=False,
@@ -127,6 +128,30 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
 
     try:
         subprocess.run(["git", "add", "-A"], cwd=repo_root, check=True, capture_output=True, text=True)
+        staged_changes = subprocess.run(
+            ["git", "diff", "--cached", "--quiet"],
+            cwd=repo_root,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if staged_changes.returncode == 0:
+            return (
+                CommandResult(
+                    ok=False,
+                    command="submit",
+                    summary="Submit failed",
+                    diagnostics=[
+                        Diagnostic(
+                            level="error",
+                            message="no staged changes to commit",
+                            code="no_changes",
+                        )
+                    ],
+                    data={"check_only": False},
+                ),
+                EXIT_USAGE_ERROR,
+            )
         commit = subprocess.run(
             ["git", "commit", "-m", args.message],
             cwd=repo_root,

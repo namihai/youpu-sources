@@ -14,14 +14,13 @@ from cli.output import CommandResult
 from cli.output import Diagnostic
 from cli.output import emit_result
 from cli.repo import resolve_repo_root
-
-PLANNED_COMMANDS = [
-    "validate",
-    "ingest",
-    "submit",
-    "inspect-url",
-    "report",
-]
+COMMAND_HANDLERS = {
+    "validate": validate_command.run,
+    "ingest": ingest_command.run,
+    "submit": submit_command.run,
+    "inspect-url": inspect_url_command.run,
+    "report": report_command.run,
+}
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -34,16 +33,6 @@ def build_parser() -> argparse.ArgumentParser:
         choices=("text", "json"),
         default="text",
         help="Output format. Default: text.",
-    )
-    parser.add_argument(
-        "--quiet",
-        action="store_true",
-        help="Only output final result.",
-    )
-    parser.add_argument(
-        "--verbose",
-        action="store_true",
-        help="Output additional details.",
     )
     parser.add_argument(
         "--no-color",
@@ -97,7 +86,7 @@ def main(argv: list[str] | None = None) -> int:
         parser.print_help()
         return EXIT_OK
 
-    if args.command not in PLANNED_COMMANDS:
+    if args.command not in COMMAND_HANDLERS:
         err = UsageError(f"unknown command: {args.command}")
         emit_result(
             CommandResult(
@@ -112,70 +101,11 @@ def main(argv: list[str] | None = None) -> int:
         )
         return err.exit_code
 
-    if args.command == "validate":
-        result, exit_code = validate_command.run(args.command_args, repo_root)
-        emit_result(
-            result,
-            output_format=args.format,
-            no_color=args.no_color,
-            stderr=not result.ok,
-        )
-        return exit_code
-
-    if args.command == "ingest":
-        result, exit_code = ingest_command.run(args.command_args, repo_root)
-        emit_result(
-            result,
-            output_format=args.format,
-            no_color=args.no_color,
-            stderr=not result.ok,
-        )
-        return exit_code
-
-    if args.command == "inspect-url":
-        result, exit_code = inspect_url_command.run(args.command_args, repo_root)
-        emit_result(
-            result,
-            output_format=args.format,
-            no_color=args.no_color,
-            stderr=not result.ok,
-        )
-        return exit_code
-
-    if args.command == "report":
-        result, exit_code = report_command.run(args.command_args, repo_root)
-        emit_result(
-            result,
-            output_format=args.format,
-            no_color=args.no_color,
-            stderr=not result.ok,
-        )
-        return exit_code
-
-    if args.command == "submit":
-        result, exit_code = submit_command.run(args.command_args, repo_root)
-        emit_result(
-            result,
-            output_format=args.format,
-            no_color=args.no_color,
-            stderr=not result.ok,
-        )
-        return exit_code
-
-    suffix = f" {' '.join(args.command_args)}" if args.command_args else ""
-    err = UsageError(
-        f"command not implemented yet: {args.command}{suffix} (repo: {repo_root})"
-    )
+    result, exit_code = COMMAND_HANDLERS[args.command](args.command_args, repo_root)
     emit_result(
-        CommandResult(
-            ok=False,
-            command=args.command,
-            summary=f"youpu: {err}",
-            diagnostics=[Diagnostic(level="error", message=str(err), code="not_implemented")],
-            data={"repo_root": str(repo_root)},
-        ),
+        result,
         output_format=args.format,
         no_color=args.no_color,
-        stderr=True,
+        stderr=not result.ok,
     )
-    return err.exit_code
+    return exit_code

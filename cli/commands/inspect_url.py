@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from cli.argparse_utils import CliArgumentParser
 from cli.errors import EXIT_OK
 from cli.errors import EXIT_USAGE_ERROR
 from cli.output import CommandResult
@@ -11,7 +12,7 @@ from cli.repo import normalize_url
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="youpu inspect-url", add_help=False)
+    parser = CliArgumentParser(prog="youpu inspect-url", add_help=False)
     parser.add_argument("url")
     return parser
 
@@ -21,7 +22,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
     parser = build_parser()
     try:
         args = parser.parse_args(command_args)
-    except SystemExit:
+    except (SystemExit, ValueError):
         return (
             CommandResult(
                 ok=False,

@@ -8,6 +8,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
+from cli.argparse_utils import CliArgumentParser
 from cli.commands.validate import DISALLOWED_FIELDS
 from cli.commands.validate import REJECTED_COLUMNS
 from cli.commands.validate import REQUIRED_NONEMPTY_FIELDS
@@ -16,7 +17,7 @@ from cli.errors import EXIT_USAGE_ERROR
 from cli.output import CommandResult
 from cli.output import Diagnostic
 from cli.repo import AcceptedDocument
-from cli.repo import ImportsLayout
+from cli.repo import get_imports_layout
 from cli.repo import ensure_imports_layout
 from cli.repo import normalize_url
 from cli.repo import parse_accepted_document
@@ -59,7 +60,7 @@ class IngestAnalysis:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="youpu ingest", add_help=False)
+    parser = CliArgumentParser(prog="youpu ingest", add_help=False)
     parser.add_argument("--dry-run", action="store_true")
     return parser
 
@@ -117,7 +118,7 @@ def next_accepted_index(accepted_dir: Path) -> int:
     return max_index + 1
 
 
-def build_analysis(repo_root: Path) -> IngestAnalysis:
+def build_analysis(repo_root: Path, *, ensure_layout: bool = False) -> IngestAnalysis:
     diagnostics: list[Diagnostic] = []
     accepted_docs: list[AcceptedDocument] = []
     rejected_rows: list[RejectedImportRow] = []
@@ -127,7 +128,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
     rejected_seen_urls: dict[str, list[str]] = defaultdict(list)
     accepted_urls = accepted_url_index(repo_root)
     rejected_urls = rejected_url_index(repo_root)
-    layout = ensure_imports_layout(repo_root)
+    layout = ensure_imports_layout(repo_root) if ensure_layout else get_imports_layout(repo_root)
 
     for path in sorted(layout.accepted.glob("*.md")):
         rel_path = str(path.relative_to(repo_root))
@@ -374,7 +375,7 @@ def serialize_accepted(doc: AcceptedDocument) -> str:
 
 
 def target_accepted_path(repo_root: Path, doc: AcceptedDocument, index: int) -> Path:
-    source_slug = slugify(doc.path.stem)
+    source_slug = doc.slug or slugify(doc.yaml_fields.get("title", "").strip() or doc.path.stem)
     return repo_root / "accepted" / f"SRC-{index:04d}-{source_slug}.md"
 
 
@@ -385,7 +386,7 @@ def write_rejected_csv(csv_path: Path, rows: list[tuple[str, str, str]]) -> None
         writer.writerows(rows)
 
 
-def merge_ingest(repo_root: Path, layout: ImportsLayout, analysis: IngestAnalysis) -> dict[str, int]:
+def merge_ingest(repo_root: Path, analysis: IngestAnalysis) -> dict[str, int]:
     accepted_dir = repo_root / "accepted"
     next_index = next_accepted_index(accepted_dir)
     imported_accepted = 0
@@ -429,16 +430,16 @@ def merge_ingest(repo_root: Path, layout: ImportsLayout, analysis: IngestAnalysi
     return {
         "imported_accepted": imported_accepted,
         "imported_rejected": imported_rejected,
-        "imports_root": str(layout.root.relative_to(repo_root)),
+                "imports_root": "imports",
     }
 
 
-def build_summary(repo_root: Path, layout: ImportsLayout, analysis: IngestAnalysis, *, dry_run: bool) -> str:
+def build_summary(analysis: IngestAnalysis, *, dry_run: bool) -> str:
     header = "Ingest dry-run completed" if dry_run else "Ingest completed"
     return "\n".join(
         [
             header,
-            f"imports root: {layout.root.relative_to(repo_root)}",
+            "imports root: imports",
             f"accepted candidates ready: {len(analysis.accepted_ready)}",
             f"rejected candidates ready: {len(analysis.rejected_ready)}",
             f"issues: {len(analysis.diagnostics)}",
@@ -448,13 +449,13 @@ def build_summary(repo_root: Path, layout: ImportsLayout, analysis: IngestAnalys
 
 def write_reports(
     repo_root: Path,
-    layout: ImportsLayout,
     analysis: IngestAnalysis,
     *,
     dry_run: bool,
     merge_data: dict[str, int] | None = None,
 ) -> None:
-    summary = build_summary(repo_root, layout, analysis, dry_run=dry_run)
+    layout = ensure_imports_layout(repo_root)
+    summary = build_summary(analysis, dry_run=dry_run)
     issues_md = layout.reports / "issues.md"
     summary_json = layout.reports / "summary.json"
 
@@ -514,7 +515,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
     parser = build_parser()
     try:
         args = parser.parse_args(command_args)
-    except SystemExit:
+    except (SystemExit, ValueError):
         return (
             CommandResult(
                 ok=False,
@@ -529,8 +530,8 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
     analysis = build_analysis(repo_root)
 
     if args.dry_run:
-        summary = build_summary(repo_root, layout, analysis, dry_run=True)
-        write_reports(repo_root, layout, analysis, dry_run=True)
+        summary = build_summary(analysis, dry_run=True)
+        write_reports(repo_root, analysis, dry_run=True)
         return (
             CommandResult(
                 ok=not analysis.diagnostics,
@@ -547,9 +548,9 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             EXIT_OK if not analysis.diagnostics else EXIT_USAGE_ERROR,
         )
 
-    merge_data = merge_ingest(repo_root, layout, analysis)
-    summary = build_summary(repo_root, layout, analysis, dry_run=False)
-    write_reports(repo_root, layout, analysis, dry_run=False, merge_data=merge_data)
+    merge_data = merge_ingest(repo_root, analysis)
+    summary = build_summary(analysis, dry_run=False)
+    write_reports(repo_root, analysis, dry_run=False, merge_data=merge_data)
     return (
         CommandResult(
             ok=not analysis.diagnostics,

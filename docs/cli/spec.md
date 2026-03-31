@@ -45,8 +45,6 @@ youpu <command> [options]
 
 ```bash
 --format text|json
---quiet
---verbose
 --no-color
 --root <path>
 ```
@@ -55,8 +53,6 @@ youpu <command> [options]
 
 - `--format text`：默认，终端友好输出
 - `--format json`：结构化输出
-- `--quiet`：只输出结论
-- `--verbose`：输出更多细节
 - `--no-color`：关闭颜色
 - `--root <path>`：指定仓库根目录，默认自动探测
 
@@ -67,7 +63,6 @@ youpu <command> [options]
 1  校验失败或守门检查失败
 2  参数错误
 3  运行时异常
-4  保留
 ```
 
 ## 默认导入目录

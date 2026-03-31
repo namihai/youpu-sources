@@ -4,20 +4,21 @@ import argparse
 import re
 from pathlib import Path
 
+from cli.argparse_utils import CliArgumentParser
 from cli.commands import ingest as ingest_command
 from cli.commands import validate as validate_command
 from cli.errors import EXIT_OK
 from cli.errors import EXIT_USAGE_ERROR
 from cli.output import CommandResult
 from cli.output import Diagnostic
-from cli.repo import ensure_imports_layout
+from cli.repo import get_imports_layout
 from cli.repo import parse_rejected_csv
 
 ACCEPTED_FILENAME_RE = re.compile(r"^SRC-(\d{4})-[a-z0-9-]+\.md$")
 
 
 def build_parser() -> argparse.ArgumentParser:
-    return argparse.ArgumentParser(prog="youpu report", add_help=False)
+    return CliArgumentParser(prog="youpu report", add_help=False)
 
 
 def latest_accepted_id(repo_root: Path) -> str | None:
@@ -36,7 +37,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
     parser = build_parser()
     try:
         parser.parse_args(command_args)
-    except SystemExit:
+    except (SystemExit, ValueError):
         return (
             CommandResult(
                 ok=False,
@@ -57,7 +58,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
     rejected = parse_rejected_csv(repo_root / "rejected" / "rejected.csv")
     rejected_count = len(rejected.rows)
     latest_id = latest_accepted_id(repo_root)
-    layout = ensure_imports_layout(repo_root)
+    layout = get_imports_layout(repo_root)
     pending_accepted = len(list(layout.accepted.glob("*.md")))
     pending_rejected = len(list(layout.rejected.glob("*.csv")))
 

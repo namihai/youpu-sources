@@ -7,7 +7,6 @@ EXIT_OK = 0
 EXIT_VALIDATION_FAILED = 1
 EXIT_USAGE_ERROR = 2
 EXIT_RUNTIME_ERROR = 3
-EXIT_REFUSED = 4
 
 
 @dataclass(frozen=True)
@@ -27,8 +26,3 @@ class UsageError(CliError):
 class RuntimeCliError(CliError):
     def __init__(self, message: str) -> None:
         super().__init__(message=message, exit_code=EXIT_RUNTIME_ERROR)
-
-
-class RefusedError(CliError):
-    def __init__(self, message: str) -> None:
-        super().__init__(message=message, exit_code=EXIT_REFUSED)
