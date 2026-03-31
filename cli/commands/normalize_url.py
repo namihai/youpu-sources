@@ -3,11 +3,11 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from tools.youpu.errors import EXIT_OK
-from tools.youpu.errors import EXIT_USAGE_ERROR
-from tools.youpu.output import CommandResult
-from tools.youpu.output import Diagnostic
-from tools.youpu.repo import normalize_url
+from cli.errors import EXIT_OK
+from cli.errors import EXIT_USAGE_ERROR
+from cli.output import CommandResult
+from cli.output import Diagnostic
+from cli.repo import normalize_url
 
 
 def build_parser() -> argparse.ArgumentParser:

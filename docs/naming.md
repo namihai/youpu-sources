@@ -40,13 +40,13 @@ SRC-0003-figshare-dunhuang-restoration.md
 3. 取一个短 slug
 4. 从 [`templates/accepted.md`](/Users/xianqiu/Projects/youpu-sources/templates/accepted.md) 复制新文件
 
-也可以直接使用辅助脚本生成新文件：
+也可以直接使用 CLI 生成新文件：
 
 ```bash
-python3 tools/validate/new_accepted.py muraldh
+./youpu new accepted muraldh --dry-run
 ```
 
-脚本会：
+CLI 会：
 
 - 自动计算下一个编号
 - 生成 `SRC-####-slug.md`

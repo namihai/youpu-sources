@@ -15,7 +15,7 @@ REQUIRED_ROOT_ENTRIES = (
     "rejected",
     "docs",
     "templates",
-    "tools",
+    "cli",
     "README.md",
 )
 

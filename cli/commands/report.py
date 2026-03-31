@@ -4,13 +4,13 @@ import argparse
 import re
 from pathlib import Path
 
-from tools.youpu.commands import duplicates as duplicates_command
-from tools.youpu.commands import validate as validate_command
-from tools.youpu.errors import EXIT_OK
-from tools.youpu.errors import EXIT_USAGE_ERROR
-from tools.youpu.output import CommandResult
-from tools.youpu.output import Diagnostic
-from tools.youpu.repo import parse_rejected_csv
+from cli.commands import duplicates as duplicates_command
+from cli.commands import validate as validate_command
+from cli.errors import EXIT_OK
+from cli.errors import EXIT_USAGE_ERROR
+from cli.output import CommandResult
+from cli.output import Diagnostic
+from cli.repo import parse_rejected_csv
 
 ACCEPTED_FILENAME_RE = re.compile(r"^SRC-(\d{4})-[a-z0-9-]+\.md$")
 

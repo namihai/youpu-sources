@@ -2,18 +2,18 @@ from __future__ import annotations
 
 import argparse
 
-from tools.youpu.commands import duplicates as duplicates_command
-from tools.youpu.commands import new as new_command
-from tools.youpu.commands import normalize_url as normalize_url_command
-from tools.youpu.commands import report as report_command
-from tools.youpu.commands import validate as validate_command
-from tools.youpu.errors import EXIT_OK
-from tools.youpu.errors import RuntimeCliError
-from tools.youpu.errors import UsageError
-from tools.youpu.output import CommandResult
-from tools.youpu.output import Diagnostic
-from tools.youpu.output import emit_result
-from tools.youpu.repo import resolve_repo_root
+from cli.commands import duplicates as duplicates_command
+from cli.commands import new as new_command
+from cli.commands import normalize_url as normalize_url_command
+from cli.commands import report as report_command
+from cli.commands import validate as validate_command
+from cli.errors import EXIT_OK
+from cli.errors import RuntimeCliError
+from cli.errors import UsageError
+from cli.output import CommandResult
+from cli.output import Diagnostic
+from cli.output import emit_result
+from cli.repo import resolve_repo_root
 
 PLANNED_COMMANDS = [
     "validate",

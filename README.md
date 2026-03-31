@@ -20,16 +20,20 @@
 ```text
 .
 ├── accepted/
+├── cli/
 ├── rejected/
 │   └── rejected.csv
 ├── docs/
 │   ├── accepted-spec.md
+│   ├── cli/
+│   │   ├── spec.md
+│   │   └── user-guide.md
 │   ├── rejected-spec.md
+│   ├── url-normalization.md
 │   └── naming.md
 ├── templates/
 │   └── accepted.md
-└── tools/
-    └── validate/
+└── youpu
 ```
 
 ## accepted 记录
@@ -82,14 +86,8 @@ rejected 的详细规范见 [`docs/rejected-spec.md`](/Users/xianqiu/Projects/yo
 
 ## URL 规范
 
-`rejected.csv` 中的 `url` 应为规范化后的 `canonical_url`。填写时遵循以下原则：
+URL 规范化规则见 [`docs/url-normalization.md`](/Users/xianqiu/Projects/youpu-sources/docs/url-normalization.md)。
 
-- 优先使用来源页面的稳定主链接
-- 尽量去掉追踪参数，例如 `utm_*`
-- 去掉无意义锚点，例如 `#intro`
-- 对同一资源的不同跳转链接，应尽量归并为同一个主链接
-- 如果站点同时提供详情页和下载页，优先记录更能代表该来源的主页面链接
-
-accepted 文档中也应尽量明确给出对应的真实主链接，以便后续工具做比对和校验。
+accepted 文档中的 `canonical_url` 与 `rejected.csv` 中的 `url` 都应遵循这份文档，以便后续工具做比对和校验。
 
 当前仓库只保留规范化后的 `accepted/` 与 `rejected/` 结果，不再保留历史中间目录与过程性草稿。

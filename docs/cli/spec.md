@@ -404,29 +404,9 @@ Repository summary
 
 ## URL 规范化规则
 
-`canonical_url` / `rejected.url` 的规范化应遵循：
+`canonical_url` / `rejected.url` 的统一规则见 [`docs/url-normalization.md`](/Users/xianqiu/Projects/youpu-sources/docs/url-normalization.md)。
 
-- 优先使用详情页主链接
-- 去掉 `utm_*`
-- 去掉页面锚点
-- 去掉明显无意义 query
-- 保留数据集唯一标识参数
-- 对 DOI、Dataverse、Zenodo、Hugging Face、Kaggle 等来源保留稳定主链接
-
-注意：
-
-- 规范化规则应是可预测的
-- 不应过度“智能猜测”
-- 无法确定时保守保留原始主链接
-
-边界约束：
-
-- 可以去掉锚点和追踪参数
-- 可以删除明显无意义的 query 参数
-- 必须保留能唯一标识资源的关键参数
-- 不应自动把详情页替换成第三方镜像页
-- 不应自动把论文页推断成数据页
-- 不应跨站点合并链接，除非规则中已明确约定
+CLI 在实现上应遵循这份文档，而不是在各命令中分别定义一套规则。
 
 ## 输出格式要求
 
@@ -493,4 +473,3 @@ Repository summary
 ## 相关文档
 
 - 用户文档：[user-guide.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/user-guide.md)
-- 当前开发清单：[implementation-checklist.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/implementation-checklist.md)

@@ -35,13 +35,9 @@ url,title,reason
 
 ## url 规范
 
-`url` 应填写规范化后的 `canonical_url`，遵循以下原则：
+`url` 应填写规范化后的 `canonical_url`。
 
-- 使用稳定主链接
-- 去掉追踪参数，例如 `utm_*`
-- 去掉无意义 query 参数
-- 去掉页面锚点
-- 对同一资源的多个跳转链接，尽量统一到同一个主链接
+具体规则见 [`docs/url-normalization.md`](/Users/xianqiu/Projects/youpu-sources/docs/url-normalization.md)。
 
 同一个 `canonical_url` 在 `rejected.csv` 中不应重复出现。
 

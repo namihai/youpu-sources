@@ -1,3 +1,30 @@
 .DS_Store
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# Python caches and tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS / local temp files
+Thumbs.db

@@ -121,26 +121,7 @@ use_cases: [研究分析, AI训练]
 - YAML 中必须包含 `canonical_url`
 - `canonical_url` 应填写该来源的稳定主链接
 - 应尽量使用规范化后的主链接，避免追踪参数与无意义锚点
-
-### `canonical_url` 规范化边界
-
-`canonical_url` 的目标是稳定标识“同一个来源”，而不是追求最短 URL。
-
-应遵循以下规则：
-
-- 优先使用详情页、数据集主页面、仓库主页面等稳定落点
-- 去掉页面锚点，例如 `#intro`
-- 去掉追踪参数，例如 `utm_*`
-- 去掉明显无意义的 query 参数
-- 保留用于唯一标识资源的关键参数，例如数据集 ID、DOI、persistentId
-- 若同一来源同时存在详情页与下载页，优先保留更能代表来源本身的详情页
-
-实现边界：
-
-- 应做可预测、保守的规范化
-- 不应基于页面内容做隐式猜测
-- 不应自动把一个站点链接改写成另一个站点链接
-- 无法确定时，应保留原始主链接，而不是过度清洗
+- 具体规则见 [`docs/url-normalization.md`](/Users/xianqiu/Projects/youpu-sources/docs/url-normalization.md)
 
 ## 正文建议结构
 

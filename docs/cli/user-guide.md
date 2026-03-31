@@ -258,4 +258,4 @@ youpu --format json report
 ## 相关文档
 
 - 开发接口文档：[spec.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/spec.md)
-- 当前开发清单：[implementation-checklist.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/implementation-checklist.md)
+- URL 规范化规则：[url-normalization.md](/Users/xianqiu/Projects/youpu-sources/docs/url-normalization.md)
