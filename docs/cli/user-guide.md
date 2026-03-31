@@ -9,13 +9,13 @@
 
 ## 目标
 
-`youpu` 是仓库的统一 CLI，用于：
+`youpu` 是仓库的守门 CLI，只做这几件事：
 
-- 校验 `accepted/` 和 `rejected/rejected.csv`
-- 检查重复和交叉冲突
-- 新建 `accepted` / `rejected` 记录
-- 规范化 URL
+- 检查正式仓库是否合法
+- 检查并合并 `imports/` 中的候选内容
+- 在提交前做最终守门
 - 输出仓库摘要
+- 诊断单个 URL
 
 统一入口：
 
@@ -23,43 +23,45 @@
 youpu <command> [options]
 ```
 
-## 第一版边界
+当前对外命令：
 
-当前第一版 CLI 只做三类事：
+- `youpu validate`
+- `youpu ingest`
+- `youpu submit`
+- `youpu report`
+- `youpu inspect-url`
 
-- 检查
-- 规范化
-- 安全新增
+## 默认导入目录
 
-不做的事：
+`ingest` 固定使用：
 
-- 不自动修复已有 `accepted/*.md`
-- 不自动修复已有 `rejected/rejected.csv`
-- 不自动批量迁移历史目录
-- 不自动改写业务判断结论
+```text
+imports/
+  accepted/
+  rejected/
+  reports/
+```
 
-如果需要改已有内容，应先用检查命令定位问题，再由用户或后续专门命令显式处理。
+其中：
+
+- `imports/accepted/`：放候选 accepted Markdown
+- `imports/rejected/`：放候选 rejected CSV
+- `imports/reports/`：自动生成问题清单和摘要
 
 ## 常用命令
 
-### 校验仓库
+### 校验正式仓库
 
 ```bash
 youpu validate
-youpu validate --scope accepted
-youpu validate --scope rejected
-youpu validate --scope all
 ```
 
 用途：
 
-- 检查结构是否符合规范
-- 检查 `accepted` / `rejected` 是否存在交叉冲突
-
-常见结果：
-
-- `Validation passed`
-- `Validation failed`
+- 检查 `accepted/`
+- 检查 `rejected/rejected.csv`
+- 检查重复
+- 检查 cross-conflict
 
 最小示例输出：
 
@@ -67,101 +69,86 @@ youpu validate --scope all
 Validation passed
 ```
 
-### 检查重复
+### 预检查导入内容
 
 ```bash
-youpu duplicates
-youpu duplicates --scope accepted
-youpu duplicates --scope rejected
-youpu duplicates --scope cross
-youpu duplicates --scope all
+youpu ingest --dry-run
 ```
 
 用途：
 
-- 检查 `accepted` 内重复
-- 检查 `rejected` 内重复
-- 检查 accepted/rejected 交叉重复
+- 扫描 `imports/accepted/` 和 `imports/rejected/`
+- 只检查，不写正式仓库
+- 刷新 `imports/reports/`
 
 最小示例输出：
 
 ```text
-No duplicates found
+Ingest dry-run completed
+imports root: imports
+accepted candidates ready: 0
+rejected candidates ready: 0
+issues: 0
 ```
 
-### 新建 accepted
+### 合并合法候选内容
 
 ```bash
-youpu new accepted <slug>
-youpu new accepted <slug> --title "标题"
-youpu new accepted <slug> --title "标题" --url https://example.com/source
-youpu new accepted <slug> --dry-run
+youpu ingest
 ```
 
-行为：
+用途：
 
-- 自动扫描当前最大编号
-- 创建下一个 `SRC-####-slug.md`
-- 从 `templates/accepted.md` 生成文件
-- `--dry-run` 只预览，不写文件
-
-示例：
-
-```bash
-youpu new accepted muraldh --title "敦煌壁画数字修复图像数据集（MuralDH）"
-```
+- 把合法候选合并进正式仓库
+- 自动做 URL 规范化、编号分配和 slug 规范化
+- 保留有问题的文件供人工处理
 
 最小示例输出：
 
 ```text
-Would create accepted/SRC-0001-demo-slug.md
+Ingest completed
+imports root: imports
+accepted candidates ready: 1
+rejected candidates ready: 1
+issues: 0
 ```
 
-### 新增 rejected
+### 提交前检查
 
 ```bash
-youpu new rejected --url <url> --title <title> --reason <reason>
-youpu new rejected --url <url> --title <title> --reason <reason> --dry-run
+youpu submit --check-only
 ```
 
-行为：
+用途：
 
-- 先规范化 URL
-- 检查是否与 `rejected` 现有记录重复
-- 检查是否与 `accepted.canonical_url` 冲突
-- `--dry-run` 只预览，不写 CSV
-
-示例：
-
-```bash
-youpu new rejected \
-  --url https://example.com/dataset?utm_source=test \
-  --title "Example Dataset" \
-  --reason "版权或许可条款不清，暂不收录。"
-```
+- 在 git 提交前做最终守门
+- 检查正式仓库
+- 检查 `imports/` 是否还有待处理内容或问题
 
 最小示例输出：
 
 ```text
-Would add rejected entry to rejected/rejected.csv
+Submit check passed
 ```
 
-### 规范化 URL
+### 提交并可选推送
 
 ```bash
-youpu normalize-url <url>
+youpu submit --message "your commit message"
+youpu submit --message "your commit message" --push
 ```
 
-示例：
+用途：
 
-```bash
-youpu normalize-url 'https://example.com/path?utm_source=x#intro'
-```
+- 先做守门检查
+- 通过后执行 `git add -A`
+- 然后执行 `git commit`
+- `--push` 时继续执行 `git push`
 
-输出：
+最小示例输出：
 
 ```text
-https://example.com/path
+Submit completed
 ```
 
 ### 查看仓库摘要
@@ -169,15 +156,6 @@ https://example.com/path
 ```bash
 youpu report
 ```
-
-输出内容：
-
-- `accepted` 文件数
-- `rejected` 行数
-- 最新 accepted 编号
-- 校验状态
-- 重复状态
-- 交叉冲突数量
 
 最小示例输出：
 
@@ -189,11 +167,38 @@ latest accepted id: SRC-0095
 validation: passed
 duplicates: none
 cross-conflicts: 0
+imports pending accepted: 0
+imports pending rejected: 0
+imports issues: 0
 ```
+
+### 诊断 URL
+
+```bash
+youpu inspect-url 'https://example.com/path?utm_source=x#intro'
+```
+
+最小示例输出：
+
+```text
+https://example.com/path
+```
+
+## `imports/reports/` 会生成什么
+
+每次运行 `youpu ingest` 或 `youpu ingest --dry-run`，都会刷新：
+
+- `imports/reports/issues.md`
+- `imports/reports/summary.json`
+
+其中：
+
+- `issues.md` 适合人阅读
+- `summary.json` 适合 agent 或脚本读取
 
 ## JSON 输出
 
-如果命令结果需要给 agent、脚本或自动化逻辑消费，使用：
+如果命令结果需要给 agent 或自动化消费，使用：
 
 ```bash
 youpu --format json <command>
@@ -202,8 +207,8 @@ youpu --format json <command>
 例如：
 
 ```bash
+youpu --format json ingest --dry-run
 youpu --format json validate
-youpu --format json duplicates --scope cross
 youpu --format json report
 ```
 
@@ -213,7 +218,7 @@ youpu --format json report
 {
   "ok": true,
   "command": "report",
-  "summary": "Repository summary\naccepted files: 93\nrejected rows: 82\nlatest accepted id: SRC-0095\nvalidation: passed\nduplicates: none\ncross-conflicts: 0",
+  "summary": "Repository summary\naccepted files: 93\nrejected rows: 82\nlatest accepted id: SRC-0095\nvalidation: passed\nduplicates: none\ncross-conflicts: 0\nimports pending accepted: 0\nimports pending rejected: 0\nimports issues: 0",
   "diagnostics": [],
   "data": {
     "accepted_files": 93,
@@ -221,41 +226,38 @@ youpu --format json report
     "latest_accepted_id": "SRC-0095",
     "validation_ok": true,
     "duplicates_ok": true,
-    "cross_conflicts": 0
+    "cross_conflicts": 0,
+    "imports_pending_accepted": 0,
+    "imports_pending_rejected": 0,
+    "imports_issues": 0
   }
 }
 ```
-
-适用场景：
-
-- 让大模型读取结构化结果
-- 在脚本中判断 `ok`、`diagnostics`、`data`
-- 将 CLI 作为 skill 或 agent 的底层执行接口
 
 ## 返回码
 
 ```text
 0  成功，无问题
-1  校验失败或发现重复
+1  校验失败或守门检查失败
 2  参数错误
 3  运行时异常
-4  拒绝执行
+4  保留
 ```
-
-`4` 常见于：
-
-- 新增 rejected 时 URL 已存在
-- 新增 rejected 时与 accepted 冲突
-- 新增 accepted 时目标文件已存在
 
 ## 建议用法
 
-- 新增或修改记录后，先跑 `youpu validate`
-- 批量迁移后，再跑 `youpu duplicates`
-- 写入前优先用 `--dry-run`
-- 如果是自动化调用，优先使用 `--format json`
+推荐流程：
+
+1. 把候选内容放进 `imports/accepted/` 和 `imports/rejected/`
+2. 运行 `youpu ingest --dry-run`
+3. 查看 `imports/reports/`
+4. 修正无法处理的项
+5. 运行 `youpu ingest`
+6. 运行 `youpu validate` 或 `youpu submit --check-only`
+7. 没问题后再执行 `youpu submit --message "..."`
 
 ## 相关文档
 
 - 开发接口文档：[spec.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/spec.md)
+- CLI 边界：[scope.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/scope.md)
 - URL 规范化规则：[url-normalization.md](/Users/xianqiu/Projects/youpu-sources/docs/url-normalization.md)

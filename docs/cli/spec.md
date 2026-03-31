@@ -1,67 +1,43 @@
 # youpu CLI 开发接口文档
 
-这份文档面向 CLI 开发者，定义 `youpu` 的命令接口、参数、返回码、数据模型和行为边界。
+这份文档面向 CLI 开发者，定义 `youpu` 当前阶段的命令接口、返回码和行为边界。
 
 如果你要看面向技术用户或大模型调用方的用法说明，请看 [user-guide.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/user-guide.md)。
 
 ## 目标
 
-`youpu` 是本仓库的统一命令行入口，用于：
+`youpu` 是本仓库的守门 CLI，用于：
 
-- 校验 `accepted/` 与 `rejected/rejected.csv` 是否符合项目规范
-- 检查并阻止重复记录
-- 安全地新增 `accepted` / `rejected` 记录
-- 规范化 URL
-- 输出适合非技术用户阅读的结果
-- 输出适合 skill 或自动化消费的结构化结果
+- 校验正式 `accepted/` 与 `rejected/rejected.csv`
+- 从默认 `imports/` 目录安全合并候选内容
+- 在提交前做最终检查
+- 输出仓库摘要
+- 对单个 URL 做轻量诊断
 
-设计原则：
+当前设计原则：
 
 - 单入口
-- 子命令明确
+- 只保留少量主命令
 - 默认输出可读
-- 支持机器可读输出
-- 校验与修复分离
-- 不做隐式破坏性修改
-
-第一版边界：
-
-- 第一版只做检查、规范化和安全新增
-- 第一版不做自动修复
-- 第一版不批量改写现有 accepted/rejected 内容，除非用户显式执行对应写命令
+- 支持机器可读 JSON
+- 只做守门，不做发现
+- 不做隐式高风险修复
 
 ## 命令入口
 
 统一入口：
 
 ```bash
-youpu <command> [subcommand] [options]
+youpu <command> [options]
 ```
 
-示例：
+当前对外命令只保留：
 
-```bash
-youpu validate
-youpu duplicates
-youpu new accepted muraldh
-youpu new rejected --url https://example.com --title "Example" --reason "不是具体数据集来源"
-youpu normalize-url https://example.com?a=1&utm_source=x
-youpu report
-```
-
-## 终端体验
-
-终端输出使用 `rich`。
-
-要求：
-
-- 成功：绿色状态
-- 警告：黄色状态
-- 错误：红色状态
-- 表格型结果：使用 `rich.table`
-- 多项问题：按条列出
-- 默认输出适合非技术用户直接阅读
-- 支持 `--format json` 输出结构化结果，供 skill 或脚本消费
+- `youpu validate`
+- `youpu ingest`
+- `youpu submit`
+- `youpu report`
+- `youpu inspect-url`
 
 ## 全局参数
 
@@ -79,26 +55,45 @@ youpu report
 
 - `--format text`：默认，终端友好输出
 - `--format json`：结构化输出
-- `--quiet`：只输出结论，不输出过程信息
+- `--quiet`：只输出结论
 - `--verbose`：输出更多细节
 - `--no-color`：关闭颜色
-- `--root <path>`：指定仓库根目录，默认当前目录或自动探测
+- `--root <path>`：指定仓库根目录，默认自动探测
 
-## 退出码规范
+## 退出码
 
 ```text
 0  成功，无问题
-1  校验失败或发现重复
+1  校验失败或守门检查失败
 2  参数错误
 3  运行时异常
-4  拒绝执行（例如将产生重复记录）
+4  保留
 ```
 
-## 数据模型要求
+## 默认导入目录
 
-### accepted schema
+`youpu ingest` 固定使用默认导入目录：
 
-建议将 `accepted` YAML 扩展为：
+```text
+imports/
+  accepted/
+  rejected/
+  reports/
+```
+
+其中：
+
+- `imports/accepted/`：候选 accepted Markdown
+- `imports/rejected/`：候选 rejected CSV
+- `imports/reports/`：由 `ingest` 生成的问题清单和摘要
+
+CLI 不支持切换导入目录路径。
+
+## 数据模型
+
+### accepted
+
+accepted 文档字段保持为：
 
 ```yaml
 title:
@@ -115,25 +110,17 @@ tags:
 use_cases:
 ```
 
-新增字段：
+`canonical_url` 必填，用于重复检查和 accepted/rejected 交叉冲突检查。
 
-- `canonical_url`
-  - 必填
-  - 表示该来源的稳定主链接
-  - 用于 accepted 内部去重
-  - 用于 accepted/rejected 交叉冲突检查
+### rejected
 
-### rejected schema
-
-保持：
+rejected CSV 保持为：
 
 ```csv
 url,title,reason
 ```
 
-其中：
-
-- `url` 为规范化后的 canonical URL
+其中 `url` 应为规范化后的 canonical URL。
 
 ## 命令规格
 
@@ -141,237 +128,94 @@ url,title,reason
 
 用途：
 
-- 校验仓库整体规范
+- 校验正式仓库是否处于合法状态
 
 接口：
 
 ```bash
 youpu validate
-youpu validate --scope accepted
-youpu validate --scope rejected
-youpu validate --scope all
 youpu validate --format json
 ```
 
-参数：
-
-- `--scope accepted|rejected|all`
-  - 默认 `all`
-
-检查项：
-
-`accepted`
-
-- 文件名符合 `SRC-####-slug.md`
-- 存在 H1
-- 存在 fenced YAML block
-- H1 与 YAML `title` 一致
-- 必填字段齐全
-- 不包含废弃字段
-- `tags` / `use_cases` 为 inline array
-- `canonical_url` 非空
-- `canonical_url` 为合法 URL
-
-`rejected`
-
-- CSV 表头为 `url,title,reason`
-- 每行 `url/title/reason` 非空
-- `url` 为合法 URL
-- `url` 不重复
-
-`cross-check`
-
-- `accepted.canonical_url` 不得出现在 `rejected.url`
-- 若冲突，视为校验失败
-
-输出：
-
-- 文本模式：摘要 + 问题列表
-- JSON 模式：返回每类问题及文件位置
-
-文本输出示例：
-
-```text
-Validation failed
-
-accepted:
-- accepted/SRC-0098-example.md: missing required field `canonical_url`
-- accepted/SRC-0099-demo.md: H1 title does not match YAML `title`
-
-rejected:
-- rejected/rejected.csv:45: duplicate url
-
-cross:
-- canonical_url exists in both accepted and rejected: https://example.com/data
-```
-
-### `duplicates`
-
-用途：
-
-- 专门检查重复，不做其他结构校验
-
-接口：
-
-```bash
-youpu duplicates
-youpu duplicates --scope accepted
-youpu duplicates --scope rejected
-youpu duplicates --scope cross
-youpu duplicates --scope all
-```
-
-参数：
-
-- `--scope accepted|rejected|cross|all`
-  - 默认 `all`
-
-检查规则：
-
-`accepted`
-
-- `canonical_url` 重复
-- `title` 完全重复
-- 可选后续扩展：归一化标题近似重复
-
-`rejected`
-
-- `url` 重复
-
-`cross`
-
-- `accepted.canonical_url` 与 `rejected.url` 冲突
-
-输出：
-
-- 表格列出重复项、涉及文件/行号、冲突值
-
-### `new accepted`
-
-用途：
-
-- 新建一个 accepted 模板文件
-
-接口：
-
-```bash
-youpu new accepted <slug>
-youpu new accepted <slug> --title "标题"
-youpu new accepted <slug> --title "标题" --url https://example.com
-```
-
-参数：
-
-- `<slug>` 必填
-- `--title <text>` 可选
-- `--url <canonical_url>` 可选
-- `--dry-run` 可选
-
 行为：
 
-- 扫描当前最大编号
-- 创建下一个文件，如 `SRC-0096-<slug>.md`
-- 从模板生成新文件
-- 若提供 `--title`，填入 H1 和 YAML `title`
-- 若提供 `--url`，填入 YAML `canonical_url`
-- 若目标文件已存在，报错
-- 不自动提交、不自动校验
+- 检查 `accepted/` 结构与字段
+- 检查 `rejected/rejected.csv` 结构与字段
+- 检查 accepted 内重复
+- 检查 rejected 内重复
+- 检查 accepted/rejected cross-conflict
 
-输出示例：
+约束：
 
-```text
-Created accepted/SRC-0096-muraldh.md
-```
+- 固定检查全仓
+- 不暴露 `scope`
+- 不做写操作
 
-`--dry-run` 输出示例：
-
-```text
-Would create accepted/SRC-0096-muraldh.md
-```
-
-### `new rejected`
+### `ingest`
 
 用途：
 
-- 安全地向 `rejected/rejected.csv` 追加一条记录
+- 从默认 `imports/` 目录检查并合并候选内容
 
 接口：
 
 ```bash
-youpu new rejected --url <url> --title <title> --reason <reason>
-```
-
-参数：
-
-- `--url` 必填
-- `--title` 必填
-- `--reason` 必填
-- `--dry-run` 可选
-
-行为：
-
-- 将 `--url` 规范化为 canonical URL
-- 检查该 URL 是否已存在于 `rejected`
-- 检查该 URL 是否已存在于 `accepted.canonical_url`
-- 若冲突，拒绝写入
-- 若无冲突，追加到 CSV
-
-拒绝条件：
-
-- URL 已存在于 rejected
-- URL 已存在于 accepted
-- URL 非法
-- title/reason 为空
-
-输出示例：
-
-```text
-Added rejected entry:
-- url: https://example.com/data
-- title: Example Dataset
-- reason: 不是具体数据集来源
-```
-
-### `normalize-url`
-
-用途：
-
-- 规范化 URL，供人工检查或其他命令复用
-
-接口：
-
-```bash
-youpu normalize-url <url>
+youpu ingest --dry-run
+youpu ingest
+youpu ingest --format json
 ```
 
 行为：
 
-- 去掉锚点
-- 去掉常见追踪参数，如 `utm_*`
-- 去掉无意义 query
-- 保留能唯一标识资源的关键参数
-- 输出 canonical URL
+- 读取 `imports/accepted/*.md`
+- 读取 `imports/rejected/*.csv`
+- 检查 schema、冲突和重复
+- 对合法内容做确定性修正
+  - `canonical_url` / `url` 规范化
+  - `accepted` 编号分配
+  - 文件名 slug 规范化
+- 在写模式下把合法内容合并到正式仓库
+- 成功导入的源文件从 `imports/` 中移除
+- 生成：
+  - `imports/reports/issues.md`
+  - `imports/reports/summary.json`
 
-输出示例：
+约束：
 
-```text
-https://example.com/dataset/123
+- 不自动补事实字段
+- 不自动判断 accepted/rejected
+- 不支持自定义导入目录
+
+### `submit`
+
+用途：
+
+- 在 git 提交前做最终守门
+
+接口：
+
+```bash
+youpu submit --check-only
+youpu submit --message "..."
+youpu submit --message "..." --push
 ```
 
-JSON 输出示例：
+行为：
 
-```json
-{
-  "input": "https://example.com/dataset/123?utm_source=x#intro",
-  "canonical_url": "https://example.com/dataset/123"
-}
-```
+- 先运行全仓检查
+- 检查 `imports/` 是否还有待处理内容
+- 检查 `imports/` 当前是否仍有未解决问题
+- `--check-only` 只返回检查结果
+- `--message` 模式下：
+  - 执行 `git add -A`
+  - 执行 `git commit -m "..."`
+  - 若带 `--push`，再执行 `git push`
 
 ### `report`
 
 用途：
 
-- 输出仓库当前状态摘要
+- 输出当前仓库摘要
 
 接口：
 
@@ -382,94 +226,88 @@ youpu report --format json
 
 输出内容：
 
-- accepted 文件总数
-- rejected 记录总数
-- accepted 最大编号
-- 是否存在校验错误
-- 是否存在重复
-- 是否存在 accepted/rejected 冲突
+- `accepted` 文件数
+- `rejected` 行数
+- 最新 accepted 编号
+- validation 状态
+- duplicates 状态
+- cross-conflicts 数量
+- `imports` 待处理文件数量
+- `imports` 当前问题数量
 
-文本示例：
+### `inspect-url`
 
-```text
-Repository summary
+用途：
 
-- accepted files: 95
-- rejected rows: 83
-- latest accepted id: SRC-0095
-- validation: passed
-- duplicates: none
-- cross-conflicts: none
+- 对单个 URL 做轻量诊断
+
+接口：
+
+```bash
+youpu inspect-url <url>
+youpu inspect-url <url> --format json
 ```
 
-## URL 规范化规则
+行为：
 
-`canonical_url` / `rejected.url` 的统一规则见 [`docs/url-normalization.md`](/Users/xianqiu/Projects/youpu-sources/docs/url-normalization.md)。
+- 校验 URL 是否合法
+- 输出规范化后的 canonical URL
 
-CLI 在实现上应遵循这份文档，而不是在各命令中分别定义一套规则。
+约束：
 
-## 输出格式要求
+- 不做写操作
+- 不承担来源发现
 
-### 文本模式
+## 自动处理边界
 
-适合非技术用户：
+允许自动处理：
 
-- 摘要在前
-- 问题分组
-- 文件路径和行号尽量明确
-- 给出下一步建议
+- URL 规范化
+- accepted 编号分配
+- accepted 文件名 slug 规范化
+- 导入时的重复与冲突拦截
 
-### JSON 模式
+不允许自动处理：
 
-适合 skill / 自动化：
+- 自动补事实字段
+- 自动推断来源真实性
+- 自动决定 accepted 或 rejected
+- 自动重写 rejected `reason`
+- 自动覆盖正式库已有记录
 
-建议结构：
+## JSON 输出
+
+所有命令都支持：
+
+```bash
+youpu --format json <command>
+```
+
+返回统一结构：
 
 ```json
 {
-  "ok": false,
-  "command": "validate",
-  "scope": "all",
-  "summary": {
-    "accepted_files": 95,
-    "rejected_rows": 83,
-    "errors": 3
-  },
-  "errors": [
-    {
-      "type": "accepted_missing_field",
-      "path": "accepted/SRC-0098-example.md",
-      "field": "canonical_url",
-      "message": "missing required field `canonical_url`"
-    }
-  ]
+  "ok": true,
+  "command": "report",
+  "summary": "Repository summary\n...",
+  "diagnostics": [],
+  "data": {}
 }
 ```
 
+其中：
+
+- `ok`：命令是否通过
+- `summary`：面向人类的摘要
+- `diagnostics`：结构化问题列表
+- `data`：补充字段
+
 ## 非目标
 
-第一版 CLI 不做这些事：
+当前 CLI 不负责：
 
-- 不自动修复 accepted 文件内容
-- 不自动修复 rejected.csv 中的业务结论
-- 不自动批量迁移历史目录
-- 不自动根据正文猜测 canonical URL
-- 不自动重写 rejected 理由
-- 不做模糊 dedupe 合并
-
-这些以后可以单独设计 `fix` 或 `import` 命令。
-
-## 第一版推荐范围
-
-建议 MVP 只做这 6 个命令：
-
-- `youpu validate`
-- `youpu duplicates`
-- `youpu new accepted`
-- `youpu new rejected`
-- `youpu normalize-url`
-- `youpu report`
-
-## 相关文档
-
-- 用户文档：[user-guide.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/user-guide.md)
+- 外部来源发现
+- 网页抓取和页面理解
+- 自动从原始网页推断数据源
+- 通用工作流管理
+- 对正式库做高风险自动修复

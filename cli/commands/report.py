@@ -4,12 +4,13 @@ import argparse
 import re
 from pathlib import Path
 
-from cli.commands import duplicates as duplicates_command
+from cli.commands import ingest as ingest_command
 from cli.commands import validate as validate_command
 from cli.errors import EXIT_OK
 from cli.errors import EXIT_USAGE_ERROR
 from cli.output import CommandResult
 from cli.output import Diagnostic
+from cli.repo import ensure_imports_layout
 from cli.repo import parse_rejected_csv
 
 ACCEPTED_FILENAME_RE = re.compile(r"^SRC-(\d{4})-[a-z0-9-]+\.md$")
@@ -56,10 +57,20 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
     rejected = parse_rejected_csv(repo_root / "rejected" / "rejected.csv")
     rejected_count = len(rejected.rows)
     latest_id = latest_accepted_id(repo_root)
+    layout = ensure_imports_layout(repo_root)
+    pending_accepted = len(list(layout.accepted.glob("*.md")))
+    pending_rejected = len(list(layout.rejected.glob("*.csv")))
 
     validate_result, _ = validate_command.run([], repo_root)
-    duplicates_result, _ = duplicates_command.run([], repo_root)
-    cross_conflicts = sum(1 for item in duplicates_result.diagnostics if item.code == "cross_duplicate_url")
+    validation_diagnostics = validate_result.diagnostics
+    duplicate_errors = [
+        item
+        for item in validation_diagnostics
+        if item.code in {"accepted_duplicate_canonical_url", "accepted_duplicate_title", "rejected_duplicate_url"}
+    ]
+    cross_conflicts = sum(1 for item in validation_diagnostics if item.code == "cross_url_conflict")
+    import_analysis = ingest_command.build_analysis(repo_root)
+    import_issues = len(import_analysis.diagnostics)
 
     summary = "\n".join(
         [
@@ -68,8 +79,11 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             f"rejected rows: {rejected_count}",
             f"latest accepted id: {latest_id or 'none'}",
             f"validation: {'passed' if validate_result.ok else 'failed'}",
-            f"duplicates: {'none' if duplicates_result.ok else 'found'}",
+            f"duplicates: {'none' if not duplicate_errors else 'found'}",
             f"cross-conflicts: {cross_conflicts}",
+            f"imports pending accepted: {pending_accepted}",
+            f"imports pending rejected: {pending_rejected}",
+            f"imports issues: {import_issues}",
         ]
     )
 
@@ -84,8 +98,11 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
                 "rejected_rows": rejected_count,
                 "latest_accepted_id": latest_id,
                 "validation_ok": validate_result.ok,
-                "duplicates_ok": duplicates_result.ok,
+                "duplicates_ok": not duplicate_errors,
                 "cross_conflicts": cross_conflicts,
+                "imports_pending_accepted": pending_accepted,
+                "imports_pending_rejected": pending_rejected,
+                "imports_issues": import_issues,
             },
         ),
         EXIT_OK,

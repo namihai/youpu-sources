@@ -33,24 +33,17 @@ SRC-0003-figshare-dunhuang-restoration.md
 
 ## 推荐做法
 
-人工新增 accepted 记录时：
+当前推荐通过导入流程生成正式 accepted 文件：
 
-1. 找到当前最大编号
-2. 顺序加一
-3. 取一个短 slug
-4. 从 [`templates/accepted.md`](/Users/xianqiu/Projects/youpu-sources/templates/accepted.md) 复制新文件
+1. 用户先把候选 Markdown 放进 `imports/accepted/`
+2. 运行 `./youpu ingest --dry-run`
+3. 修正问题后运行 `./youpu ingest`
 
-也可以直接使用 CLI 生成新文件：
-
-```bash
-./youpu new accepted muraldh --dry-run
-```
-
-CLI 会：
+`ingest` 会在正式合并时：
 
 - 自动计算下一个编号
 - 生成 `SRC-####-slug.md`
-- 从模板复制初始内容
+- 对文件名做规范化处理
 
 ## 不推荐做法
 

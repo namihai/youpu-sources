@@ -59,6 +59,14 @@ class RejectedCsv:
     rows: list[RejectedRow]
 
 
+@dataclass(frozen=True)
+class ImportsLayout:
+    root: Path
+    accepted: Path
+    rejected: Path
+    reports: Path
+
+
 def parse_simple_yaml_block(text: str) -> dict[str, str]:
     match = YAML_BLOCK_RE.search(text)
     if not match:
@@ -190,3 +198,20 @@ def resolve_repo_root(root: str | None) -> Path:
         return candidate
 
     return find_repo_root()
+
+
+def get_imports_layout(repo_root: Path) -> ImportsLayout:
+    imports_root = repo_root / "imports"
+    return ImportsLayout(
+        root=imports_root,
+        accepted=imports_root / "accepted",
+        rejected=imports_root / "rejected",
+        reports=imports_root / "reports",
+    )
+
+
+def ensure_imports_layout(repo_root: Path) -> ImportsLayout:
+    layout = get_imports_layout(repo_root)
+    for path in (layout.root, layout.accepted, layout.rejected, layout.reports):
+        path.mkdir(parents=True, exist_ok=True)
+    return layout

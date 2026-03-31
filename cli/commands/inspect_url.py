@@ -11,7 +11,7 @@ from cli.repo import normalize_url
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="youpu normalize-url", add_help=False)
+    parser = argparse.ArgumentParser(prog="youpu inspect-url", add_help=False)
     parser.add_argument("url")
     return parser
 
@@ -25,8 +25,8 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
         return (
             CommandResult(
                 ok=False,
-                command="normalize-url",
-                summary="Normalize URL failed",
+                command="inspect-url",
+                summary="Inspect URL failed",
                 diagnostics=[
                     Diagnostic(
                         level="error",
@@ -44,8 +44,8 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
         return (
             CommandResult(
                 ok=False,
-                command="normalize-url",
-                summary="Normalize URL failed",
+                command="inspect-url",
+                summary="Inspect URL failed",
                 diagnostics=[
                     Diagnostic(
                         level="error",
@@ -60,7 +60,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
     return (
         CommandResult(
             ok=True,
-            command="normalize-url",
+            command="inspect-url",
             summary=canonical_url,
             diagnostics=[],
             data={

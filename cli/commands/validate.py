@@ -42,13 +42,7 @@ REJECTED_COLUMNS = ["url", "title", "reason"]
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="youpu validate", add_help=False)
-    parser.add_argument(
-        "--scope",
-        choices=("accepted", "rejected", "all"),
-        default="all",
-    )
-    return parser
+    return argparse.ArgumentParser(prog="youpu validate", add_help=False)
 
 
 def validate_accepted(repo_root: Path) -> list[Diagnostic]:
@@ -285,17 +279,104 @@ def validate_cross(repo_root: Path) -> list[Diagnostic]:
     return diagnostics
 
 
+def validate_accepted_duplicates(repo_root: Path) -> list[Diagnostic]:
+    diagnostics: list[Diagnostic] = []
+    by_canonical_url: dict[str, list[str]] = defaultdict(list)
+    by_title: dict[str, list[str]] = defaultdict(list)
+
+    for path in sorted((repo_root / "accepted").glob("*.md")):
+        try:
+            doc = parse_accepted_document(path)
+        except Exception:
+            continue
+
+        title = doc.yaml_fields.get("title", "").strip()
+        if title:
+            by_title[title].append(str(path.relative_to(repo_root)))
+
+        canonical_url = doc.yaml_fields.get("canonical_url", "").strip()
+        if not canonical_url:
+            continue
+        try:
+            normalized = normalize_url(canonical_url)
+        except ValueError:
+            continue
+        by_canonical_url[normalized].append(str(path.relative_to(repo_root)))
+
+    for canonical_url, paths in sorted(by_canonical_url.items()):
+        if len(paths) < 2:
+            continue
+        diagnostics.append(
+            Diagnostic(
+                level="error",
+                message=f"duplicate canonical_url: {canonical_url}",
+                path=", ".join(paths),
+                code="accepted_duplicate_canonical_url",
+                details={"canonical_url": canonical_url, "paths": paths},
+            )
+        )
+
+    for title, paths in sorted(by_title.items()):
+        if len(paths) < 2:
+            continue
+        diagnostics.append(
+            Diagnostic(
+                level="warning",
+                message=f"duplicate title: {title}",
+                path=", ".join(paths),
+                code="accepted_duplicate_title",
+                details={"title": title, "paths": paths},
+            )
+        )
+
+    return diagnostics
+
+
+def validate_rejected_duplicates(repo_root: Path) -> list[Diagnostic]:
+    diagnostics: list[Diagnostic] = []
+    by_url: dict[str, list[int]] = defaultdict(list)
+    csv_path = repo_root / "rejected" / "rejected.csv"
+
+    try:
+        rejected = parse_rejected_csv(csv_path)
+    except Exception:
+        return diagnostics
+
+    for row in rejected.rows:
+        if not row.url:
+            continue
+        try:
+            normalized = normalize_url(row.url)
+        except ValueError:
+            continue
+        by_url[normalized].append(row.row_number)
+
+    for url, rows in sorted(by_url.items()):
+        if len(rows) < 2:
+            continue
+        diagnostics.append(
+            Diagnostic(
+                level="error",
+                message=f"duplicate rejected url: {url}",
+                path=", ".join(f"{csv_path.relative_to(repo_root)}:{row}" for row in rows),
+                code="rejected_duplicate_url",
+                details={"url": url, "rows": rows},
+            )
+        )
+
+    return diagnostics
+
+
 def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
     parser = build_parser()
     args = parser.parse_args(command_args)
 
     diagnostics: list[Diagnostic] = []
-    if args.scope in {"accepted", "all"}:
-        diagnostics.extend(validate_accepted(repo_root))
-    if args.scope in {"rejected", "all"}:
-        diagnostics.extend(validate_rejected(repo_root))
-    if args.scope == "all":
-        diagnostics.extend(validate_cross(repo_root))
+    diagnostics.extend(validate_accepted(repo_root))
+    diagnostics.extend(validate_accepted_duplicates(repo_root))
+    diagnostics.extend(validate_rejected(repo_root))
+    diagnostics.extend(validate_rejected_duplicates(repo_root))
+    diagnostics.extend(validate_cross(repo_root))
 
     ok = not diagnostics
     result = CommandResult(
@@ -303,6 +384,6 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
         command="validate",
         summary="Validation passed" if ok else "Validation failed",
         diagnostics=diagnostics,
-        data={"scope": args.scope},
+        data={"scope": "all"},
     )
     return result, (EXIT_OK if ok else EXIT_VALIDATION_FAILED)

@@ -26,8 +26,10 @@
 ├── docs/
 │   ├── accepted-spec.md
 │   ├── cli/
+│   │   ├── scope.md
 │   │   ├── spec.md
 │   │   └── user-guide.md
+│   ├── project-scope.md
 │   ├── rejected-spec.md
 │   ├── url-normalization.md
 │   └── naming.md
@@ -91,3 +93,7 @@ URL 规范化规则见 [`docs/url-normalization.md`](/Users/xianqiu/Projects/you
 accepted 文档中的 `canonical_url` 与 `rejected.csv` 中的 `url` 都应遵循这份文档，以便后续工具做比对和校验。
 
 当前仓库只保留规范化后的 `accepted/` 与 `rejected/` 结果，不再保留历史中间目录与过程性草稿。
+
+项目边界见 [`docs/project-scope.md`](/Users/xianqiu/Projects/youpu-sources/docs/project-scope.md)，CLI 边界见 [`docs/cli/scope.md`](/Users/xianqiu/Projects/youpu-sources/docs/cli/scope.md)，接口与用法说明分别见 [`docs/cli/spec.md`](/Users/xianqiu/Projects/youpu-sources/docs/cli/spec.md) 和 [`docs/cli/user-guide.md`](/Users/xianqiu/Projects/youpu-sources/docs/cli/user-guide.md)。
+
+当前建议对外只保留少量守门命令：`validate`、`ingest`、`submit`、`report`、`inspect-url`。

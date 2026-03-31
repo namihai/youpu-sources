@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import argparse
 
-from cli.commands import duplicates as duplicates_command
-from cli.commands import new as new_command
-from cli.commands import normalize_url as normalize_url_command
+from cli.commands import inspect_url as inspect_url_command
+from cli.commands import ingest as ingest_command
 from cli.commands import report as report_command
+from cli.commands import submit as submit_command
 from cli.commands import validate as validate_command
 from cli.errors import EXIT_OK
 from cli.errors import RuntimeCliError
@@ -17,9 +17,9 @@ from cli.repo import resolve_repo_root
 
 PLANNED_COMMANDS = [
     "validate",
-    "duplicates",
-    "new",
-    "normalize-url",
+    "ingest",
+    "submit",
+    "inspect-url",
     "report",
 ]
 
@@ -122,8 +122,8 @@ def main(argv: list[str] | None = None) -> int:
         )
         return exit_code
 
-    if args.command == "duplicates":
-        result, exit_code = duplicates_command.run(args.command_args, repo_root)
+    if args.command == "ingest":
+        result, exit_code = ingest_command.run(args.command_args, repo_root)
         emit_result(
             result,
             output_format=args.format,
@@ -132,18 +132,8 @@ def main(argv: list[str] | None = None) -> int:
         )
         return exit_code
 
-    if args.command == "new":
-        result, exit_code = new_command.run(args.command_args, repo_root)
-        emit_result(
-            result,
-            output_format=args.format,
-            no_color=args.no_color,
-            stderr=not result.ok,
-        )
-        return exit_code
-
-    if args.command == "normalize-url":
-        result, exit_code = normalize_url_command.run(args.command_args, repo_root)
+    if args.command == "inspect-url":
+        result, exit_code = inspect_url_command.run(args.command_args, repo_root)
         emit_result(
             result,
             output_format=args.format,
@@ -154,6 +144,16 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "report":
         result, exit_code = report_command.run(args.command_args, repo_root)
+        emit_result(
+            result,
+            output_format=args.format,
+            no_color=args.no_color,
+            stderr=not result.ok,
+        )
+        return exit_code
+
+    if args.command == "submit":
+        result, exit_code = submit_command.run(args.command_args, repo_root)
         emit_result(
             result,
             output_format=args.format,

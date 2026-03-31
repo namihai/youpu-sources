@@ -6,8 +6,8 @@
 
 - `accepted/*.md` 中的 `canonical_url`
 - `rejected/rejected.csv` 中的 `url`
-- `youpu normalize-url`
-- `youpu new rejected`
+- `youpu inspect-url`
+- `youpu ingest`
 - 任何做去重或交叉冲突检查的逻辑
 
 ## 目标
