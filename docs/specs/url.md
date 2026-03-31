@@ -1,4 +1,4 @@
-# URL 规范化规则
+# URL 规范
 
 这份文档定义本仓库中 `canonical_url` 与 `rejected.csv:url` 的统一规范。
 
@@ -103,7 +103,7 @@ https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi%3A10.7910%2FDVN%2F7
 
 ## 相关文档
 
-- accepted 规范：[accepted-spec.md](/Users/xianqiu/Projects/youpu-sources/docs/accepted-spec.md)
-- rejected 规范：[rejected-spec.md](/Users/xianqiu/Projects/youpu-sources/docs/rejected-spec.md)
-- CLI 开发接口文档：[docs/cli/spec.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/spec.md)
-- CLI 用户文档：[docs/cli/user-guide.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/user-guide.md)
+- accepted 规范：[accepted.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/accepted.md)
+- rejected 规范：[rejected.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/rejected.md)
+- CLI 开发接口文档：[spec.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/spec.md)
+- CLI 用户文档：[user-guide.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/user-guide.md)

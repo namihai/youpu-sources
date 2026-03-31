@@ -2,7 +2,7 @@
 
 这份文档定义 `youpu` CLI 在当前阶段负责什么、不负责什么，以及对外命令的收敛方向。
 
-相关的项目总边界见 [`../project-scope.md`](/Users/xianqiu/Projects/youpu-sources/docs/project-scope.md)。
+相关的项目总边界见 [`../overview/project-scope.md`](/Users/xianqiu/Projects/youpu-sources/docs/overview/project-scope.md)。
 
 ## CLI 的职责
 

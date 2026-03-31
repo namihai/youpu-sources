@@ -24,15 +24,19 @@
 ├── rejected/
 │   └── rejected.csv
 ├── docs/
-│   ├── accepted-spec.md
+│   ├── index.md
 │   ├── cli/
 │   │   ├── scope.md
 │   │   ├── spec.md
 │   │   └── user-guide.md
-│   ├── project-scope.md
-│   ├── rejected-spec.md
-│   ├── url-normalization.md
-│   └── naming.md
+│   ├── overview/
+│   │   └── project-scope.md
+│   ├── skills/
+│   │   └── youpu-gatekeeper.md
+│   └── specs/
+│       ├── accepted.md
+│       ├── rejected.md
+│       └── url.md
 ├── templates/
 │   └── accepted.md
 └── youpu
@@ -45,7 +49,7 @@
 约束：
 
 - 一个来源对应一个 Markdown 文件
-- 文件名遵循统一命名规则，见 [`docs/naming.md`](/Users/xianqiu/Projects/youpu-sources/docs/naming.md)
+- 文件名规则和文档结构见 [`docs/specs/accepted.md`](/Users/xianqiu/Projects/youpu-sources/docs/specs/accepted.md)
 - 文档主体采用统一模板，见 [`templates/accepted.md`](/Users/xianqiu/Projects/youpu-sources/templates/accepted.md)
 - 当前阶段以 YAML 元信息为主要规范对象
 - 标题与 YAML 之间可能存在历史遗留的 Notion 导出文字，这部分不视为标准结构
@@ -68,7 +72,7 @@ tags:
 use_cases:
 ```
 
-accepted 的详细规范见 [`docs/accepted-spec.md`](/Users/xianqiu/Projects/youpu-sources/docs/accepted-spec.md)。
+accepted 的详细规范见 [`docs/specs/accepted.md`](/Users/xianqiu/Projects/youpu-sources/docs/specs/accepted.md)。
 
 其中 `canonical_url` 表示该来源的稳定主链接，用于 accepted 内部去重和后续与 `rejected.csv` 的交叉检查。
 
@@ -84,16 +88,16 @@ accepted 的详细规范见 [`docs/accepted-spec.md`](/Users/xianqiu/Projects/yo
 
 其中 `url` 应填写规范化后的 `canonical_url`，作为 rejected 记录的唯一标识。
 
-rejected 的详细规范见 [`docs/rejected-spec.md`](/Users/xianqiu/Projects/youpu-sources/docs/rejected-spec.md)。
+rejected 的详细规范见 [`docs/specs/rejected.md`](/Users/xianqiu/Projects/youpu-sources/docs/specs/rejected.md)。
 
 ## URL 规范
 
-URL 规范化规则见 [`docs/url-normalization.md`](/Users/xianqiu/Projects/youpu-sources/docs/url-normalization.md)。
+URL 规范见 [`docs/specs/url.md`](/Users/xianqiu/Projects/youpu-sources/docs/specs/url.md)。
 
 accepted 文档中的 `canonical_url` 与 `rejected.csv` 中的 `url` 都应遵循这份文档，以便后续工具做比对和校验。
 
 当前仓库只保留规范化后的 `accepted/` 与 `rejected/` 结果，不再保留历史中间目录与过程性草稿。
 
-项目边界见 [`docs/project-scope.md`](/Users/xianqiu/Projects/youpu-sources/docs/project-scope.md)，CLI 边界见 [`docs/cli/scope.md`](/Users/xianqiu/Projects/youpu-sources/docs/cli/scope.md)，接口与用法说明分别见 [`docs/cli/spec.md`](/Users/xianqiu/Projects/youpu-sources/docs/cli/spec.md) 和 [`docs/cli/user-guide.md`](/Users/xianqiu/Projects/youpu-sources/docs/cli/user-guide.md)。
+项目边界见 [`docs/overview/project-scope.md`](/Users/xianqiu/Projects/youpu-sources/docs/overview/project-scope.md)，CLI 边界见 [`docs/cli/scope.md`](/Users/xianqiu/Projects/youpu-sources/docs/cli/scope.md)，接口与用法说明分别见 [`docs/cli/spec.md`](/Users/xianqiu/Projects/youpu-sources/docs/cli/spec.md) 和 [`docs/cli/user-guide.md`](/Users/xianqiu/Projects/youpu-sources/docs/cli/user-guide.md)。更完整的文档导航见 [`docs/index.md`](/Users/xianqiu/Projects/youpu-sources/docs/index.md)。
 
 当前建议对外只保留少量守门命令：`validate`、`ingest`、`submit`、`report`、`inspect-url`。

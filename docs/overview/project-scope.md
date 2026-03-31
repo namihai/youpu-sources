@@ -82,4 +82,4 @@ skill 不应取代仓库规范，也不应绕过 CLI 直接修改正式结果。
 
 如果后续业务流程稳定，再考虑是否把外围工作流单独扩展为独立工具。
 
-CLI 的具体边界和命令收敛方向见 [`cli/scope.md`](/Users/xianqiu/Projects/youpu-sources/docs/cli/scope.md)。
+CLI 的具体边界和命令收敛方向见 [`../cli/scope.md`](/Users/xianqiu/Projects/youpu-sources/docs/cli/scope.md)。

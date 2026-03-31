@@ -259,4 +259,4 @@ youpu --format json report
 
 - 开发接口文档：[spec.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/spec.md)
 - CLI 边界：[scope.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/scope.md)
-- URL 规范化规则：[url-normalization.md](/Users/xianqiu/Projects/youpu-sources/docs/url-normalization.md)
+- URL 规范：[url.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/url.md)
