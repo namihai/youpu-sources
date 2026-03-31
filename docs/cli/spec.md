@@ -1,6 +1,6 @@
 # youpu CLI 开发接口文档
 
-这份文档面向 CLI 开发者，定义 `youpu` 当前阶段的命令接口、返回码和行为边界。
+这份文档面向 CLI 开发者，定义 `youpu` 的命令接口、返回码和行为边界。
 
 如果你要看面向技术用户或大模型调用方的用法说明，请看 [user-guide.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/user-guide.md)。
 
@@ -14,7 +14,7 @@
 - 输出仓库摘要
 - 对单个 URL 做轻量诊断
 
-当前设计原则：
+设计原则：
 
 - 单入口
 - 只保留少量主命令
@@ -31,7 +31,7 @@
 youpu <command> [options]
 ```
 
-当前对外命令只保留：
+对外命令只保留：
 
 - `youpu validate`
 - `youpu ingest`
@@ -170,7 +170,7 @@ youpu ingest --format json
   - `accepted` 编号分配
   - 文件名 slug 规范化
 - 在写模式下把合法内容合并到正式仓库
-- 成功导入的源文件从 `imports/` 中移除
+- 成功导入的源文件会从 `imports/` 中清理
 - 生成：
   - `imports/reports/issues.md`
   - `imports/reports/summary.json`
@@ -199,7 +199,7 @@ youpu submit --message "..." --push
 
 - 先运行全仓检查
 - 检查 `imports/` 是否还有待处理内容
-- 检查 `imports/` 当前是否仍有未解决问题
+- 检查 `imports/` 是否仍有未解决问题
 - `--check-only` 只返回检查结果
 - `--message` 模式下：
   - 执行 `git add -A`
@@ -210,7 +210,7 @@ youpu submit --message "..." --push
 
 用途：
 
-- 输出当前仓库摘要
+- 输出仓库摘要
 
 接口：
 
@@ -299,7 +299,7 @@ youpu --format json <command>
 
 ## 非目标
 
-当前 CLI 不负责：
+CLI 不负责：
 
 - 外部来源发现
 - 网页抓取和页面理解
