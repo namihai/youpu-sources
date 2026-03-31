@@ -103,7 +103,7 @@ https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi%3A10.7910%2FDVN%2F7
 
 ## 相关文档
 
-- accepted 规范：[accepted.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/accepted.md)
-- rejected 规范：[rejected.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/rejected.md)
-- CLI 开发接口文档：[spec.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/spec.md)
-- CLI 用户文档：[user-guide.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/user-guide.md)
+- accepted 规范：[accepted.md](accepted.md)
+- rejected 规范：[rejected.md](rejected.md)
+- CLI 开发接口文档：[spec.md](../cli/spec.md)
+- CLI 用户文档：[user-guide.md](../cli/user-guide.md)

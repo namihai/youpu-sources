@@ -2,7 +2,7 @@
 
 这份文档面向 CLI 开发者，定义 `youpu` 的命令接口、返回码和行为边界。
 
-如果你要看面向技术用户或大模型调用方的用法说明，请看 [user-guide.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/user-guide.md)。
+如果你要看面向技术用户或大模型调用方的用法说明，请看 [user-guide.md](user-guide.md)。
 
 ## 目标
 

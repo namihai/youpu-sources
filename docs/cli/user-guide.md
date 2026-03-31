@@ -2,7 +2,7 @@
 
 这份文档面向仓库使用者，说明 `youpu` 应该怎么用。
 
-如果你只想快速开始，先看 [README.md](/Users/xianqiu/Projects/youpu-sources/README.md)。如果你要看开发接口和返回码，再看 [spec.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/spec.md)。
+如果你只想快速开始，先看 [README.md](../../README.md)。如果你要看开发接口和返回码，再看 [spec.md](spec.md)。
 
 ## `youpu` 是做什么的
 
@@ -183,7 +183,7 @@ https://example.com/path
 
 运行 `youpu ingest` 或 `youpu ingest --dry-run` 后，优先查看：
 
-- [`imports/reports/issues.md`](/Users/xianqiu/Projects/youpu-sources/imports/reports/issues.md)
+- [`imports/reports/issues.md`](../../imports/reports/issues.md)
 
 这里会列出：
 
@@ -193,7 +193,7 @@ https://example.com/path
 
 系统还会生成：
 
-- [`imports/reports/summary.json`](/Users/xianqiu/Projects/youpu-sources/imports/reports/summary.json)
+- [`imports/reports/summary.json`](../../imports/reports/summary.json)
 
 这个文件更适合脚本或 agent 使用。
 
@@ -213,8 +213,8 @@ youpu --format json report
 
 ## 相关文档
 
-- 文档总入口：[../index.md](/Users/xianqiu/Projects/youpu-sources/docs/index.md)
-- accepted 规范：[../specs/accepted.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/accepted.md)
-- rejected 规范：[../specs/rejected.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/rejected.md)
-- URL 规范：[../specs/url.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/url.md)
-- CLI 开发接口：[spec.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/spec.md)
+- 文档总入口：[../index.md](../index.md)
+- accepted 规范：[../specs/accepted.md](../specs/accepted.md)
+- rejected 规范：[../specs/rejected.md](../specs/rejected.md)
+- URL 规范：[../specs/url.md](../specs/url.md)
+- CLI 开发接口：[spec.md](spec.md)

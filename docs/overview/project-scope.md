@@ -80,4 +80,4 @@ skill 不应取代仓库规范，也不应绕过 CLI 直接修改正式结果。
 - 让 CLI 通过少量主命令负责检查、清单和安全合并
 - 让 skill 只做编排和解释
 
-CLI 的具体边界和命令收敛方向见 [`../cli/scope.md`](/Users/xianqiu/Projects/youpu-sources/docs/cli/scope.md)。
+CLI 的具体边界和命令收敛方向见 [`../cli/scope.md`](../cli/scope.md)。

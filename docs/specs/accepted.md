@@ -155,7 +155,7 @@ use_cases: [研究分析, AI训练]
 - YAML 中必须包含 `canonical_url`
 - `canonical_url` 应填写该来源的稳定主链接
 - 应尽量使用规范化后的主链接，避免追踪参数与无意义锚点
-- 具体规则见 [`url.md`](/Users/xianqiu/Projects/youpu-sources/docs/specs/url.md)
+- 具体规则见 [`url.md`](url.md)
 
 ## 正文建议结构
 

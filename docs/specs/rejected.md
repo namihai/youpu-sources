@@ -37,7 +37,7 @@ url,title,reason
 
 `url` 应填写规范化后的 `canonical_url`。
 
-具体规则见 [`url.md`](/Users/xianqiu/Projects/youpu-sources/docs/specs/url.md)。
+具体规则见 [`url.md`](url.md)。
 
 同一个 `canonical_url` 在 `rejected.csv` 中不应重复出现。
 

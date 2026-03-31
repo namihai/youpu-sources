@@ -68,7 +68,7 @@ imports/
 
 如果有问题，优先查看：
 
-- [`imports/reports/issues.md`](/Users/xianqiu/Projects/youpu-sources/imports/reports/issues.md)
+- [`imports/reports/issues.md`](../../imports/reports/issues.md)
 
 这份清单会告诉你：
 
@@ -132,13 +132,13 @@ imports/
 这项 skill 的底层其实还是在调用 `youpu`。  
 如果你更喜欢直接用命令行，可以看：
 
-- [CLI 用户文档](/Users/xianqiu/Projects/youpu-sources/docs/cli/user-guide.md)
+- [CLI 用户文档](../cli/user-guide.md)
 
 如果你只是正常使用仓库，优先用 skill 就可以。
 
 ## 相关文档
 
-- 文档总入口：[../index.md](/Users/xianqiu/Projects/youpu-sources/docs/index.md)
-- CLI 用户文档：[../cli/user-guide.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/user-guide.md)
-- accepted 规范：[../specs/accepted.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/accepted.md)
-- rejected 规范：[../specs/rejected.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/rejected.md)
+- 文档总入口：[../index.md](../index.md)
+- CLI 用户文档：[../cli/user-guide.md](../cli/user-guide.md)
+- accepted 规范：[../specs/accepted.md](../specs/accepted.md)
+- rejected 规范：[../specs/rejected.md](../specs/rejected.md)

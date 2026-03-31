@@ -7,7 +7,7 @@
 - `accepted/`：确认保留的数据集来源
 - `rejected/rejected.csv`：确认不保留的数据集来源
 
-如果你只是想开始使用，这个页面就够了；更详细的说明都放在 [`docs/index.md`](/Users/xianqiu/Projects/youpu-sources/docs/index.md)。
+如果你只是想开始使用，这个页面就够了；更详细的说明都放在 [`docs/index.md`](docs/index.md)。
 
 ## 你可以用它做什么
 
@@ -35,8 +35,8 @@ imports/
 
 如果你不确定文件格式是否正确，先看详细规范：
 
-- [`docs/specs/accepted.md`](/Users/xianqiu/Projects/youpu-sources/docs/specs/accepted.md)
-- [`docs/specs/rejected.md`](/Users/xianqiu/Projects/youpu-sources/docs/specs/rejected.md)
+- [`docs/specs/accepted.md`](docs/specs/accepted.md)
+- [`docs/specs/rejected.md`](docs/specs/rejected.md)
 
 ### 2. 使用 skill 检查导入内容
 
@@ -52,13 +52,13 @@ skill 会先做导入前检查，并告诉你：
 - 哪些内容有格式问题
 - 哪些内容与现有记录冲突
 
-如果你需要了解这项 skill 的边界和行为，见 [`docs/skills/youpu-gatekeeper.md`](/Users/xianqiu/Projects/youpu-sources/docs/skills/youpu-gatekeeper.md)。
+如果你需要了解这项 skill 的边界和行为，见 [`docs/skills/youpu-gatekeeper.md`](docs/skills/youpu-gatekeeper.md)。
 
 ### 3. 处理问题清单
 
 如果有不能导入的内容，可以查看：
 
-- [`imports/reports/issues.md`](/Users/xianqiu/Projects/youpu-sources/imports/reports/issues.md)
+- [`imports/reports/issues.md`](imports/reports/issues.md)
 
 这个文件会告诉你：
 
@@ -106,7 +106,7 @@ skill 会先检查，再执行导入。只有符合规范的内容才会被合�
 
 默认情况下，AI 会根据当前改动自动生成合适的 commit message。
 
-命令行的具体用法放在 [`docs/cli/user-guide.md`](/Users/xianqiu/Projects/youpu-sources/docs/cli/user-guide.md)。
+命令行的具体用法放在 [`docs/cli/user-guide.md`](docs/cli/user-guide.md)。
 
 ## 仓库结构
 
@@ -137,11 +137,11 @@ skill 会先检查，再执行导入。只有符合规范的内容才会被合�
 
 ## 去哪里看详细说明
 
-- 文档总入口：[docs/index.md](/Users/xianqiu/Projects/youpu-sources/docs/index.md)
-- Skill 文档：[docs/skills/youpu-gatekeeper.md](/Users/xianqiu/Projects/youpu-sources/docs/skills/youpu-gatekeeper.md)
-- CLI 用户文档：[docs/cli/user-guide.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/user-guide.md)
-- accepted 规范：[docs/specs/accepted.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/accepted.md)
-- rejected 规范：[docs/specs/rejected.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/rejected.md)
-- URL 规范：[docs/specs/url.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/url.md)
+- 文档总入口：[docs/index.md](docs/index.md)
+- Skill 文档：[docs/skills/youpu-gatekeeper.md](docs/skills/youpu-gatekeeper.md)
+- CLI 用户文档：[docs/cli/user-guide.md](docs/cli/user-guide.md)
+- accepted 规范：[docs/specs/accepted.md](docs/specs/accepted.md)
+- rejected 规范：[docs/specs/rejected.md](docs/specs/rejected.md)
+- URL 规范：[docs/specs/url.md](docs/specs/url.md)
 
-如果你是第一次使用，建议从 [`docs/index.md`](/Users/xianqiu/Projects/youpu-sources/docs/index.md) 开始。
+如果你是第一次使用，建议从 [`docs/index.md`](docs/index.md) 开始。
