@@ -1,0 +1,83 @@
+url,title,reason
+https://huggingface.co/datasets/PeacefulData/2025_DCASE_AudioQA_Official,2025_DCASE_AudioQA_Official,建议不可用（非中国文化领域）。
+https://zenodo.org/records/11256533,AADA photographs (Finland),建议不可用（芬兰）。
+https://www.kaggle.com/datasets/bapuchendage/ancient-inscription-database-bdc-db,Ancient inscription database (bdc_db),待人工确认（中国关联不清晰）。当前按不可用处理以避免误入库；如确认是中国碑刻/铭文库可转入可用库。
+https://zenodo.org/records/18095892,Archaeological site dataset (Poland),建议不可用（非中国特定）。
+https://zenodo.org/records/14409524,Archaeoscape LiDAR archaeology dataset (Cambodia),建议不可用（柬埔寨考古）。
+https://zenodo.org/records/18724632,Art-historical metadata NER dataset,建议不可用（非中国特定）。
+https://www.scidb.cn/en/detail?dataSetId=DS_8e0634a0335d4ba28a0a6b74ceea55ad,Catalogue of Life China 2024 annual checklist,建议不可用（生物多样性/自然科学，不属于中国文化领域）。
+https://www.scidb.cn/en/detail?dataSetId=9507ba16714f4872b1468eacfcdcb33d,Chinese A-share companies + world heritage misconduct study,建议不可用（偏金融/公司治理研究数据，与文化领域关联弱）。
+https://zenodo.org/records/10954078,Cultural significance assessment sample records,建议不可用（非中国特定）。
+https://zenodo.org/records/15462807,Data-envelopes for digital cultural heritage,建议不可用（方法/框架类，不是中国文化数据集）。
+https://zenodo.org/records/15828222,Datasheets for Digital Cultural Heritage Datasets v2,建议不可用（方法/文档类，不是中国文化数据集）。
+https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi%3A10.7910%2FDVN%2F70A2QQ,Deaf GLAM dataset (Harvard Dataverse),建议不可用（非中国特定）。
+https://zenodo.org/records/14950565,Enki AI for archaeology datasets,建议不可用（非中国特定）。
+https://zenodo.org/records/14778193,Findability of cultural heritage datasets report summary,建议不可用（报告类）。
+https://zenodo.org/records/15302409,Global museum visitor reviews (Zenodo),建议不可用（非中国特定）。
+https://toolbox.google.com/datasetsearch/search?query=museum,Google Dataset Search query page: museum,建议不可用（这是检索结果页，不是具体数据集落地点）。
+https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi%3A10.7910%2FDVN%2FVESLGI,Harvard Dataverse museum exhibit impact replication data,建议不可用（非中国特定）。
+https://ieee-dataport.org/documents/model-inversion-hyperspectral-characteristics-phosphate-content-mural-plaster-based,Hyperspectral mural plaster dataset (IEEE DataPort),建议不可用（与中国文化关联不清晰，且更偏材料/理化数据；若后续定义“文物材料科学”纳入范围可再评估）。
+https://zenodo.org/records/14626611,Images & point clouds cultural heritage dataset (non-China),建议不可用（非中国特定）。
+https://zenodo.org/records/12611240,Museum collection digitized storage unit level,建议不可用（非中国特定）。
+https://zenodo.org/records/14918763,Museum visitor trajectories dataset (Zenodo),建议不可用（非中国特定）。
+https://zenodo.org/records/14760720,National Digital Heritage Strategy 2025-2028,建议不可用（政策文档，不是数据集）。
+https://zenodo.org/records/14233546,Natural History Museum Vienna floor dataset,建议不可用（非中国特定）。
+https://zenodo.org/records/17978502,Night of the Museums Poland 2025,建议不可用（非中国特定）。
+https://huggingface.co/datasets/Grozkal/PaperSeek-OpenAlex-Embeddings,PaperSeek-OpenAlex-Embeddings,建议不可用（通用学术嵌入快照）。
+https://zenodo.org/records/16093001,Project CHANGES paper PDF record,建议不可用（看起来是论文/记录，非可复用数据集）。
+https://zenodo.org/records/13993089,RePAIR fractured frescoes dataset (Pompeii),建议不可用（庞贝壁画）。
+https://universe.roboflow.com/mask-ajadx/guggenheim-museum-pda7f,Roboflow guggenheim-museum,建议不可用（非中国特定）。
+https://universe.roboflow.com/technocobras/museum-apomm,Roboflow museum-apomm,建议不可用（非中国特定）。
+https://universe.roboflow.com/fuse-project/museum-guide,Roboflow museum-guide,建议不可用（非中国特定）。
+https://universe.roboflow.com/too-codemen/museum-objects,Roboflow museum-objects,建议不可用（非中国特定）。
+https://universe.roboflow.com/rowida-abdelkhalek/national-museum,Roboflow national-museum,建议不可用（非中国特定）。
+https://zenodo.org/records/15038538,Synthetic data from museum specimens,建议不可用（非中国特定）。
+https://zenodo.org/records/13448935,Texas Tech University mammalogy collection,建议不可用（非中国特定）。
+https://github.com/mbzuai-oryx/TimeTravel,TimeTravel (GitHub),建议不可用（非中国特定）。
+https://huggingface.co/datasets/MBZUAI/TimeTravel,TimeTravel (HF),建议不可用（历史/文化文物基准但非中国特定；可作为“通用文化基准”候选另行维护）。
+https://data.unesco.org/explore/dataset/whc001/?flg=en-us,UNESCO World Heritage List (global),建议不可用（全球名单，非中国特定；如需要“世界遗产名录通用底表”可另建通用库）。
+https://www.kaggle.com/datasets/thedevastator/unesco-world-heritage-sites-dataset,UNESCO world heritage sites dataset (Kaggle; global),建议不可用（全球名单）。
+https://zenodo.org/records/18925309,Ukrainian state museums fieldwork images,建议不可用（非中国特定）。
+https://github.com/AIGeeksGroup/VaseVQA-3D,VaseVQA-3D,建议不可用（古希腊陶器，非中国文化领域）。
+https://github.com/Thomas-J-Watson-Library/Data-Sets,Watson-Library Data-Sets,建议不可用（非中国特定）。
+https://www.scidb.cn/en/detail?dataSetId=f2bf34b77fe649d5831c90e6eca22162,World cultural heritage monitoring dataset (global; unclear),建议不可用（全球/范围不清晰；与中国文化领域关联不够明确）。
+https://www.kaggle.com/datasets/joebeachcapital/art-history,art-history (Kaggle),建议不可用（非中国特定）。
+https://www.kaggle.com/datasets/sujaykapadnis/art-history-allocations,art-history-allocations,建议不可用（非中国特定）。
+https://huggingface.co/datasets/Mitsua/art-museums-pd-440k,art-museums-pd-440k,建议不可用（与中国文化领域关联弱，非中国特定）。
+https://github.com/OurHeritageOurStories/cgdc_annotations,cgdc_annotations,建议不可用（非中国文化领域）。
+https://huggingface.co/datasets/davidheineman/colm-2025,colm-2025,建议不可用（会议/研究相关通用数据，非中国文化领域）。
+https://huggingface.co/datasets/crag-mm-2025/crag-mm-single-turn-public,crag-mm-single-turn-public,建议不可用（通用多模态RAG基准，非中国文化领域）。
+https://www.kaggle.com/datasets/imrlab/cultural-heritage-apps-dataset,cultural-heritage-apps-dataset,建议不可用（文化遗产应用元数据，非中国特定）。
+https://www.kaggle.com/datasets/ziya07/cultural-heritage-visual-dataset,cultural-heritage-visual-dataset,建议不可用（非中国特定）。
+https://www.kaggle.com/datasets/ziya07/cultural-heritage-visual-storytelling-dataset,cultural-heritage-visual-storytelling-dataset,建议不可用（非中国特定）。
+https://huggingface.co/datasets/nick007x/github-code-2025,github-code-2025,建议不可用（通用代码数据集）。
+https://www.kaggle.com/datasets/lokeshparab/gutenberg-books-and-metadata-2025,gutenberg-books-and-metadata-2025,建议不可用（通用古登堡英文书）。
+https://www.kaggle.com/datasets/programmer3/high-fidelity-cultural-heritage-3d-dataset,high-fidelity-cultural-heritage-3d-dataset,建议不可用（非中国特定）。
+https://www.kaggle.com/datasets/ansonnnnn/historic-art,historic-art,建议不可用（非中国特定）。
+https://www.kaggle.com/datasets/ziya07/intangible-cultural-heritage-dataset,intangible-cultural-heritage-dataset (non-China),建议不可用（非中国特定）。
+https://www.kaggle.com/datasets/imls/museum-directory,museum-directory (US),建议不可用（美国博物馆名录，非中国文化领域）。
+https://github.com/Birkbeck/museum-object-flows,museum-object-flows,建议不可用（英国博物馆相关）。
+https://www.kaggle.com/datasets/markusschmitz/museums,museums (Kaggle),建议不可用（疑似非中国）。
+https://github.com/project-tirtha/tirtha-public,tirtha-public,建议不可用（非中国文化领域）。
+https://www.scidb.cn/en/detail?dataSetId=efc79612bbf54466aea47a881b3de6ec,Dunhuang dance 3D motion dataset (ScienceDB duplicate record),与 accepted 中已保留来源重复。
+https://github.com/guanhaisu/OBSD,OBSD (Oracle bone deciphering with diffusion),不是数据集来源，仅为方法代码仓库。
+https://zenodo.org/records/1285593,Beijing Opera Percussion Pattern Dataset（Zenodo）,版权或许可条款不清，暂不收录。
+https://huggingface.co/datasets/ByteDance/AncientDoc,ByteDance/AncientDoc（古文档多任务理解基准，HF）,版权或许可条款不清，暂不收录。
+https://cbdb.hsites.harvard.edu/,CBDB China Biographical Database（中国历代人物传记数据库）,使用与再分发边界不清，暂不收录。
+https://zenodo.org/records/5744336,CBFdataset: Chinese Bamboo Flute Performances（Zenodo）,版权或许可条款不清，暂不收录。
+https://www.nature.com/articles/s41597-026-06776-5,CTOVSR: Chinese Traditional Opera Video Super-Resolution Dataset（Scientific Data）,仅定位到论文页面，未确认可下载数据落点。
+https://catalog.data.gov/dataset/china-dimensions-data-collection-china-maps-bibliographic-database,China Maps Bibliographic Database（China Dimensions / data.gov）,页面存在，但当前无法确认直接下载与许可条款。
+https://www.kaggle.com/datasets/yuanhaowang486/chinese-calligraphy-styles-by-calligraphers,Chinese Calligraphy Styles by Calligraphers（Kaggle）,版权或许可条款不清，暂不收录。
+https://www.kaggle.com/datasets/colabsss/chinese-heritage-building-damage-dataset,Chinese Heritage Building Crack Protection Dataset（Kaggle）,版权或许可条款不清，暂不收录。
+https://www.kaggle.com/datasets/ziya07/chinese-ich-visual-design-dataset,Chinese ICH Visual Design Dataset（Kaggle）,版权或许可条款不清，暂不收录。
+https://data.mendeley.com/datasets/vjyh3g8w2r/2,Dynamical social map in ancient China: 618–1644（Mendeley Data）,版权或许可条款不清，暂不收录。
+https://zenodo.org/records/1323561,Jingju a cappella singing dataset part1（Zenodo）,版权或许可条款不清，暂不收录。
+https://zenodo.org/records/1163407,Jingju a cappella singing dataset part2（Zenodo）,版权或许可条款不清，暂不收录。
+https://openkg.cn/en/data/,OpenKG 数据集发布与发现平台,不是具体数据集来源，仅为数据集发现平台入口。
+https://huggingface.co/datasets/TSXu/UniCalli_dataset,TSXu/UniCalli_dataset（HF 书法数据集）,版权或许可条款不清，暂不收录。
+https://ich.unesco.org/en/open-access-to-dive-data-01218,UNESCO Dive into ICH 开放数据（说明与落点线索）,不是具体数据集来源，仅为开放数据说明页。
+https://ich.unesco.org/en/lists,UNESCO ICH Lists（权威条目落地页线索）,不是具体数据集来源，仅为列表落地页。
+https://data.unesco.org/explore/dataset/ich001/,UNESCO Intangible Heritage List（可筛中国条目）,全球名单，非中国特定来源。
+https://www.mpiwg-berlin.mpg.de/research/projects/webgis-platform-historical-maps-china,WebGIS Platform of Historical Maps of China（MPIWG 项目线索）,不是具体数据集来源，仅为项目介绍页。
+https://huggingface.co/datasets/gtang666/CalliBench,gtang666/CalliBench（HF 书法VLM评测集）,版权或许可条款不清，暂不收录。
+https://github.com/MTG/jingjuPhonemeAnnotation,jingjuPhonemeAnnotation（京剧清唱层级标注，GitHub+Zenodo）,版权或许可条款不清，暂不收录。
