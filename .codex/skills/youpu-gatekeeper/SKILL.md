@@ -15,7 +15,7 @@ Use it only for:
 - running `youpu validate`
 - running `youpu report`
 - running `youpu submit --check-only`
-- running `youpu submit --message "..." [--push]`
+- running `youpu submit --message "..." [--push]` with an AI-written message
 - running `youpu inspect-url <url>`
 - explaining `imports/reports/issues.md`
 
@@ -43,7 +43,8 @@ Write-operation guardrails:
   - only if it passes, run `./youpu ingest`
 - Before submit:
   - run `./youpu submit --check-only`
-  - only if it passes, run `./youpu submit --message "..."` and optionally `--push`
+  - only if it passes, inspect the current changes and write a concise commit message
+  - then run `./youpu submit --message "..."` and optionally `--push`
 
 ## Command Mapping
 
@@ -53,8 +54,8 @@ Map user requests to commands like this:
 - "导入 imports" -> `./youpu ingest --dry-run`, then `./youpu ingest` if clean
 - "检查仓库" -> `./youpu validate`
 - "提交前检查" -> `./youpu submit --check-only`
-- "提交" -> `./youpu submit --check-only`, then `./youpu submit --message "..."`
-- "提交并推送" -> `./youpu submit --check-only`, then `./youpu submit --message "..." --push`
+- "提交" -> `./youpu submit --check-only`, then generate a message, then `./youpu submit --message "..."`
+- "提交并推送" -> `./youpu submit --check-only`, then generate a message, then `./youpu submit --message "..." --push`
 - "检查这个 URL" -> `./youpu inspect-url '<url>'`
 
 ## Failure Handling
@@ -65,7 +66,6 @@ Stop and report when any of these is true:
 - `youpu validate` fails
 - `youpu submit --check-only` fails
 - `imports/reports/issues.md` still lists unresolved issues
-- a submit was requested without a commit message
 - a CLI command returns a runtime error you cannot safely recover from
 
 When stopping:
@@ -82,6 +82,13 @@ Be concise. Report:
 - whether it passed
 - what blocked progress, if anything
 - the next action
+
+When the user asks to submit or push:
+
+- do not ask the user to provide a commit message by default
+- inspect the current changes
+- write a short, concrete commit message that matches the change set
+- tell the user which message you used
 
 If you need repository details, consult:
 

@@ -1,103 +1,147 @@
 # youpu-sources
 
-这个仓库用于记录已经过核验的数据集来源结论，不收集数据集本身，也不承载个人工作流。
+`youpu-sources` 用来维护一份可靠、可持续整理的数据集来源清单。
 
-仓库当前只保留两类有结论的结果：
+这个仓库只保存两类已经有明确结论的记录：
 
-- `accepted/`：已确认真实有效、值得保留的数据集来源记录。每条记录为一个 Markdown 文件。
-- `rejected/rejected.csv`：已确认不保留的数据集来源记录。每条记录为一行 CSV。
+- `accepted/`：确认保留的数据集来源
+- `rejected/rejected.csv`：确认不保留的数据集来源
 
-不纳入本仓库的内容：
+如果你只是想开始使用，这个页面就够了；更详细的说明都放在 [`docs/index.md`](/Users/xianqiu/Projects/youpu-sources/docs/index.md)。
 
-- 个人采集流程
-- 中间验证过程
-- Notion 页面和临时笔记
-- 待处理、进行中、待复核等过程状态
-- 数据集文件本体
+## 你可以用它做什么
 
-## 目录结构
+- 把你整理好的候选记录放进导入目录
+- 先检查这些候选记录能不能进入正式仓库
+- 只把符合规范、没有冲突的内容合并进去
+- 在提交前再做一次完整检查
+
+这个仓库不保存数据集文件本身，也不负责帮你发现外部来源。
+
+## Quickstart
+
+### 1. 准备候选内容
+
+把要导入的内容放到默认导入目录：
+
+```text
+imports/
+  accepted/
+  rejected/
+```
+
+- 放进 `imports/accepted/` 的内容，表示你希望它进入 `accepted/`
+- 放进 `imports/rejected/` 的内容，表示你希望它进入 `rejected/rejected.csv`
+
+如果你不确定文件格式是否正确，先看详细规范：
+
+- [`docs/specs/accepted.md`](/Users/xianqiu/Projects/youpu-sources/docs/specs/accepted.md)
+- [`docs/specs/rejected.md`](/Users/xianqiu/Projects/youpu-sources/docs/specs/rejected.md)
+
+### 2. 使用 skill 检查导入内容
+
+推荐直接使用 `youpu-gatekeeper` 这项 skill，用自然语言发出请求，例如：
+
+```text
+检查 imports
+```
+
+skill 会先做导入前检查，并告诉你：
+
+- 哪些内容可以导入
+- 哪些内容有格式问题
+- 哪些内容与现有记录冲突
+
+如果你需要了解这项 skill 的边界和行为，见 [`docs/skills/youpu-gatekeeper.md`](/Users/xianqiu/Projects/youpu-sources/docs/skills/youpu-gatekeeper.md)。
+
+### 3. 处理问题清单
+
+如果有不能导入的内容，可以查看：
+
+- [`imports/reports/issues.md`](/Users/xianqiu/Projects/youpu-sources/imports/reports/issues.md)
+
+这个文件会告诉你：
+
+- 哪些内容可以导入
+- 哪些内容有格式问题
+- 哪些内容与现有记录冲突
+
+### 4. 让 skill 执行导入
+
+确认没有问题后，可以直接对 skill 说：
+
+```text
+导入 imports 里的内容
+```
+
+skill 会先检查，再执行导入。只有符合规范的内容才会被合并进正式仓库。
+
+### 5. 导入后再做一次检查
+
+你可以继续让 skill 做一次仓库检查，例如：
+
+```text
+检查仓库
+```
+
+或者：
+
+```text
+做一次提交前检查
+```
+
+### 6. 提交前检查
+
+如果你准备提交，也可以直接让 skill 帮你执行，例如：
+
+```text
+提交
+```
+
+如果还要推送到远端：
+
+```text
+提交并推送
+```
+
+默认情况下，AI 会根据当前改动自动生成合适的 commit message。
+
+命令行的具体用法放在 [`docs/cli/user-guide.md`](/Users/xianqiu/Projects/youpu-sources/docs/cli/user-guide.md)。
+
+## 仓库结构
 
 ```text
 .
 ├── accepted/
-├── cli/
 ├── rejected/
 │   └── rejected.csv
 ├── docs/
 │   ├── index.md
-│   ├── cli/
-│   │   ├── scope.md
-│   │   ├── spec.md
-│   │   └── user-guide.md
 │   ├── overview/
-│   │   └── project-scope.md
-│   ├── skills/
-│   │   └── youpu-gatekeeper.md
-│   └── specs/
-│       ├── accepted.md
-│       ├── rejected.md
-│       └── url.md
+│   ├── specs/
+│   ├── cli/
+│   └── skills/
 ├── templates/
 │   └── accepted.md
+├── cli/
 └── youpu
 ```
 
-## accepted 记录
+你通常只需要关心这些位置：
 
-`accepted/` 中每个文件表示一个已确认有效的数据集来源。
+- `accepted/`：正式保留的记录
+- `rejected/rejected.csv`：正式拒绝的记录
+- `imports/`：临时导入目录
+- `docs/`：详细文档
+- `youpu`：底层命令入口
 
-约束：
+## 去哪里看详细说明
 
-- 一个来源对应一个 Markdown 文件
-- 文件名规则和文档结构见 [`docs/specs/accepted.md`](/Users/xianqiu/Projects/youpu-sources/docs/specs/accepted.md)
-- 文档主体采用统一模板，见 [`templates/accepted.md`](/Users/xianqiu/Projects/youpu-sources/templates/accepted.md)
-- 当前阶段以 YAML 元信息为主要规范对象
-- 标题与 YAML 之间可能存在历史遗留的 Notion 导出文字，这部分不视为标准结构
-- 正文保留 `# title`，并要求与 YAML `title` 一致
+- 文档总入口：[docs/index.md](/Users/xianqiu/Projects/youpu-sources/docs/index.md)
+- Skill 文档：[docs/skills/youpu-gatekeeper.md](/Users/xianqiu/Projects/youpu-sources/docs/skills/youpu-gatekeeper.md)
+- CLI 用户文档：[docs/cli/user-guide.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/user-guide.md)
+- accepted 规范：[docs/specs/accepted.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/accepted.md)
+- rejected 规范：[docs/specs/rejected.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/rejected.md)
+- URL 规范：[docs/specs/url.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/url.md)
 
-accepted 当前只保留以下字段：
-
-```yaml
-title:
-canonical_url:
-domain:
-content_type:
-data_form:
-data_type:
-region:
-source_type:
-source_org:
-permissions:
-tags:
-use_cases:
-```
-
-accepted 的详细规范见 [`docs/specs/accepted.md`](/Users/xianqiu/Projects/youpu-sources/docs/specs/accepted.md)。
-
-其中 `canonical_url` 表示该来源的稳定主链接，用于 accepted 内部去重和后续与 `rejected.csv` 的交叉检查。
-
-## rejected 记录
-
-`rejected/rejected.csv` 用于记录已确认不保留的数据集来源。
-
-字段：
-
-- `url`
-- `title`
-- `reason`
-
-其中 `url` 应填写规范化后的 `canonical_url`，作为 rejected 记录的唯一标识。
-
-rejected 的详细规范见 [`docs/specs/rejected.md`](/Users/xianqiu/Projects/youpu-sources/docs/specs/rejected.md)。
-
-## URL 规范
-
-URL 规范见 [`docs/specs/url.md`](/Users/xianqiu/Projects/youpu-sources/docs/specs/url.md)。
-
-accepted 文档中的 `canonical_url` 与 `rejected.csv` 中的 `url` 都应遵循这份文档，以便后续工具做比对和校验。
-
-当前仓库只保留规范化后的 `accepted/` 与 `rejected/` 结果，不再保留历史中间目录与过程性草稿。
-
-项目边界见 [`docs/overview/project-scope.md`](/Users/xianqiu/Projects/youpu-sources/docs/overview/project-scope.md)，CLI 边界见 [`docs/cli/scope.md`](/Users/xianqiu/Projects/youpu-sources/docs/cli/scope.md)，接口与用法说明分别见 [`docs/cli/spec.md`](/Users/xianqiu/Projects/youpu-sources/docs/cli/spec.md) 和 [`docs/cli/user-guide.md`](/Users/xianqiu/Projects/youpu-sources/docs/cli/user-guide.md)。更完整的文档导航见 [`docs/index.md`](/Users/xianqiu/Projects/youpu-sources/docs/index.md)。
-
-当前建议对外只保留少量守门命令：`validate`、`ingest`、`submit`、`report`、`inspect-url`。
+如果你是第一次使用，建议从 [`docs/index.md`](/Users/xianqiu/Projects/youpu-sources/docs/index.md) 开始。

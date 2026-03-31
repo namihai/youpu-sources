@@ -1,39 +1,45 @@
 # youpu CLI 用户文档
 
-这份文档面向两类使用者：
+这份文档面向仓库使用者，说明 `youpu` 应该怎么用。
 
-- 技术用户
-- 会调用命令行工具的大模型或 agent
+如果你只想快速开始，先看 [README.md](/Users/xianqiu/Projects/youpu-sources/README.md)。如果你要看开发接口和返回码，再看 [spec.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/spec.md)。
 
-如果你要看接口边界、返回码和开发约束，请看 [spec.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/spec.md)。
+## `youpu` 是做什么的
 
-## 目标
+`youpu` 是这个仓库的守门命令。它只负责：
 
-`youpu` 是仓库的守门 CLI，只做这几件事：
-
-- 检查正式仓库是否合法
-- 检查并合并 `imports/` 中的候选内容
-- 在提交前做最终守门
-- 输出仓库摘要
+- 检查正式仓库是否合规
+- 检查并导入 `imports/` 中的候选内容
+- 在提交前做最后检查
+- 输出当前仓库摘要
 - 诊断单个 URL
 
-统一入口：
+常用命令只有 5 个：
 
 ```bash
-youpu <command> [options]
+youpu validate
+youpu ingest
+youpu submit
+youpu report
+youpu inspect-url
 ```
 
-当前对外命令：
+## 你通常怎么用
 
-- `youpu validate`
-- `youpu ingest`
-- `youpu submit`
-- `youpu report`
-- `youpu inspect-url`
+推荐按这个顺序：
 
-## 默认导入目录
+1. 把候选内容放进 `imports/accepted/` 和 `imports/rejected/`
+2. 运行 `youpu ingest --dry-run`
+3. 查看 `imports/reports/issues.md`
+4. 修正不能处理的内容
+5. 运行 `youpu ingest`
+6. 运行 `youpu validate` 或 `youpu report`
+7. 提交前运行 `youpu submit --check-only`
+8. 最后再运行 `youpu submit --message "..."`
 
-`ingest` 固定使用：
+## 导入目录
+
+`youpu ingest` 固定读取这个目录：
 
 ```text
 imports/
@@ -42,44 +48,23 @@ imports/
   reports/
 ```
 
-其中：
+说明：
 
 - `imports/accepted/`：放候选 accepted Markdown
 - `imports/rejected/`：放候选 rejected CSV
-- `imports/reports/`：自动生成问题清单和摘要
+- `imports/reports/`：保存检查结果和问题清单
+
+`youpu` 不支持切换到其他导入目录。
 
 ## 常用命令
 
-### 校验正式仓库
-
-```bash
-youpu validate
-```
-
-用途：
-
-- 检查 `accepted/`
-- 检查 `rejected/rejected.csv`
-- 检查重复
-- 检查 cross-conflict
-
-最小示例输出：
-
-```text
-Validation passed
-```
-
-### 预检查导入内容
+### 先检查导入内容
 
 ```bash
 youpu ingest --dry-run
 ```
 
-用途：
-
-- 扫描 `imports/accepted/` 和 `imports/rejected/`
-- 只检查，不写正式仓库
-- 刷新 `imports/reports/`
+这个命令会检查 `imports/` 里的内容，但不会修改正式仓库。
 
 最小示例输出：
 
@@ -91,17 +76,13 @@ rejected candidates ready: 0
 issues: 0
 ```
 
-### 合并合法候选内容
+### 正式导入
 
 ```bash
 youpu ingest
 ```
 
-用途：
-
-- 把合法候选合并进正式仓库
-- 自动做 URL 规范化、编号分配和 slug 规范化
-- 保留有问题的文件供人工处理
+这个命令会把合规的候选内容写入正式仓库，并保留不能处理的内容供你手工修正。
 
 最小示例输出：
 
@@ -113,45 +94,26 @@ rejected candidates ready: 1
 issues: 0
 ```
 
-### 提交前检查
+### 检查正式仓库
 
 ```bash
-youpu submit --check-only
+youpu validate
 ```
 
-用途：
+这个命令会检查正式仓库中的：
 
-- 在 git 提交前做最终守门
-- 检查正式仓库
-- 检查 `imports/` 是否还有待处理内容或问题
+- `accepted/`
+- `rejected/rejected.csv`
+- 重复记录
+- accepted / rejected 冲突
 
 最小示例输出：
 
 ```text
-Submit check passed
+Validation passed
 ```
 
-### 提交并可选推送
-
-```bash
-youpu submit --message "your commit message"
-youpu submit --message "your commit message" --push
-```
-
-用途：
-
-- 先做守门检查
-- 通过后执行 `git add -A`
-- 然后执行 `git commit`
-- `--push` 时继续执行 `git push`
-
-最小示例输出：
-
-```text
-Submit completed
-```
-
-### 查看仓库摘要
+### 查看当前摘要
 
 ```bash
 youpu report
@@ -172,11 +134,44 @@ imports pending rejected: 0
 imports issues: 0
 ```
 
-### 诊断 URL
+### 提交前检查
+
+```bash
+youpu submit --check-only
+```
+
+这个命令会在提交前确认：
+
+- 正式仓库合法
+- `imports/` 里没有待处理内容
+- `imports/reports/` 里没有未解决问题
+
+最小示例输出：
+
+```text
+Submit check passed
+```
+
+### 提交并可选推送
+
+```bash
+youpu submit --message "your commit message"
+youpu submit --message "your commit message" --push
+```
+
+最小示例输出：
+
+```text
+Submit completed
+```
+
+### 诊断单个 URL
 
 ```bash
 youpu inspect-url 'https://example.com/path?utm_source=x#intro'
 ```
+
+这个命令会输出规范化后的 URL。
 
 最小示例输出：
 
@@ -184,21 +179,25 @@ youpu inspect-url 'https://example.com/path?utm_source=x#intro'
 https://example.com/path
 ```
 
-## `imports/reports/` 会生成什么
+## 遇到问题先看哪里
 
-每次运行 `youpu ingest` 或 `youpu ingest --dry-run`，都会刷新：
+运行 `youpu ingest` 或 `youpu ingest --dry-run` 后，优先查看：
 
-- `imports/reports/issues.md`
-- `imports/reports/summary.json`
+- [`imports/reports/issues.md`](/Users/xianqiu/Projects/youpu-sources/imports/reports/issues.md)
 
-其中：
+这里会列出：
 
-- `issues.md` 适合人阅读
-- `summary.json` 适合 agent 或脚本读取
+- 哪些文件可以导入
+- 哪些文件格式不对
+- 哪些文件和现有记录冲突
 
-## JSON 输出
+系统还会生成：
 
-如果命令结果需要给 agent 或自动化消费，使用：
+- [`imports/reports/summary.json`](/Users/xianqiu/Projects/youpu-sources/imports/reports/summary.json)
+
+这个文件更适合脚本或 agent 使用。
+
+## 如果你需要 JSON 输出
 
 ```bash
 youpu --format json <command>
@@ -212,51 +211,10 @@ youpu --format json validate
 youpu --format json report
 ```
 
-最小示例输出：
-
-```json
-{
-  "ok": true,
-  "command": "report",
-  "summary": "Repository summary\naccepted files: 93\nrejected rows: 82\nlatest accepted id: SRC-0095\nvalidation: passed\nduplicates: none\ncross-conflicts: 0\nimports pending accepted: 0\nimports pending rejected: 0\nimports issues: 0",
-  "diagnostics": [],
-  "data": {
-    "accepted_files": 93,
-    "rejected_rows": 82,
-    "latest_accepted_id": "SRC-0095",
-    "validation_ok": true,
-    "duplicates_ok": true,
-    "cross_conflicts": 0,
-    "imports_pending_accepted": 0,
-    "imports_pending_rejected": 0,
-    "imports_issues": 0
-  }
-}
-```
-
-## 返回码
-
-```text
-0  成功，无问题
-1  校验失败或守门检查失败
-2  参数错误
-3  运行时异常
-```
-
-## 建议用法
-
-推荐流程：
-
-1. 把候选内容放进 `imports/accepted/` 和 `imports/rejected/`
-2. 运行 `youpu ingest --dry-run`
-3. 查看 `imports/reports/`
-4. 修正无法处理的项
-5. 运行 `youpu ingest`
-6. 运行 `youpu validate` 或 `youpu submit --check-only`
-7. 没问题后再执行 `youpu submit --message "..."`
-
 ## 相关文档
 
-- 开发接口文档：[spec.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/spec.md)
-- CLI 边界：[scope.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/scope.md)
-- URL 规范：[url.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/url.md)
+- 文档总入口：[../index.md](/Users/xianqiu/Projects/youpu-sources/docs/index.md)
+- accepted 规范：[../specs/accepted.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/accepted.md)
+- rejected 规范：[../specs/rejected.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/rejected.md)
+- URL 规范：[../specs/url.md](/Users/xianqiu/Projects/youpu-sources/docs/specs/url.md)
+- CLI 开发接口：[spec.md](/Users/xianqiu/Projects/youpu-sources/docs/cli/spec.md)
