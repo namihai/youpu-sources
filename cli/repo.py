@@ -20,6 +20,7 @@ REQUIRED_ROOT_ENTRIES = (
 )
 
 ACCEPTED_NAME_RE = re.compile(r"^SRC-(\d{4})-([a-z0-9-]+)\.md$")
+IMPORT_ACCEPTED_NAME_RE = re.compile(r"^[a-z0-9][a-z0-9-]*\.md$")
 YAML_BLOCK_RE = re.compile(r"```yaml\s*\n(.*?)\n```", re.DOTALL)
 KEY_RE = re.compile(r"^([A-Za-z_][A-Za-z0-9_]*):\s*(.*)$")
 TITLE_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
@@ -62,8 +63,7 @@ class RejectedCsv:
 @dataclass(frozen=True)
 class ImportsLayout:
     root: Path
-    accepted: Path
-    rejected: Path
+    rejected_csv: Path
 
 
 def parse_simple_yaml_block(text: str) -> dict[str, str]:
@@ -203,6 +203,22 @@ def get_imports_layout(repo_root: Path) -> ImportsLayout:
     imports_root = repo_root / "imports"
     return ImportsLayout(
         root=imports_root,
-        accepted=imports_root / "accepted",
-        rejected=imports_root / "rejected",
+        rejected_csv=imports_root / "rejected.csv",
     )
+
+
+def get_import_accepted_paths(repo_root: Path) -> list[Path]:
+    imports_root = get_imports_layout(repo_root).root
+    if not imports_root.exists():
+        return []
+    return sorted(path for path in imports_root.glob("*.md") if path.is_file())
+
+
+def validate_import_accepted_filename(path: str | Path) -> str | None:
+    candidate = Path(path)
+    name = candidate.name
+    if name.startswith("SRC-"):
+        return "imports markdown must not use the final `SRC-####-slug.md` naming"
+    if not IMPORT_ACCEPTED_NAME_RE.match(name):
+        return "imports markdown filename must use lowercase letters, digits, and hyphens"
+    return None

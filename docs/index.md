@@ -29,3 +29,4 @@
 
 - `youpu` 现在主要是 GitHub Actions 和维护者使用的规则接口
 - 普通贡献者的主流程是提交 `imports/` 并通过 PR 协作完成入库
+- `imports/` 的有效输入只有两类：根目录 Markdown 和 `imports/rejected.csv`

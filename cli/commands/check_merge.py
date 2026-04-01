@@ -11,6 +11,7 @@ from cli.errors import EXIT_USAGE_ERROR
 from cli.errors import EXIT_VALIDATION_FAILED
 from cli.output import CommandResult
 from cli.output import Diagnostic
+from cli.repo import get_import_accepted_paths
 from cli.repo import get_imports_layout
 
 
@@ -37,8 +38,8 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
     diagnostics = list(validate_result.diagnostics)
 
     layout = get_imports_layout(repo_root)
-    accepted_files = sorted(layout.accepted.glob("*.md"))
-    rejected_files = sorted(layout.rejected.glob("*.csv"))
+    accepted_files = get_import_accepted_paths(repo_root)
+    rejected_files = [layout.rejected_csv] if layout.rejected_csv.exists() else []
     if accepted_files or rejected_files:
         diagnostics.append(
             Diagnostic(

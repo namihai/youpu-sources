@@ -26,26 +26,24 @@
 - `actions/setup-python`
 - `actions/github-script`
 
-### 2. 设置默认分支保护
+### 2. 收缩默认分支写权限
 
-建议对默认分支开启 branch protection，至少包括：
+如果当前使用的是私有仓库免费方案，不一定能依赖 GitHub 的 branch protection。
 
-- Require a pull request before merging
-- Require status checks to pass before merging
-- Require branches to be up to date before merging
-- Restrict direct pushes to the default branch
+这时建议：
 
-如果团队规模允许，建议再加：
-
-- Require at least 1 approval
+- 只给少数维护者保留 `main` 的写权限
+- 普通贡献者统一通过 PR 协作
+- 团队内部约定不直接 push `main`
+- 把 `PR Check / check-pr` 作为合并前必看结果
 
 ### 3. 选择强制检查项
 
-建议至少把以下 workflow 结果设为 required status checks：
+如果当前仓库计划升级到支持 branch protection 的方案，建议至少把以下 workflow 结果设为 required status checks：
 
 - `PR Check / check-pr`
 
-如果后续希望把 ingest 后状态也纳入强制检查，可以再考虑把 `/ingest` 相关结果纳入流程约束。但第一阶段只要求 PR 检查即可。
+如果当前不使用 branch protection，这一项可以退化为团队约定：维护者只在 `PR Check / check-pr` 通过后合并。
 
 ### 4. 允许 Actions 写回内部分支
 
@@ -91,6 +89,7 @@ fork PR 不支持自动回写 ingest 结果。
 - 内部协作者优先使用主仓库分支，不走 fork
 - 外部贡献只负责提交输入，不直接进入自动 ingest 路径
 - `/ingest` 只由维护者触发
+- 维护者不直接 push `main`
 - 合并前优先确认 `check-merge` 的结果
 
 ## 非阻塞建议
@@ -104,6 +103,6 @@ fork PR 不支持自动回写 ingest 结果。
 
 ## 当前仓库对应文件
 
-- PR 检查 workflow：[/.github/workflows/pr-check.yml](/Users/xianqiu/Projects/youpu-sources/.github/workflows/pr-check.yml)
-- `/ingest` workflow：[/.github/workflows/ingest.yml](/Users/xianqiu/Projects/youpu-sources/.github/workflows/ingest.yml)
-- 贡献入口：[README.md](/Users/xianqiu/Projects/youpu-sources/README.md)
+- PR 检查 workflow：[../../.github/workflows/pr-check.yml](../../.github/workflows/pr-check.yml)
+- `/ingest` workflow：[../../.github/workflows/ingest.yml](../../.github/workflows/ingest.yml)
+- 贡献入口：[../../README.md](../../README.md)

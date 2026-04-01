@@ -33,12 +33,14 @@
 
 ```text
 imports/
-  accepted/
-  rejected/
+  *.md
+  rejected.csv
 ```
 
-- 放进 `imports/accepted/` 的内容，表示你希望它进入 `accepted/`
-- 放进 `imports/rejected/` 的内容，表示你希望它进入 `rejected/rejected.csv`
+- 放进 `imports/*.md` 的内容，表示你希望它进入 `accepted/`
+- 放进 `imports/rejected.csv` 的内容，表示你希望它进入 `rejected/rejected.csv`
+
+`imports/` 只接收两类输入：根目录下的候选 accepted Markdown，以及固定文件名 `imports/rejected.csv`。
 
 如果你不确定格式是否正确，先看：
 

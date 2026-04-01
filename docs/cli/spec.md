@@ -76,8 +76,8 @@ youpu <command> [options]
 
 检查范围：
 
-- `imports/accepted/*.md`
-- `imports/rejected/*.csv`
+- `imports/*.md`
+- `imports/rejected.csv`
 - 与正式区的冲突
 - `imports/` 内部重复
 
@@ -107,7 +107,8 @@ youpu <command> [options]
 行为：
 
 - 调用 `validate-repo`
-- 要求 `imports/accepted` 和 `imports/rejected` 为空
+- 要求 `imports/` 根目录没有待处理 Markdown
+- 要求 `imports/rejected.csv` 不存在
 - 要求当前分支没有遗留导入问题
 
 ### `ingest`
@@ -123,6 +124,11 @@ youpu <command> [options]
 - 进行确定性修正
 - 写入 `accepted/` / `rejected/`
 - 删除已处理输入
+
+输入约束：
+
+- `imports/*.md` 作为 accepted 候选输入
+- `imports/rejected.csv` 作为 rejected 候选输入
 
 约束：
 

@@ -19,6 +19,11 @@
 - rejected 只维护一个 CSV 文件：`rejected/rejected.csv`
 - 每一行代表一个已拒绝来源
 
+导入候选时使用的输入文件也固定为单个 CSV：
+
+- `imports/rejected.csv`
+- CSV 头与正式 `rejected/rejected.csv` 保持一致
+
 ## 字段定义
 
 CSV 头应固定为：
@@ -29,17 +34,19 @@ url,title,reason
 
 字段说明：
 
-- `url`：规范化后的 `canonical_url`，作为唯一标识
+- `url`：该来源的主链接，正式入库时保存规范化后的结果，作为唯一标识
 - `title`：来源标题或人工识别名称
 - `reason`：拒绝原因
 
 ## url 规范
 
-`url` 应填写规范化后的 `canonical_url`。
+`url` 应尽量填写稳定主链接。
+
+输入阶段可以先使用原始 URL；系统会在校验和入库时按统一规则规范化。
 
 具体规则见 [`url.md`](url.md)。
 
-同一个 `canonical_url` 在 `rejected.csv` 中不应重复出现。
+同一个规范化后的 `url` 在 `rejected.csv` 中不应重复出现。
 
 ## reason 填写建议
 

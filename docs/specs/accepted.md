@@ -43,17 +43,18 @@ SRC-0003-figshare-dunhuang-restoration.md
 - 不建议包含随机 hash
 - 不建议直接使用超长中文标题
 
-推荐通过导入流程生成正式 accepted 文件：
+维护者如果要在本地调试 accepted 导入流程，可以按下面方式验证：
 
-1. 用户先把候选 Markdown 放进 `imports/accepted/`
-2. 运行 `./youpu ingest --dry-run`
-3. 修正问题后运行 `./youpu ingest`
+1. 用户先把候选 Markdown 放进 `imports/` 根目录
+2. 运行 `youpu validate-imports`
+3. 修正问题后运行 `youpu ingest`
 
 `ingest` 会在正式合并时：
 
 - 自动计算下一个编号
+- 优先根据 imports 文件名生成 `slug`
 - 生成 `SRC-####-slug.md`
-- 对文件名做规范化处理
+- 写入正式 accepted 文件名
 
 不建议使用以下命名方式：
 
@@ -153,8 +154,9 @@ use_cases: [研究分析, AI训练]
 ## 链接要求
 
 - YAML 中必须包含 `canonical_url`
-- `canonical_url` 应填写该来源的稳定主链接
+- `canonical_url` 应尽量填写该来源的稳定主链接
 - 应尽量使用规范化后的主链接，避免追踪参数与无意义锚点
+- 输入阶段可以先使用原始 URL；系统会在校验和入库时按统一规则规范化
 - 具体规则见 [`url.md`](url.md)
 
 ## 正文建议结构

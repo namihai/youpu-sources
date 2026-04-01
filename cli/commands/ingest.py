@@ -14,10 +14,12 @@ from cli.errors import EXIT_VALIDATION_FAILED
 from cli.output import CommandResult
 from cli.output import Diagnostic
 from cli.repo import AcceptedDocument
+from cli.repo import get_import_accepted_paths
 from cli.repo import get_imports_layout
 from cli.repo import normalize_url
 from cli.repo import parse_accepted_document
 from cli.repo import parse_rejected_csv
+from cli.repo import validate_import_accepted_filename
 from cli.validation import DISALLOWED_FIELDS
 from cli.validation import REJECTED_COLUMNS
 from cli.validation import REQUIRED_NONEMPTY_FIELDS
@@ -127,8 +129,36 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
     rejected_urls = rejected_url_index(repo_root)
     layout = get_imports_layout(repo_root)
 
-    for path in sorted(layout.accepted.glob("*.md")):
+    if layout.root.exists():
+        for path in sorted(layout.root.iterdir()):
+            if not path.is_file():
+                continue
+            if path.name in {layout.rejected_csv.name, ".gitkeep"}:
+                continue
+            if path.suffix == ".md":
+                continue
+            diagnostics.append(
+                Diagnostic(
+                    level="error",
+                    message="imports only accepts markdown files and `rejected.csv` at the root",
+                    path=str(path.relative_to(repo_root)),
+                    code="import_unexpected_file",
+                )
+            )
+
+    for path in get_import_accepted_paths(repo_root):
         rel_path = str(path.relative_to(repo_root))
+        filename_error = validate_import_accepted_filename(path)
+        if filename_error:
+            diagnostics.append(
+                Diagnostic(
+                    level="error",
+                    message=filename_error,
+                    path=rel_path,
+                    code="import_accepted_invalid_filename",
+                )
+            )
+            accepted_error_paths.add(rel_path)
         try:
             doc = parse_accepted_document(path)
         except Exception as exc:
@@ -238,14 +268,15 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
             diagnostics.append(
                 Diagnostic(
                     level="error",
-                    message=f"duplicate canonical_url inside imports/accepted: {normalized_url}",
+                    message=f"duplicate canonical_url inside imports: {normalized_url}",
                     path=rel_path,
                     code="import_accepted_duplicate_canonical_url",
                 )
             )
             accepted_error_paths.add(rel_path)
 
-    for path in sorted(layout.rejected.glob("*.csv")):
+    rejected_files = [layout.rejected_csv] if layout.rejected_csv.exists() else []
+    for path in rejected_files:
         rel_csv_path = str(path.relative_to(repo_root))
         try:
             rejected = parse_rejected_csv(path)
@@ -328,7 +359,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
             diagnostics.append(
                 Diagnostic(
                     level="error",
-                    message=f"duplicate url inside imports/rejected: {normalized_url}",
+                    message=f"duplicate url inside imports/rejected.csv: {normalized_url}",
                     path=row_path,
                     code="import_rejected_duplicate_url",
                 )
@@ -372,7 +403,7 @@ def serialize_accepted(doc: AcceptedDocument) -> str:
 
 
 def target_accepted_path(repo_root: Path, doc: AcceptedDocument, index: int) -> Path:
-    source_slug = doc.slug or slugify(doc.yaml_fields.get("title", "").strip() or doc.path.stem)
+    source_slug = slugify(doc.path.stem)
     return repo_root / "accepted" / f"SRC-{index:04d}-{source_slug}.md"
 
 

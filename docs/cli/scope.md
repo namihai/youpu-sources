@@ -32,6 +32,11 @@
 - JSON 输出适合机器消费
 - 不为了方便而引入高风险自动修正
 
+CLI 识别的导入区边界为：
+
+- `imports/*.md`：accepted 候选输入
+- `imports/rejected.csv`：rejected 候选输入
+
 ## 对外命令
 
 对外主命令为：

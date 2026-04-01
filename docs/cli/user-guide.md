@@ -1,6 +1,6 @@
 # youpu CLI 用户文档
 
-这份文档说明新的 `youpu` 命令集应该怎么用。
+这份文档说明 `youpu` 命令集应该怎么用。
 
 `youpu` 现在主要供两类场景使用：
 
@@ -54,7 +54,8 @@ youpu check-merge
 这个命令要求：
 
 - 正式区合法
-- `imports/accepted` 和 `imports/rejected` 没有待处理文件
+- `imports/` 根目录没有待处理 Markdown
+- `imports/rejected.csv` 不存在
 - 当前分支没有遗留导入问题
 
 ### 执行正式入库
@@ -98,8 +99,8 @@ youpu validate-imports
 
 用于检查：
 
-- `imports/accepted/*.md`
-- `imports/rejected/*.csv`
+- `imports/*.md`
+- `imports/rejected.csv`
 - 与正式区的冲突
 - `imports/` 内部重复
 

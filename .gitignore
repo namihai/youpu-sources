@@ -29,5 +29,3 @@ env/
 # OS / local temp files
 Thumbs.db
 
-# Runtime reports
-imports/reports/

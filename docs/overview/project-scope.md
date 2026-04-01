@@ -39,8 +39,8 @@
 
 输入边界：
 
-- 用户提供候选 `accepted` 文档
-- 用户提供候选 `rejected` 记录
+- 用户通过 `imports/*.md` 提供候选 `accepted` 文档
+- 用户通过 `imports/rejected.csv` 提供候选 `rejected` 记录
 
 输出边界：
 
@@ -67,5 +67,10 @@
 - 让用户把候选内容放进导入目录
 - 让 CLI 通过少量主命令负责检查、清单和安全合并
 - 让 GitHub Actions 作为主流程执行面
+
+当前导入目录约束为：
+
+- `imports/*.md`：accepted 候选输入
+- `imports/rejected.csv`：rejected 候选输入
 
 CLI 的具体边界和命令收敛方向见 [`../cli/scope.md`](../cli/scope.md)。

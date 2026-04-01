@@ -11,6 +11,7 @@ from cli.errors import EXIT_OK
 from cli.errors import EXIT_USAGE_ERROR
 from cli.output import CommandResult
 from cli.output import Diagnostic
+from cli.repo import get_import_accepted_paths
 from cli.repo import get_imports_layout
 from cli.repo import parse_rejected_csv
 
@@ -59,8 +60,8 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
     rejected_count = len(rejected.rows)
     latest_id = latest_accepted_id(repo_root)
     layout = get_imports_layout(repo_root)
-    pending_accepted = len(list(layout.accepted.glob("*.md")))
-    pending_rejected = len(list(layout.rejected.glob("*.csv")))
+    pending_accepted = len(get_import_accepted_paths(repo_root))
+    pending_rejected = 1 if layout.rejected_csv.exists() else 0
 
     validate_result, _ = validate_repo_command.run([], repo_root)
     validation_diagnostics = validate_result.diagnostics
