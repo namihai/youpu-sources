@@ -107,7 +107,7 @@ youpu report
 
 ## 相关文档
 
-- 常见失败与处理方式：[common-failures.md](common-failures.md)
+- 常见失败与处理方式：[failures.md](failures.md)
 - 仓库设置：[github-repo-setup.md](github-repo-setup.md)
 - CLI 用户文档：[../cli/user-guide.md](../cli/user-guide.md)
 - CLI 开发接口：[../cli/spec.md](../cli/spec.md)
