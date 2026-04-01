@@ -35,15 +35,15 @@
 - 只给少数维护者保留 `main` 的写权限
 - 普通贡献者统一通过 PR 协作
 - 团队内部约定不直接 push `main`
-- 把 `PR Check / check-pr` 作为合并前必看结果
+- 把 `check-pr` 作为合并前必看结果
 
 ### 3. 选择强制检查项
 
 如果当前仓库计划升级到支持 branch protection 的方案，建议至少把以下 workflow 结果设为 required status checks：
 
-- `PR Check / check-pr`
+- `check-pr`
 
-如果当前不使用 branch protection，这一项可以退化为团队约定：维护者只在 `PR Check / check-pr` 通过后合并。
+如果当前不使用 branch protection，这一项可以退化为团队约定：维护者只在 `check-pr` 通过后合并。
 
 ### 4. 允许 Actions 写回内部分支
 

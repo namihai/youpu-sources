@@ -19,13 +19,13 @@
 
 1. 贡献者把候选内容放进 `imports/`
 2. 提交 PR
-3. 等待 `PR Check / check-pr`
+3. 等待 `check-pr`
 4. 根据检查结果修改 PR
 
 维护者在这一阶段主要看：
 
 - 候选内容本身是否合理
-- `PR Check / check-pr` 是否通过
+- `check-pr` 是否通过
 - PR diff 是否只包含本次候选输入
 
 ### 2. 触发 `/ingest`
@@ -73,7 +73,7 @@ fork PR 只支持检查，不支持自动回写 ingest 结果。
 
 对 fork PR：
 
-1. 让 `PR Check / check-pr` 正常运行
+1. 让 `check-pr` 正常运行
 2. 如果内容值得入库，由维护者把对应输入复制到主仓库内部分支
 3. 在内部分支 PR 上再执行 `/ingest`
 
@@ -107,6 +107,7 @@ youpu report
 
 ## 相关文档
 
+- 常见失败与处理方式：[common-failures.md](common-failures.md)
 - 仓库设置：[github-repo-setup.md](github-repo-setup.md)
 - CLI 用户文档：[../cli/user-guide.md](../cli/user-guide.md)
 - CLI 开发接口：[../cli/spec.md](../cli/spec.md)

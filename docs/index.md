@@ -12,6 +12,7 @@
 ## 面向贡献者
 
 - README：[../README.md](../README.md)
+- 常见失败与处理方式：[overview/common-failures.md](overview/common-failures.md)
 - CLI 用户文档：[cli/user-guide.md](cli/user-guide.md)
 - accepted 规范：[specs/accepted.md](specs/accepted.md)
 - rejected 规范：[specs/rejected.md](specs/rejected.md)
@@ -19,6 +20,7 @@
 
 ## 面向维护者
 
+- 常见失败与处理方式：[overview/common-failures.md](overview/common-failures.md)
 - 维护者操作手册：[overview/maintainer-guide.md](overview/maintainer-guide.md)
 - 项目边界：[overview/project-scope.md](overview/project-scope.md)
 - GitHub 仓库设置：[overview/github-repo-setup.md](overview/github-repo-setup.md)

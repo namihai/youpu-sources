@@ -41,6 +41,7 @@ imports/
 - [`docs/specs/accepted.md`](docs/specs/accepted.md)
 - [`docs/specs/rejected.md`](docs/specs/rejected.md)
 - [`docs/specs/url.md`](docs/specs/url.md)
+- [`docs/overview/common-failures.md`](docs/overview/common-failures.md)
 
 ## PR 中会发生什么
 
@@ -69,6 +70,7 @@ PR 检查通过后，维护者会接手后续入库和合并。
 ## 去哪里看详细说明
 
 - 文档总入口：[docs/index.md](docs/index.md)
+- 常见失败与处理方式：[docs/overview/common-failures.md](docs/overview/common-failures.md)
 - 维护者操作手册：[docs/overview/maintainer-guide.md](docs/overview/maintainer-guide.md)
 - 项目边界：[docs/overview/project-scope.md](docs/overview/project-scope.md)
 - GitHub 仓库设置：[docs/overview/github-repo-setup.md](docs/overview/github-repo-setup.md)
