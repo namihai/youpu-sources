@@ -1,7 +1,0 @@
-interface:
-  display_name: "youpu Gatekeeper"
-  short_description: "Check imports and run guarded youpu workflows."
-  default_prompt: "Use $youpu-gatekeeper to check imports, explain issues, or run a guarded ingest or submit workflow in this repository."
-
-policy:
-  allow_implicit_invocation: true

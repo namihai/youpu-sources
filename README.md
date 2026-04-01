@@ -7,22 +7,29 @@
 - `accepted/`：确认保留的数据集来源
 - `rejected/rejected.csv`：确认不保留的数据集来源
 
-如果你只是想开始使用，这个页面就够了；更详细的说明都放在 [`docs/index.md`](docs/index.md)。
-
-## 你可以用它做什么
-
-- 把你整理好的候选记录放进导入目录
-- 先检查这些候选记录能不能进入正式仓库
-- 只把符合规范、没有冲突的内容合并进去
-- 在提交前再做一次完整检查
-
 这个仓库不保存数据集文件本身，也不负责帮你发现外部来源。
 
-## 快速开始
+## 贡献流程
 
-### 1. 准备候选内容
+这个仓库的主流程是：
 
-把要导入的内容放到默认导入目录：
+1. 把候选内容放进 `imports/`
+2. 提交 Pull Request
+3. 等待 GitHub Actions 自动检查
+4. 根据 CI 反馈修改内容
+5. 由维护者在 PR 中触发 `/ingest`
+6. 审查最终入库结果并合并
+
+普通贡献者不需要依赖本地命令行完成主流程。
+
+适用范围：
+
+- 内部协作者：推荐直接在主仓库分支上提交 PR，支持自动 `/ingest`
+- 外部协作者：可以提交 fork PR 做输入检查，但正式 ingest 由维护者转到内部分支接管
+
+## 你需要提交什么
+
+把候选内容放到默认导入目录：
 
 ```text
 imports/
@@ -33,115 +40,70 @@ imports/
 - 放进 `imports/accepted/` 的内容，表示你希望它进入 `accepted/`
 - 放进 `imports/rejected/` 的内容，表示你希望它进入 `rejected/rejected.csv`
 
-如果你不确定文件格式是否正确，先看详细规范：
+如果你不确定格式是否正确，先看：
 
 - [`docs/specs/accepted.md`](docs/specs/accepted.md)
 - [`docs/specs/rejected.md`](docs/specs/rejected.md)
+- [`docs/specs/url.md`](docs/specs/url.md)
 
-### 2. 使用 skill 检查导入内容
+## PR 中会发生什么
 
-推荐直接使用 `youpu-gatekeeper` 这项 skill，用自然语言发出请求，例如：
+当你提交 PR 后，系统会自动执行检查：
 
-```text
-检查 imports
-```
+- 校验正式区 `accepted/` 和 `rejected/`
+- 校验 `imports/` 中的候选内容
+- 报出格式问题、重复和冲突
 
-skill 会先做导入前检查，并告诉你：
+如果检查失败，你只需要根据反馈修改 PR。
 
-- 哪些内容可以导入
-- 哪些内容有格式问题
-- 哪些内容与现有记录冲突
-
-如果你需要了解这项 skill 的边界和行为，见 [`docs/skills/youpu-gatekeeper.md`](docs/skills/youpu-gatekeeper.md)。
-
-### 3. 处理问题清单
-
-如果有不能导入的内容，可以查看：
-
-- [`imports/reports/issues.md`](imports/reports/issues.md)
-
-这个文件会告诉你：
-
-- 哪些内容可以导入
-- 哪些内容有格式问题
-- 哪些内容与现有记录冲突
-
-### 4. 让 skill 执行导入
-
-确认没有问题后，可以直接对 skill 说：
+当 PR 检查通过后，维护者会在 PR 中评论：
 
 ```text
-导入 imports 里的内容
+/ingest
 ```
 
-skill 会先检查，再执行导入。只有符合规范的内容才会被合并进正式仓库。
+这个动作会触发受控 workflow：
 
-### 5. 导入后再做一次检查
+1. 再次执行 PR 检查
+2. 运行 `youpu ingest`
+3. 把正式区变更提交回该 PR 分支
+4. 运行合并前检查
 
-你可以继续让 skill 做一次仓库检查，例如：
+说明：
 
-```text
-检查仓库
-```
+- 只有主仓库内部分支 PR 支持自动回写
+- fork PR 仍然可以跑检查
+- 如果 fork PR 需要正式入库，维护者应将对应 `imports/` 内容转移到内部分支后再执行 `/ingest`
 
-或者：
+## 目录职责
 
-```text
-做一次提交前检查
-```
+仓库中几个主要目录的职责如下：
 
-### 6. 提交前检查
-
-如果你准备提交，也可以直接让 skill 帮你执行，例如：
-
-```text
-提交
-```
-
-如果还要推送到远端：
-
-```text
-提交并推送
-```
-
-默认情况下，AI 会根据当前改动自动生成合适的 commit message。
-
-命令行的具体用法放在 [`docs/cli/user-guide.md`](docs/cli/user-guide.md)。
-
-## 仓库结构
-
-```text
-.
-├── accepted/
-├── rejected/
-│   └── rejected.csv
-├── docs/
-│   ├── index.md
-│   ├── overview/
-│   ├── specs/
-│   ├── cli/
-│   └── skills/
-├── templates/
-│   └── accepted.md
-├── cli/
-└── youpu
-```
-
-你通常只需要关心这些位置：
-
-- `accepted/`：正式保留的记录
-- `rejected/rejected.csv`：正式拒绝的记录
-- `imports/`：临时导入目录
+- `imports/`：待处理输入区
+- `accepted/`：正式保留记录
+- `rejected/`：正式拒绝记录
+- `templates/`：候选内容模板
 - `docs/`：详细文档
-- `youpu`：底层命令入口
+
+`imports/` 不是归档区。内容一旦被成功 ingest，对应输入文件就应从 `imports/` 中移除。
+
+## 维护者接口
+
+`youpu` 是仓库规则内核，主要供 GitHub Actions 和维护者使用。
+
+维护者通常会用到：
+
+- `youpu check-pr`
+- `youpu ingest`
+- `youpu check-merge`
 
 ## 去哪里看详细说明
 
 - 文档总入口：[docs/index.md](docs/index.md)
-- Skill 文档：[docs/skills/youpu-gatekeeper.md](docs/skills/youpu-gatekeeper.md)
+- 项目边界：[docs/overview/project-scope.md](docs/overview/project-scope.md)
+- GitHub 仓库设置：[docs/overview/github-repo-setup.md](docs/overview/github-repo-setup.md)
 - CLI 用户文档：[docs/cli/user-guide.md](docs/cli/user-guide.md)
+- CLI 开发接口：[docs/cli/spec.md](docs/cli/spec.md)
 - accepted 规范：[docs/specs/accepted.md](docs/specs/accepted.md)
 - rejected 规范：[docs/specs/rejected.md](docs/specs/rejected.md)
 - URL 规范：[docs/specs/url.md](docs/specs/url.md)
-
-如果你是第一次使用，建议从 [`docs/index.md`](docs/index.md) 开始。

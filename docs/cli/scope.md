@@ -2,45 +2,56 @@
 
 这份文档定义 `youpu` CLI 负责什么、不负责什么，以及对外命令的边界。
 
-相关的项目总边界见 [`../overview/project-scope.md`](../overview/project-scope.md)。
-
 ## CLI 的职责
 
-`youpu` CLI 是仓库内的守门工具，负责：
+`youpu` 是仓库规则内核，负责：
 
-- 规范校验
-- 导入目录检查与安全合并
-- 提交前检查
-- URL 诊断
+- 校验正式区
+- 校验导入区
+- 表达 PR 检查与合并前检查
+- 执行确定性 ingest
+- 输出文本或 JSON 结果
 
-CLI 不负责外部信息发现，也不负责复杂采集工作流。
+## CLI 不负责什么
+
+`youpu` 不负责：
+
+- Git 提交或推送
+- 外部来源发现
+- 自动补全事实字段
+- 接受或拒绝结论的主观判断
+- PR 权限控制
+
+这些职责应分别由 GitHub、维护者和仓库外围流程承担。
 
 ## 设计原则
 
-CLI 保持小而稳的能力集合：
-
-- 让用户把候选内容放进导入目录
-- 让 CLI 通过少量主命令负责检查、清单和安全合并
-- 让 skill 只做编排和解释
+- GitHub Actions 中的仓库规则检查应通过 `youpu` 命令表达
+- 检查命令与写入命令分离
+- 退出码稳定
+- JSON 输出适合机器消费
+- 不为了方便而引入高风险自动修正
 
 ## 对外命令
 
-对外只保留以下 5 个命令：
+对外主命令为：
 
-- `youpu validate`
+- `youpu validate-repo`
+- `youpu validate-imports`
+- `youpu check-pr`
+- `youpu check-merge`
 - `youpu ingest`
-- `youpu submit`
 - `youpu report`
-- `youpu inspect-url`
 
 其中：
 
-- `validate`、`ingest`、`submit`、`report` 是主流程命令
-- `inspect-url` 是辅助诊断命令
+- `validate-repo` / `validate-imports` 是基础检查命令
+- `check-pr` / `check-merge` 是协作状态命令
+- `ingest` 是唯一写入命令
+- `report` 是辅助观测命令
 
-以下能力不作为对外命令暴露：
+## 相关文档
 
-- 手工新增 `accepted` / `rejected` 的命令
-- 单独暴露的重复检查命令
-- 单独暴露的 URL 规范化命令
-- 多工作区或多来源路径参数
+- 项目边界：[../overview/project-scope.md](../overview/project-scope.md)
+- CLI 用户文档：[user-guide.md](user-guide.md)
+- CLI 开发接口：[spec.md](spec.md)

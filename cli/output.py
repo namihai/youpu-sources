@@ -7,8 +7,6 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
 
-from rich.console import Console
-
 
 @dataclass(frozen=True)
 class Diagnostic:
@@ -29,9 +27,9 @@ class CommandResult:
 
 
 def render_text(result: CommandResult, *, no_color: bool = False, stderr: bool = False) -> None:
-    console = Console(stderr=stderr, no_color=no_color)
-    status_style = "green" if result.ok else "red"
-    console.print(result.summary, style=status_style)
+    del no_color
+    target = sys.stderr if stderr else sys.stdout
+    print(result.summary, file=target)
 
     for diag in result.diagnostics:
         prefix = diag.level.upper()
@@ -40,7 +38,7 @@ def render_text(result: CommandResult, *, no_color: bool = False, stderr: bool =
             parts.append(f"path={diag.path}")
         if diag.code:
             parts.append(f"code={diag.code}")
-        console.print(" | ".join(parts))
+        print(" | ".join(parts), file=target)
 
 
 def render_json(result: CommandResult) -> str:
