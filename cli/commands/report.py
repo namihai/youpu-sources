@@ -13,6 +13,7 @@ from cli.output import CommandResult
 from cli.output import Diagnostic
 from cli.repo import get_import_accepted_paths
 from cli.repo import get_imports_layout
+from cli.repo import get_rejected_csv_path
 from cli.repo import parse_rejected_csv
 
 ACCEPTED_FILENAME_RE = re.compile(r"^SRC-(\d{4})-[a-z0-9-]+\.md$")
@@ -56,7 +57,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
         )
 
     accepted_count = len(list((repo_root / "accepted").glob("*.md")))
-    rejected = parse_rejected_csv(repo_root / "rejected" / "rejected.csv")
+    rejected = parse_rejected_csv(get_rejected_csv_path(repo_root))
     rejected_count = len(rejected.rows)
     latest_id = latest_accepted_id(repo_root)
     layout = get_imports_layout(repo_root)

@@ -2,7 +2,7 @@
 
 ## 定义
 
-`rejected/rejected.csv` 用于记录已确认不保留的数据集来源。
+`rejected.csv` 用于记录已确认不保留的数据集来源。
 
 拒绝原因可能包括但不限于：
 
@@ -16,13 +16,13 @@
 
 ## 文件形式
 
-- rejected 只维护一个 CSV 文件：`rejected/rejected.csv`
+- rejected 只维护一个 CSV 文件：`rejected.csv`
 - 每一行代表一个已拒绝来源
 
 导入候选时使用的输入文件也固定为单个 CSV：
 
 - `imports/rejected.csv`
-- CSV 头与正式 `rejected/rejected.csv` 保持一致
+- CSV 头与正式 `rejected.csv` 保持一致
 
 ## 字段定义
 

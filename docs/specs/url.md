@@ -5,7 +5,7 @@
 适用范围：
 
 - `accepted/*.md` 中的 `canonical_url`
-- `rejected/rejected.csv` 中的 `url`
+- `rejected.csv` 中的 `url`
 - `youpu ingest`
 - 任何做去重或交叉冲突检查的逻辑
 

@@ -4,6 +4,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from cli.output import Diagnostic
+from cli.repo import get_rejected_csv_path
 from cli.repo import normalize_url
 from cli.repo import parse_accepted_document
 from cli.repo import parse_rejected_csv
@@ -140,7 +141,7 @@ def validate_accepted(repo_root: Path) -> list[Diagnostic]:
 
 def validate_rejected(repo_root: Path) -> list[Diagnostic]:
     diagnostics: list[Diagnostic] = []
-    csv_path = repo_root / "rejected" / "rejected.csv"
+    csv_path = get_rejected_csv_path(repo_root)
 
     try:
         rejected = parse_rejected_csv(csv_path)
@@ -232,7 +233,7 @@ def validate_cross(repo_root: Path) -> list[Diagnostic]:
             continue
         accepted_urls[normalized].append(str(path.relative_to(repo_root)))
 
-    csv_path = repo_root / "rejected" / "rejected.csv"
+    csv_path = get_rejected_csv_path(repo_root)
     try:
         rejected = parse_rejected_csv(csv_path)
     except Exception:
@@ -326,7 +327,7 @@ def validate_accepted_duplicates(repo_root: Path) -> list[Diagnostic]:
 def validate_rejected_duplicates(repo_root: Path) -> list[Diagnostic]:
     diagnostics: list[Diagnostic] = []
     by_url: dict[str, list[int]] = defaultdict(list)
-    csv_path = repo_root / "rejected" / "rejected.csv"
+    csv_path = get_rejected_csv_path(repo_root)
 
     try:
         rejected = parse_rejected_csv(csv_path)

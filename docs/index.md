@@ -19,6 +19,7 @@
 
 ## 面向维护者
 
+- 维护者操作手册：[overview/maintainer-guide.md](overview/maintainer-guide.md)
 - 项目边界：[overview/project-scope.md](overview/project-scope.md)
 - GitHub 仓库设置：[overview/github-repo-setup.md](overview/github-repo-setup.md)
 - CLI 边界：[cli/scope.md](cli/scope.md)

@@ -87,7 +87,7 @@ youpu validate-repo
 用于检查：
 
 - `accepted/`
-- `rejected/rejected.csv`
+- `rejected.csv`
 - 正式区重复
 - accepted / rejected 冲突
 

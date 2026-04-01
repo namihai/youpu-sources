@@ -16,6 +16,7 @@ from cli.output import Diagnostic
 from cli.repo import AcceptedDocument
 from cli.repo import get_import_accepted_paths
 from cli.repo import get_imports_layout
+from cli.repo import get_rejected_csv_path
 from cli.repo import normalize_url
 from cli.repo import parse_accepted_document
 from cli.repo import parse_rejected_csv
@@ -84,7 +85,7 @@ def accepted_url_index(repo_root: Path) -> dict[str, list[str]]:
 
 def rejected_url_index(repo_root: Path) -> dict[str, list[str]]:
     index: dict[str, list[str]] = defaultdict(list)
-    csv_path = repo_root / "rejected" / "rejected.csv"
+    csv_path = get_rejected_csv_path(repo_root)
     try:
         rejected = parse_rejected_csv(csv_path)
     except Exception:
@@ -427,7 +428,7 @@ def merge_ingest(repo_root: Path, analysis: IngestAnalysis) -> dict[str, int]:
         doc.path.unlink()
         imported_accepted += 1
 
-    rejected_csv = repo_root / "rejected" / "rejected.csv"
+    rejected_csv = get_rejected_csv_path(repo_root)
     existing_rows: list[tuple[str, str, str]] = []
     if rejected_csv.exists():
         parsed = parse_rejected_csv(rejected_csv)

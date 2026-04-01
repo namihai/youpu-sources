@@ -12,7 +12,7 @@ from urllib.parse import urlunsplit
 
 REQUIRED_ROOT_ENTRIES = (
     "accepted",
-    "rejected",
+    "rejected.csv",
     "docs",
     "templates",
     "cli",
@@ -205,6 +205,10 @@ def get_imports_layout(repo_root: Path) -> ImportsLayout:
         root=imports_root,
         rejected_csv=imports_root / "rejected.csv",
     )
+
+
+def get_rejected_csv_path(repo_root: Path) -> Path:
+    return repo_root / "rejected.csv"
 
 
 def get_import_accepted_paths(repo_root: Path) -> list[Path]:

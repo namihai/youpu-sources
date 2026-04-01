@@ -59,7 +59,7 @@ youpu <command> [options]
 检查范围：
 
 - `accepted/`
-- `rejected/rejected.csv`
+- `rejected.csv`
 - 正式区重复
 - accepted / rejected 冲突
 
