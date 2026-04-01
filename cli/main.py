@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import argparse
 
-from cli.commands import inspect_url as inspect_url_command
+from cli.commands import check_merge as check_merge_command
+from cli.commands import check_pr as check_pr_command
 from cli.commands import ingest as ingest_command
 from cli.commands import report as report_command
-from cli.commands import submit as submit_command
-from cli.commands import validate as validate_command
+from cli.commands import validate_imports as validate_imports_command
+from cli.commands import validate_repo as validate_repo_command
 from cli.errors import EXIT_OK
 from cli.errors import RuntimeCliError
 from cli.errors import UsageError
@@ -15,10 +16,11 @@ from cli.output import Diagnostic
 from cli.output import emit_result
 from cli.repo import resolve_repo_root
 COMMAND_HANDLERS = {
-    "validate": validate_command.run,
+    "validate-repo": validate_repo_command.run,
+    "validate-imports": validate_imports_command.run,
+    "check-pr": check_pr_command.run,
+    "check-merge": check_merge_command.run,
     "ingest": ingest_command.run,
-    "submit": submit_command.run,
-    "inspect-url": inspect_url_command.run,
     "report": report_command.run,
 }
 

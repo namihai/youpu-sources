@@ -6,7 +6,7 @@ from pathlib import Path
 
 from cli.argparse_utils import CliArgumentParser
 from cli.commands import ingest as ingest_command
-from cli.commands import validate as validate_command
+from cli.commands import validate_repo as validate_repo_command
 from cli.errors import EXIT_OK
 from cli.errors import EXIT_USAGE_ERROR
 from cli.output import CommandResult
@@ -62,7 +62,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
     pending_accepted = len(list(layout.accepted.glob("*.md")))
     pending_rejected = len(list(layout.rejected.glob("*.csv")))
 
-    validate_result, _ = validate_command.run([], repo_root)
+    validate_result, _ = validate_repo_command.run([], repo_root)
     validation_diagnostics = validate_result.diagnostics
     duplicate_errors = [
         item

@@ -1,220 +1,140 @@
 # youpu CLI 用户文档
 
-这份文档面向仓库使用者，说明 `youpu` 应该怎么用。
+这份文档说明新的 `youpu` 命令集应该怎么用。
 
-如果你只想快速开始，先看 [README.md](../../README.md)。如果你要看开发接口和返回码，再看 [spec.md](spec.md)。
+`youpu` 现在主要供两类场景使用：
 
-## `youpu` 是做什么的
+- GitHub Actions 调用
+- 维护者本地调试或排障
 
-`youpu` 是这个仓库的守门命令。它只负责：
+普通贡献者的主流程见 [README.md](../../README.md)。
 
-- 检查正式仓库是否合规
-- 检查并导入 `imports/` 中的候选内容
-- 在提交前做最后检查
-- 输出当前仓库摘要
-- 诊断单个 URL
+## 协作约定
 
-常用命令只有 5 个：
+- 内部协作者应使用主仓库分支提交 PR，这类 PR 支持维护者通过 `/ingest` 自动回写
+- 外部 fork PR 只作为输入检查入口，不支持自动回写 ingest 结果
+- 如果外部贡献需要正式入库，维护者应在内部分支接管对应 `imports/` 内容
+
+## 命令列表
+
+当前主命令如下：
 
 ```bash
-youpu validate
+youpu validate-repo
+youpu validate-imports
+youpu check-pr
+youpu check-merge
 youpu ingest
-youpu submit
 youpu report
-youpu inspect-url
 ```
 
 ## 你通常怎么用
 
-推荐按这个顺序：
+### 维护 PR
 
-1. 把候选内容放进 `imports/accepted/` 和 `imports/rejected/`
-2. 运行 `youpu ingest --dry-run`
-3. 查看 `imports/reports/issues.md`
-4. 修正不能处理的内容
-5. 运行 `youpu ingest`
-6. 运行 `youpu validate` 或 `youpu report`
-7. 提交前运行 `youpu submit --check-only`
-8. 最后再运行 `youpu submit --message "..."`
-
-## 导入目录
-
-`youpu ingest` 固定读取这个目录：
-
-```text
-imports/
-  accepted/
-  rejected/
-  reports/
-```
-
-说明：
-
-- `imports/accepted/`：放候选 accepted Markdown
-- `imports/rejected/`：放候选 rejected CSV
-- `imports/reports/`：保存检查结果和问题清单
-
-`youpu` 不支持切换到其他导入目录。
-
-## 常用命令
-
-### 先检查导入内容
+如果你要在本地复现 PR 检查，运行：
 
 ```bash
-youpu ingest --dry-run
+youpu check-pr
 ```
 
-这个命令会检查 `imports/` 里的内容，但不会修改正式仓库。
+这个命令会同时：
 
-最小示例输出：
+- 检查正式区
+- 检查 `imports/`
 
-```text
-Ingest dry-run completed
-imports root: imports
-accepted candidates ready: 0
-rejected candidates ready: 0
-issues: 0
+### 准备合并
+
+如果你要确认当前分支是否已经达到可合并状态，运行：
+
+```bash
+youpu check-merge
 ```
 
-### 正式导入
+这个命令要求：
+
+- 正式区合法
+- `imports/accepted` 和 `imports/rejected` 没有待处理文件
+- 当前分支没有遗留导入问题
+
+### 执行正式入库
+
+如果你要执行确定性的导入，运行：
 
 ```bash
 youpu ingest
 ```
 
-这个命令会把合规的候选内容写入正式仓库，并保留不能处理的内容供你手工修正。
+这个命令会：
 
-最小示例输出：
+- 读取 `imports/`
+- 校验候选内容
+- 对允许自动修正的部分做确定性处理
+- 写入 `accepted/` / `rejected/`
+- 删除已处理的输入文件
 
-```text
-Ingest completed
-imports root: imports
-accepted candidates ready: 1
-rejected candidates ready: 1
-issues: 0
-```
+如果候选内容存在问题，命令会直接失败，不会做部分写入。
 
-### 检查正式仓库
+## 单独检查命令
+
+### 检查正式区
 
 ```bash
-youpu validate
+youpu validate-repo
 ```
 
-这个命令会检查正式仓库中的：
+用于检查：
 
 - `accepted/`
 - `rejected/rejected.csv`
-- 重复记录
+- 正式区重复
 - accepted / rejected 冲突
 
-最小示例输出：
-
-```text
-Validation passed
-```
-
-### 查看当前摘要
+### 检查导入区
 
 ```bash
-youpu report
+youpu validate-imports
 ```
 
-最小示例输出：
+用于检查：
 
-```text
-Repository summary
-accepted files: 93
-rejected rows: 82
-latest accepted id: SRC-0095
-validation: passed
-duplicates: none
-cross-conflicts: 0
-imports pending accepted: 0
-imports pending rejected: 0
-imports issues: 0
-```
+- `imports/accepted/*.md`
+- `imports/rejected/*.csv`
+- 与正式区的冲突
+- `imports/` 内部重复
 
-### 提交前检查
+这个命令是只读的，不会执行 ingest，也不会默认把报告写入版本控制。
+
+## 输出格式
+
+所有命令都支持：
 
 ```bash
-youpu submit --check-only
-```
-
-这个命令会在提交前确认：
-
-- 正式仓库合法
-- `imports/` 里没有待处理内容
-- `imports/reports/` 里没有未解决问题
-
-最小示例输出：
-
-```text
-Submit check passed
-```
-
-### 提交并可选推送
-
-```bash
-youpu submit --message "your commit message"
-youpu submit --message "your commit message" --push
-```
-
-最小示例输出：
-
-```text
-Submit completed
-```
-
-### 诊断单个 URL
-
-```bash
-youpu inspect-url 'https://example.com/path?utm_source=x#intro'
-```
-
-这个命令会输出规范化后的 URL。
-
-最小示例输出：
-
-```text
-https://example.com/path
-```
-
-## 遇到问题先看哪里
-
-运行 `youpu ingest` 或 `youpu ingest --dry-run` 后，优先查看：
-
-- [`imports/reports/issues.md`](../../imports/reports/issues.md)
-
-这里会列出：
-
-- 哪些文件可以导入
-- 哪些文件格式不对
-- 哪些文件和现有记录冲突
-
-系统还会生成：
-
-- [`imports/reports/summary.json`](../../imports/reports/summary.json)
-
-这个文件更适合脚本或 agent 使用。
-
-## 如果你需要 JSON 输出
-
-```bash
+youpu --format text <command>
 youpu --format json <command>
 ```
 
 例如：
 
 ```bash
-youpu --format json ingest --dry-run
-youpu --format json validate
-youpu --format json report
+youpu --format json check-pr
+youpu --format json check-merge
+```
+
+JSON 输出适合 CI、脚本或后续生成 PR 注释。
+
+## 退出码
+
+```text
+0  成功
+1  规则检查失败
+2  参数错误
+3  运行时异常
 ```
 
 ## 相关文档
 
 - 文档总入口：[../index.md](../index.md)
-- accepted 规范：[../specs/accepted.md](../specs/accepted.md)
-- rejected 规范：[../specs/rejected.md](../specs/rejected.md)
-- URL 规范：[../specs/url.md](../specs/url.md)
+- 项目边界：[../overview/project-scope.md](../overview/project-scope.md)
+- CLI 边界：[scope.md](scope.md)
 - CLI 开发接口：[spec.md](spec.md)

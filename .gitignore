@@ -29,5 +29,5 @@ env/
 # OS / local temp files
 Thumbs.db
 
-# Local import workspace
-imports/
+# Runtime reports
+imports/reports/

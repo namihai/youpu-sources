@@ -2,26 +2,25 @@ from __future__ import annotations
 
 import argparse
 import csv
-import json
 import re
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
 from cli.argparse_utils import CliArgumentParser
-from cli.commands.validate import DISALLOWED_FIELDS
-from cli.commands.validate import REJECTED_COLUMNS
-from cli.commands.validate import REQUIRED_NONEMPTY_FIELDS
 from cli.errors import EXIT_OK
 from cli.errors import EXIT_USAGE_ERROR
+from cli.errors import EXIT_VALIDATION_FAILED
 from cli.output import CommandResult
 from cli.output import Diagnostic
 from cli.repo import AcceptedDocument
 from cli.repo import get_imports_layout
-from cli.repo import ensure_imports_layout
 from cli.repo import normalize_url
 from cli.repo import parse_accepted_document
 from cli.repo import parse_rejected_csv
+from cli.validation import DISALLOWED_FIELDS
+from cli.validation import REJECTED_COLUMNS
+from cli.validation import REQUIRED_NONEMPTY_FIELDS
 
 SLUG_CLEAN_RE = re.compile(r"[^a-z0-9]+")
 ACCEPTED_FIELD_ORDER = [
@@ -60,9 +59,7 @@ class IngestAnalysis:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = CliArgumentParser(prog="youpu ingest", add_help=False)
-    parser.add_argument("--dry-run", action="store_true")
-    return parser
+    return CliArgumentParser(prog="youpu ingest", add_help=False)
 
 
 def accepted_url_index(repo_root: Path) -> dict[str, list[str]]:
@@ -118,7 +115,7 @@ def next_accepted_index(accepted_dir: Path) -> int:
     return max_index + 1
 
 
-def build_analysis(repo_root: Path, *, ensure_layout: bool = False) -> IngestAnalysis:
+def build_analysis(repo_root: Path) -> IngestAnalysis:
     diagnostics: list[Diagnostic] = []
     accepted_docs: list[AcceptedDocument] = []
     rejected_rows: list[RejectedImportRow] = []
@@ -128,7 +125,7 @@ def build_analysis(repo_root: Path, *, ensure_layout: bool = False) -> IngestAna
     rejected_seen_urls: dict[str, list[str]] = defaultdict(list)
     accepted_urls = accepted_url_index(repo_root)
     rejected_urls = rejected_url_index(repo_root)
-    layout = ensure_imports_layout(repo_root) if ensure_layout else get_imports_layout(repo_root)
+    layout = get_imports_layout(repo_root)
 
     for path in sorted(layout.accepted.glob("*.md")):
         rel_path = str(path.relative_to(repo_root))
@@ -430,7 +427,7 @@ def merge_ingest(repo_root: Path, analysis: IngestAnalysis) -> dict[str, int]:
     return {
         "imported_accepted": imported_accepted,
         "imported_rejected": imported_rejected,
-                "imports_root": "imports",
+        "imports_root": "imports",
     }
 
 
@@ -447,74 +444,10 @@ def build_summary(analysis: IngestAnalysis, *, dry_run: bool) -> str:
     )
 
 
-def write_reports(
-    repo_root: Path,
-    analysis: IngestAnalysis,
-    *,
-    dry_run: bool,
-    merge_data: dict[str, int] | None = None,
-) -> None:
-    layout = ensure_imports_layout(repo_root)
-    summary = build_summary(analysis, dry_run=dry_run)
-    issues_md = layout.reports / "issues.md"
-    summary_json = layout.reports / "summary.json"
-
-    md_lines = [
-        "# Ingest Report",
-        "",
-        f"- mode: {'dry-run' if dry_run else 'write'}",
-        f"- imports root: {layout.root.relative_to(repo_root)}",
-        f"- accepted ready: {len(analysis.accepted_ready)}",
-        f"- rejected ready: {len(analysis.rejected_ready)}",
-        f"- issues: {len(analysis.diagnostics)}",
-    ]
-    if merge_data is not None:
-        md_lines.extend(
-            [
-                f"- imported accepted: {merge_data.get('imported_accepted', 0)}",
-                f"- imported rejected: {merge_data.get('imported_rejected', 0)}",
-            ]
-        )
-
-    if analysis.diagnostics:
-        md_lines.extend(["", "## Issues", ""])
-        for diag in analysis.diagnostics:
-            line = f"- `{diag.path}`: {diag.message}" if diag.path else f"- {diag.message}"
-            if diag.code:
-                line = f"{line} (`{diag.code}`)"
-            md_lines.append(line)
-    else:
-        md_lines.extend(["", "## Issues", "", "- none"])
-
-    issues_md.write_text("\n".join(md_lines) + "\n", encoding="utf-8")
-
-    payload = {
-        "summary": summary,
-        "dry_run": dry_run,
-        "imports_root": str(layout.root.relative_to(repo_root)),
-        "accepted_ready": len(analysis.accepted_ready),
-        "rejected_ready": len(analysis.rejected_ready),
-        "issues": len(analysis.diagnostics),
-        "diagnostics": [
-            {
-                "level": diag.level,
-                "message": diag.message,
-                "path": diag.path,
-                "code": diag.code,
-                "details": diag.details,
-            }
-            for diag in analysis.diagnostics
-        ],
-    }
-    if merge_data is not None:
-        payload.update(merge_data)
-    summary_json.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-
-
 def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
     parser = build_parser()
     try:
-        args = parser.parse_args(command_args)
+        parser.parse_args(command_args)
     except (SystemExit, ValueError):
         return (
             CommandResult(
@@ -526,37 +459,33 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             EXIT_USAGE_ERROR,
         )
 
-    layout = ensure_imports_layout(repo_root)
+    layout = get_imports_layout(repo_root)
     analysis = build_analysis(repo_root)
-
-    if args.dry_run:
-        summary = build_summary(analysis, dry_run=True)
-        write_reports(repo_root, analysis, dry_run=True)
+    if analysis.diagnostics:
         return (
             CommandResult(
-                ok=not analysis.diagnostics,
+                ok=False,
                 command="ingest",
-                summary=summary,
+                summary="Ingest failed",
                 diagnostics=analysis.diagnostics,
                 data={
                     "imports_root": str(layout.root.relative_to(repo_root)),
                     "accepted_ready": len(analysis.accepted_ready),
                     "rejected_ready": len(analysis.rejected_ready),
-                    "dry_run": True,
+                    "dry_run": False,
                 },
             ),
-            EXIT_OK if not analysis.diagnostics else EXIT_USAGE_ERROR,
+            EXIT_VALIDATION_FAILED,
         )
 
     merge_data = merge_ingest(repo_root, analysis)
     summary = build_summary(analysis, dry_run=False)
-    write_reports(repo_root, analysis, dry_run=False, merge_data=merge_data)
     return (
         CommandResult(
-            ok=not analysis.diagnostics,
+            ok=True,
             command="ingest",
             summary=summary,
-            diagnostics=analysis.diagnostics,
+            diagnostics=[],
             data={
                 **merge_data,
                 "accepted_ready": len(analysis.accepted_ready),
@@ -564,5 +493,5 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
                 "dry_run": False,
             },
         ),
-        EXIT_OK if not analysis.diagnostics else EXIT_USAGE_ERROR,
+        EXIT_OK,
     )

@@ -64,7 +64,6 @@ class ImportsLayout:
     root: Path
     accepted: Path
     rejected: Path
-    reports: Path
 
 
 def parse_simple_yaml_block(text: str) -> dict[str, str]:
@@ -206,12 +205,4 @@ def get_imports_layout(repo_root: Path) -> ImportsLayout:
         root=imports_root,
         accepted=imports_root / "accepted",
         rejected=imports_root / "rejected",
-        reports=imports_root / "reports",
     )
-
-
-def ensure_imports_layout(repo_root: Path) -> ImportsLayout:
-    layout = get_imports_layout(repo_root)
-    for path in (layout.root, layout.accepted, layout.rejected, layout.reports):
-        path.mkdir(parents=True, exist_ok=True)
-    return layout

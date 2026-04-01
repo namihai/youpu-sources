@@ -1,0 +1,92 @@
+name: Ingest PR
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  ingest:
+    if: ${{ github.event.issue.pull_request && github.event.comment.body == '/ingest' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate commenter permission
+        id: permission
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const permission = await github.rest.repos.getCollaboratorPermissionLevel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              username: context.payload.comment.user.login,
+            });
+            const allowed = new Set(["admin", "maintain", "write"]);
+            core.setOutput("allowed", allowed.has(permission.data.permission) ? "true" : "false");
+            if (!allowed.has(permission.data.permission)) {
+              core.setFailed(`User ${context.payload.comment.user.login} does not have permission to run /ingest.`);
+            }
+
+      - name: Load PR metadata
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            core.setOutput("head_ref", pr.data.head.ref);
+            core.setOutput("head_repo", pr.data.head.repo.full_name);
+            core.setOutput("is_fork", pr.data.head.repo.full_name !== `${context.repo.owner}/${context.repo.repo}` ? "true" : "false");
+
+      - name: Stop on fork PR
+        if: ${{ steps.pr.outputs.is_fork == 'true' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.setFailed(
+              "Fork PRs do not support automatic /ingest write-back. Please move the candidate files to an internal branch and run /ingest there."
+            );
+
+      - name: Checkout PR branch
+        if: ${{ steps.pr.outputs.is_fork != 'true' }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.pr.outputs.head_repo }}
+          ref: ${{ steps.pr.outputs.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        if: ${{ steps.pr.outputs.is_fork != 'true' }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Run PR checks
+        if: ${{ steps.pr.outputs.is_fork != 'true' }}
+        run: python3 youpu check-pr
+
+      - name: Run ingest
+        if: ${{ steps.pr.outputs.is_fork != 'true' }}
+        run: python3 youpu ingest
+
+      - name: Commit ingest result
+        if: ${{ steps.pr.outputs.is_fork != 'true' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "Run ingest for PR"
+          git push origin HEAD:${{ steps.pr.outputs.head_ref }}
+
+      - name: Run merge checks
+        if: ${{ steps.pr.outputs.is_fork != 'true' }}
+        run: python3 youpu check-merge
