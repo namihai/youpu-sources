@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 from youpu.app.ingest import build_analysis
@@ -65,6 +66,60 @@ Body text.
         self.assertEqual(accepted_doc.yaml_fields["canonical_url"], "https://example.com/dataset?id=1")
         self.assertEqual(accepted_doc.yaml_fields["subtitle"], "Subtitle: value")
         self.assertEqual(rejected_csv.rows[0].url, "https://example.com/rejected")
+
+    def test_merge_ingest_keeps_sources_when_write_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = create_repo_skeleton(Path(tmp))
+            accepted_path = repo_root / "staging" / "accepted" / "sample.md"
+            accepted_path.write_text(
+                """# Sample Title
+
+```yaml
+title: "Sample Title"
+subtitle: "Subtitle"
+canonical_url: "https://example.com/dataset"
+domain: "领域"
+content_type: "内容类型"
+data_form: "文本"
+data_type: "元数据"
+region: "CN"
+source_type: "机构"
+source_org: "Example Org"
+permissions: "公开"
+tags: [tag-a, tag-b]
+use_cases: [case-a]
+```
+""",
+                encoding="utf-8",
+            )
+            rejected_path = repo_root / "staging" / "rejected" / "rows.csv"
+            rejected_path.write_text(
+                "url,title,reason\nhttps://example.com/rejected,Rejected,not fit\n",
+                encoding="utf-8",
+            )
+
+            analysis = build_analysis(repo_root)
+            self.assertEqual(analysis.diagnostics, [])
+
+            original_write_rejected_csv = __import__("youpu.app.ingest", fromlist=["write_rejected_csv"]).write_rejected_csv
+            calls = {"count": 0}
+
+            def flaky_write(csv_path: Path, columns: list[str], rows: list[tuple[str, str, str]]) -> None:
+                calls["count"] += 1
+                if calls["count"] == 1:
+                    raise OSError("simulated write failure")
+                original_write_rejected_csv(csv_path, columns, rows)
+
+            with patch("youpu.app.ingest.write_rejected_csv", side_effect=flaky_write):
+                with self.assertRaisesRegex(OSError, "simulated write failure"):
+                    merge_ingest(repo_root, analysis)
+
+            accepted_files = list((repo_root / "data" / "accepted").glob("*.md"))
+            temp_files = list(repo_root.rglob("*.tmp"))
+            self.assertEqual(accepted_files, [])
+            self.assertTrue(accepted_path.exists())
+            self.assertTrue(rejected_path.exists())
+            self.assertEqual(temp_files, [])
 
 
 if __name__ == "__main__":

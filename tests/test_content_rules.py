@@ -94,6 +94,30 @@ class ContentRulesTests(unittest.TestCase):
             ],
         )
 
+    def test_validate_accepted_document_rejects_malformed_inline_array(self) -> None:
+        doc = AcceptedDocument(
+            path=Path("example.md"),
+            index=1,
+            slug="example",
+            heading="Example",
+            yaml_fields={
+                "title": "Example",
+                "canonical_url": "https://example.com/path",
+                "tags": "[tag-a,,tag-b]",
+            },
+            body="body",
+        )
+
+        diagnostics, normalized_url = validate_accepted_document(
+            doc,
+            rel_path="staging/accepted/example.md",
+            rules=self.rules,
+            code_prefix="staging_accepted",
+        )
+
+        self.assertEqual(normalized_url, "https://example.com/path")
+        self.assertEqual([item.code for item in diagnostics], ["staging_accepted_invalid_array"])
+
 
 if __name__ == "__main__":
     unittest.main()

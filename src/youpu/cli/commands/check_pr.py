@@ -1,35 +1,18 @@
 from __future__ import annotations
 
-import argparse
 from pathlib import Path
 
 from youpu.app.checks import run_pr_check
 from youpu.app.results import CommandResult
-from youpu.cli.argparse_utils import CliArgumentParser
 from youpu.cli.errors import EXIT_OK
-from youpu.cli.errors import EXIT_USAGE_ERROR
 from youpu.cli.errors import EXIT_VALIDATION_FAILED
-from youpu.domain.diagnostics import Diagnostic
-
-
-def build_parser() -> argparse.ArgumentParser:
-    return CliArgumentParser(prog="youpu check-pr", add_help=False)
+from youpu.cli.commands.common import parse_no_args
+from youpu.cli.commands.common import usage_error_result
 
 
 def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
-    parser = build_parser()
-    try:
-        parser.parse_args(command_args)
-    except (SystemExit, ValueError):
-        return (
-            CommandResult(
-                ok=False,
-                command="check-pr",
-                summary="PR check failed",
-                diagnostics=[Diagnostic(level="error", message="invalid arguments", code="usage_error")],
-            ),
-            EXIT_USAGE_ERROR,
-        )
+    if not parse_no_args(command_args, prog="youpu check-pr"):
+        return usage_error_result("check-pr", "PR check failed")
 
     report = run_pr_check(repo_root)
     ok = report.ok

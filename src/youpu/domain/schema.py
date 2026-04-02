@@ -18,8 +18,25 @@ def _schema_error(repo_root: Path, name: str, message: str, code: str) -> Schema
     )
 
 
-def get_accepted_fields(repo_root: Path) -> list[AcceptedField]:
-    raw = load_schema_document(get_schema_path(repo_root, "accepted"))
+@dataclass(frozen=True)
+class AcceptedSchemaConfig:
+    fields: list[AcceptedField]
+    template_path: Path
+
+
+@dataclass(frozen=True)
+class RejectedSchemaConfig:
+    columns: list[RejectedColumn]
+    template_path: Path
+
+
+@dataclass(frozen=True)
+class SchemaConfig:
+    accepted: AcceptedSchemaConfig
+    rejected: RejectedSchemaConfig
+
+
+def _parse_accepted_schema(repo_root: Path, raw: object) -> AcceptedSchemaConfig:
     if not isinstance(raw, dict):
         raise _schema_error(repo_root, "accepted", "accepted schema must be a mapping", "accepted_schema_invalid")
 
@@ -52,11 +69,17 @@ def get_accepted_fields(repo_root: Path) -> list[AcceptedField]:
         seen_names.add(name)
         parsed.append(AcceptedField(name=name, field_type=field_type, required=required, example=example))
 
-    return parsed
+    template = raw.get("template")
+    if not isinstance(template, dict):
+        raise _schema_error(repo_root, "accepted", "accepted schema must define `template.path`", "accepted_schema_invalid")
+    path = template.get("path")
+    if not isinstance(path, str) or not path:
+        raise _schema_error(repo_root, "accepted", "accepted schema must define non-empty `template.path`", "accepted_schema_invalid")
+
+    return AcceptedSchemaConfig(fields=parsed, template_path=repo_root / path)
 
 
-def get_rejected_columns(repo_root: Path) -> list[RejectedColumn]:
-    raw = load_schema_document(get_schema_path(repo_root, "rejected"))
+def _parse_rejected_schema(repo_root: Path, raw: object) -> RejectedSchemaConfig:
     if not isinstance(raw, dict):
         raise _schema_error(repo_root, "rejected", "rejected schema must be a mapping", "rejected_schema_invalid")
 
@@ -86,7 +109,31 @@ def get_rejected_columns(repo_root: Path) -> list[RejectedColumn]:
         seen_names.add(name)
         parsed.append(RejectedColumn(name=name, required=required, example=example))
 
-    return parsed
+    template = raw.get("template")
+    if not isinstance(template, dict):
+        raise _schema_error(repo_root, "rejected", "rejected schema must define `template.path`", "rejected_schema_invalid")
+    path = template.get("path")
+    if not isinstance(path, str) or not path:
+        raise _schema_error(repo_root, "rejected", "rejected schema must define non-empty `template.path`", "rejected_schema_invalid")
+
+    return RejectedSchemaConfig(columns=parsed, template_path=repo_root / path)
+
+
+def load_schema_config(repo_root: Path) -> SchemaConfig:
+    accepted_raw = load_schema_document(get_schema_path(repo_root, "accepted"))
+    rejected_raw = load_schema_document(get_schema_path(repo_root, "rejected"))
+    return SchemaConfig(
+        accepted=_parse_accepted_schema(repo_root, accepted_raw),
+        rejected=_parse_rejected_schema(repo_root, rejected_raw),
+    )
+
+
+def get_accepted_fields(repo_root: Path) -> list[AcceptedField]:
+    return load_schema_config(repo_root).accepted.fields
+
+
+def get_rejected_columns(repo_root: Path) -> list[RejectedColumn]:
+    return load_schema_config(repo_root).rejected.columns
 
 
 def get_accepted_field_order(repo_root: Path) -> list[str]:
@@ -106,16 +153,7 @@ def get_accepted_allowed_fields(repo_root: Path) -> set[str]:
 
 
 def get_accepted_template_path(repo_root: Path) -> Path:
-    raw = load_schema_document(get_schema_path(repo_root, "accepted"))
-    if not isinstance(raw, dict):
-        raise _schema_error(repo_root, "accepted", "accepted schema must be a mapping", "accepted_schema_invalid")
-    template = raw.get("template")
-    if not isinstance(template, dict):
-        raise _schema_error(repo_root, "accepted", "accepted schema must define `template.path`", "accepted_schema_invalid")
-    path = template.get("path")
-    if not isinstance(path, str) or not path:
-        raise _schema_error(repo_root, "accepted", "accepted schema must define non-empty `template.path`", "accepted_schema_invalid")
-    return repo_root / path
+    return load_schema_config(repo_root).accepted.template_path
 
 
 def get_rejected_column_names(repo_root: Path) -> list[str]:
@@ -123,16 +161,7 @@ def get_rejected_column_names(repo_root: Path) -> list[str]:
 
 
 def get_rejected_template_path(repo_root: Path) -> Path:
-    raw = load_schema_document(get_schema_path(repo_root, "rejected"))
-    if not isinstance(raw, dict):
-        raise _schema_error(repo_root, "rejected", "rejected schema must be a mapping", "rejected_schema_invalid")
-    template = raw.get("template")
-    if not isinstance(template, dict):
-        raise _schema_error(repo_root, "rejected", "rejected schema must define `template.path`", "rejected_schema_invalid")
-    path = template.get("path")
-    if not isinstance(path, str) or not path:
-        raise _schema_error(repo_root, "rejected", "rejected schema must define non-empty `template.path`", "rejected_schema_invalid")
-    return repo_root / path
+    return load_schema_config(repo_root).rejected.template_path
 
 
 @dataclass(frozen=True)
@@ -144,9 +173,10 @@ class SchemaRules:
 
 
 def load_schema_rules(repo_root: Path) -> SchemaRules:
+    config = load_schema_config(repo_root)
     return SchemaRules(
-        accepted_required_fields=get_accepted_required_fields(repo_root),
-        accepted_allowed_fields=get_accepted_allowed_fields(repo_root),
-        accepted_array_fields=get_accepted_array_fields(repo_root),
-        rejected_column_names=get_rejected_column_names(repo_root),
+        accepted_required_fields=[field.name for field in config.accepted.fields if field.required],
+        accepted_allowed_fields={field.name for field in config.accepted.fields},
+        accepted_array_fields=[field.name for field in config.accepted.fields if field.is_array],
+        rejected_column_names=[column.name for column in config.rejected.columns],
     )

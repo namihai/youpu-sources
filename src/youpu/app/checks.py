@@ -24,6 +24,7 @@ from youpu.infra.repo_layout import get_staging_accepted_paths
 from youpu.infra.repo_layout import get_staging_layout
 from youpu.infra.schema_store import SchemaConfigError
 from youpu.infra.schema_store import get_schema_path
+from youpu.app.staging import build_staging_analysis
 
 
 @dataclass(frozen=True)
@@ -314,8 +315,7 @@ def _validate_rejected_duplicates(repo_root: Path) -> list[Diagnostic]:
 
 
 def run_imports_check(repo_root: Path) -> ImportsCheck:
-    from youpu.app.ingest import build_analysis
-    analysis = build_analysis(repo_root)
+    analysis = build_staging_analysis(repo_root)
     return ImportsCheck(
         diagnostics=analysis.diagnostics,
         accepted_ready=len(analysis.accepted_ready),

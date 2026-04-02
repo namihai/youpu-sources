@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from youpu.domain.accepted import AcceptedDocument
+from youpu.domain.accepted import parse_inline_array
 from youpu.domain.diagnostics import Diagnostic
 from youpu.domain.schema import SchemaRules
 from youpu.domain.urls import normalize_url
@@ -43,8 +44,20 @@ def validate_accepted_document(
 
     for key in rules.accepted_array_fields:
         value = doc.yaml_fields.get(key, "").strip()
-        if value and not (value.startswith("[") and value.endswith("]")):
-            diagnostics.append(Diagnostic(level="error", message=f"field `{key}` must use inline array syntax like [a, b]", path=rel_path, code=f"{code_prefix}_invalid_array", details={"field": key}))
+        if not value:
+            continue
+        try:
+            parse_inline_array(value)
+        except ValueError as exc:
+            diagnostics.append(
+                Diagnostic(
+                    level="error",
+                    message=f"field `{key}` {exc}",
+                    path=rel_path,
+                    code=f"{code_prefix}_invalid_array",
+                    details={"field": key},
+                )
+            )
 
     canonical_url = doc.yaml_fields.get("canonical_url", "").strip()
     if canonical_url:

@@ -1,21 +1,15 @@
 from __future__ import annotations
 
-import argparse
 from pathlib import Path
 
 from youpu.app.checks import ImportsCheck
 from youpu.app.checks import run_imports_check
 from youpu.app.results import CommandResult
-from youpu.cli.argparse_utils import CliArgumentParser
+from youpu.cli.commands.common import parse_no_args
+from youpu.cli.commands.common import usage_error_result
 from youpu.cli.errors import EXIT_OK
-from youpu.cli.errors import EXIT_USAGE_ERROR
 from youpu.cli.errors import EXIT_VALIDATION_FAILED
-from youpu.domain.diagnostics import Diagnostic
 from youpu.infra.repo_layout import get_staging_layout
-
-
-def build_parser() -> argparse.ArgumentParser:
-    return CliArgumentParser(prog="youpu validate-imports", add_help=False)
 
 
 def build_summary(report: ImportsCheck, repo_root: Path, *, ok: bool) -> str:
@@ -33,19 +27,8 @@ def build_summary(report: ImportsCheck, repo_root: Path, *, ok: bool) -> str:
 
 
 def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
-    parser = build_parser()
-    try:
-        parser.parse_args(command_args)
-    except (SystemExit, ValueError):
-        return (
-            CommandResult(
-                ok=False,
-                command="validate-imports",
-                summary="Staging validation failed",
-                diagnostics=[Diagnostic(level="error", message="invalid arguments", code="usage_error")],
-            ),
-            EXIT_USAGE_ERROR,
-        )
+    if not parse_no_args(command_args, prog="youpu validate-imports"):
+        return usage_error_result("validate-imports", "Staging validation failed")
 
     report = run_imports_check(repo_root)
     ok = report.ok
