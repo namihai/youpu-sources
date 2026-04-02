@@ -35,7 +35,7 @@
 逻辑入口：
 
 ```bash
-youpu <command> [options]
+youpu [--format text|json] [--root <path>] <command> [command_args]
 ```
 
 当前命令：
@@ -204,7 +204,7 @@ CLI 识别的导入区边界为：
 
 ## 输出结构
 
-所有命令都应输出：
+JSON 输出固定包含：
 
 - `ok`
 - `command`
@@ -224,6 +224,11 @@ CLI 识别的导入区边界为：
 
 - staging 相关字段使用 `staging_*`
 - 不再新增 `imports_*` 风格字段
+
+文本输出不承诺与 JSON 同构。当前文本输出只保证：
+
+- 第一行输出摘要 `summary`
+- 后续按行输出 diagnostics
 
 ## 自动修正边界
 
