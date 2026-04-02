@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from cli.main import main
+from youpu.cli.main import main
 
 
 if __name__ == "__main__":

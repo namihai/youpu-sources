@@ -12,8 +12,8 @@ def create_repo_skeleton(repo_root: Path) -> Path:
     (repo_root / "staging" / "rejected").mkdir(parents=True)
     (repo_root / "schemas").mkdir(parents=True)
     (repo_root / "docs").mkdir(parents=True)
+    (repo_root / "src").mkdir(parents=True)
     (repo_root / "templates").mkdir(parents=True)
-    (repo_root / "cli").mkdir(parents=True)
     (repo_root / "README.md").write_text("# temp repo\n", encoding="utf-8")
 
     for rel_path in (

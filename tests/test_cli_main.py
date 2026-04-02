@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import os
 import tempfile
 import unittest
 from contextlib import redirect_stderr
@@ -9,7 +10,7 @@ from pathlib import Path
 import subprocess
 import sys
 
-from cli.main import main
+from youpu.cli.main import main
 from tests.support import create_repo_skeleton
 
 
@@ -41,12 +42,16 @@ class CliMainTests(unittest.TestCase):
     def test_module_entrypoint_matches_script_behavior(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo_root = create_repo_skeleton(Path(tmp))
+            env = dict(os.environ)
+            src_path = str(Path(__file__).resolve().parents[1] / "src")
+            env["PYTHONPATH"] = src_path if not env.get("PYTHONPATH") else f"{src_path}:{env['PYTHONPATH']}"
             result = subprocess.run(
-                [sys.executable, "-m", "cli.main", "--root", str(repo_root), "report"],
+                [sys.executable, "-m", "youpu.cli.main", "--root", str(repo_root), "report"],
                 check=False,
                 capture_output=True,
                 text=True,
                 cwd=Path(__file__).resolve().parents[1],
+                env=env,
             )
 
         self.assertEqual(result.returncode, 0)

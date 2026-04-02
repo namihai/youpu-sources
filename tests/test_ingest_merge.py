@@ -4,10 +4,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from cli.commands.ingest import build_analysis
-from cli.commands.ingest import merge_ingest
-from cli.repo import parse_accepted_document
-from cli.repo import parse_rejected_csv
+from youpu.app.ingest import build_analysis
+from youpu.app.ingest import merge_ingest
+from youpu.infra.accepted_store import parse_accepted_document
+from youpu.infra.rejected_store import parse_rejected_csv
 from tests.support import create_repo_skeleton
 
 

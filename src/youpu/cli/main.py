@@ -2,22 +2,22 @@ from __future__ import annotations
 
 import argparse
 
-from cli.commands import check_merge as check_merge_command
-from cli.commands import check_pr as check_pr_command
-from cli.commands import ingest as ingest_command
-from cli.commands import report as report_command
-from cli.commands import validate_imports as validate_imports_command
-from cli.commands import validate_repo as validate_repo_command
-from cli.commands import validate_schema as validate_schema_command
-from cli.errors import CliError
-from cli.errors import EXIT_OK
-from cli.errors import EXIT_RUNTIME_ERROR
-from cli.errors import RuntimeCliError
-from cli.errors import UsageError
-from cli.output import CommandResult
-from cli.output import Diagnostic
-from cli.output import emit_result
-from cli.repo import resolve_repo_root
+from youpu.cli.commands import check_merge as check_merge_command
+from youpu.cli.commands import check_pr as check_pr_command
+from youpu.cli.commands import ingest as ingest_command
+from youpu.cli.commands import report as report_command
+from youpu.cli.commands import validate_imports as validate_imports_command
+from youpu.cli.commands import validate_repo as validate_repo_command
+from youpu.cli.commands import validate_schema as validate_schema_command
+from youpu.cli.errors import CliError
+from youpu.cli.errors import EXIT_OK
+from youpu.cli.errors import EXIT_RUNTIME_ERROR
+from youpu.cli.errors import RuntimeCliError
+from youpu.cli.errors import UsageError
+from youpu.cli.output import emit_result
+from youpu.app.results import CommandResult
+from youpu.domain.diagnostics import Diagnostic
+from youpu.infra.repo_root import resolve_repo_root
 
 COMMAND_HANDLERS = {
     "validate-schema": validate_schema_command.run,

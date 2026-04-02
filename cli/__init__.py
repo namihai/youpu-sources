@@ -1,1 +1,0 @@
-"""youpu CLI package."""

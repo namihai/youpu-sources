@@ -47,6 +47,8 @@ staging/
 make test
 ```
 
+源码当前采用分层结构，位于 `src/youpu/` 下；具体分层说明见 [源码结构文档](docs/overview/source-layout.md)。
+
 ## 进一步阅读
 
 完整流程见：
@@ -64,6 +66,7 @@ make test
 - 操作手册：[docs/overview/contributor-guide.md](docs/overview/contributor-guide.md)
 - 常见失败与处理方式：[docs/overview/failures.md](docs/overview/failures.md)
 - 维护者操作手册：[docs/overview/maintainer-guide.md](docs/overview/maintainer-guide.md)
+- 源码结构：[docs/overview/source-layout.md](docs/overview/source-layout.md)
 - 项目边界：[docs/overview/project-scope.md](docs/overview/project-scope.md)
 - GitHub 仓库设置：[docs/overview/github-repo-setup.md](docs/overview/github-repo-setup.md)
 - CLI 用户文档：[docs/cli/user-guide.md](docs/cli/user-guide.md)

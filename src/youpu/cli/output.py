@@ -3,27 +3,8 @@ from __future__ import annotations
 import json
 import sys
 from dataclasses import asdict
-from dataclasses import dataclass
-from dataclasses import field
-from typing import Any
 
-
-@dataclass(frozen=True)
-class Diagnostic:
-    level: str
-    message: str
-    path: str | None = None
-    code: str | None = None
-    details: dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass(frozen=True)
-class CommandResult:
-    ok: bool
-    command: str
-    summary: str
-    diagnostics: list[Diagnostic] = field(default_factory=list)
-    data: dict[str, Any] = field(default_factory=dict)
+from youpu.app.results import CommandResult
 
 
 def render_text(result: CommandResult, *, stderr: bool = False) -> None:

@@ -3,10 +3,10 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
-from cli.content_rules import SchemaRules
-from cli.content_rules import validate_accepted_document
-from cli.content_rules import validate_rejected_values
-from cli.repo import AcceptedDocument
+from youpu.domain.accepted import AcceptedDocument
+from youpu.domain.rules import validate_accepted_document
+from youpu.domain.rules import validate_rejected_values
+from youpu.domain.schema import SchemaRules
 
 
 class ContentRulesTests(unittest.TestCase):

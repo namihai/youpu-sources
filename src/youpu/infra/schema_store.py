@@ -19,14 +19,9 @@ def get_schema_path(repo_root: Path, name: str) -> Path:
     return repo_root / "schemas" / f"{name}.json"
 
 
-def load_schema_document(path_str: str) -> object:
-    path = Path(path_str)
+def load_schema_document(path: Path) -> object:
     if not path.exists():
-        raise SchemaConfigError(
-            path=path,
-            message="schema file is missing",
-            code="schema_missing",
-        )
+        raise SchemaConfigError(path=path, message="schema file is missing", code="schema_missing")
 
     try:
         return json.loads(path.read_text(encoding="utf-8"))

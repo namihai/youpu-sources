@@ -134,10 +134,13 @@ youpu report
 
 如果本次 PR 涉及字段调整、模板调整或 CLI schema 逻辑调整，建议先单独跑一次 `youpu validate-schema`，再看 `check-pr` / `check-merge`。
 
+如果需要继续修改 CLI 实现本身，源码当前位于 `src/youpu/`，并按 `cli / app / domain / infra` 分层；具体见 [source-layout.md](source-layout.md)。
+
 ## 相关文档
 
 - 常见失败与处理方式：[failures.md](failures.md)
 - 仓库设置：[github-repo-setup.md](github-repo-setup.md)
+- 源码结构：[source-layout.md](source-layout.md)
 - CLI 用户文档：[../cli/user-guide.md](../cli/user-guide.md)
 - CLI 开发接口：[../cli/spec.md](../cli/spec.md)
 - 项目边界：[project-scope.md](project-scope.md)

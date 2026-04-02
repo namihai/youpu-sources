@@ -4,10 +4,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from cli.commands.ingest import serialize_accepted
-from cli.repo import AcceptedDocument
-from cli.repo import parse_accepted_document
-from cli.repo import parse_simple_yaml_block
+from youpu.app.ingest import serialize_accepted
+from youpu.domain.accepted import AcceptedDocument
+from youpu.infra.accepted_store import parse_accepted_document
+from youpu.infra.accepted_store import parse_simple_yaml_block
 
 
 class AcceptedYamlIoTests(unittest.TestCase):

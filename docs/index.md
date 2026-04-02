@@ -14,6 +14,7 @@
 - README：[../README.md](../README.md)
 - 操作手册：[overview/contributor-guide.md](overview/contributor-guide.md)
 - 常见失败与处理方式：[overview/failures.md](overview/failures.md)
+- 源码结构：[overview/source-layout.md](overview/source-layout.md)
 - CLI 用户文档：[cli/user-guide.md](cli/user-guide.md)
 - accepted 规范：[specs/accepted.md](specs/accepted.md)
 - rejected 规范：[specs/rejected.md](specs/rejected.md)
@@ -25,6 +26,7 @@
 
 - 常见失败与处理方式：[overview/failures.md](overview/failures.md)
 - 维护者操作手册：[overview/maintainer-guide.md](overview/maintainer-guide.md)
+- 源码结构：[overview/source-layout.md](overview/source-layout.md)
 - 项目边界：[overview/project-scope.md](overview/project-scope.md)
 - GitHub 仓库设置：[overview/github-repo-setup.md](overview/github-repo-setup.md)
 - CLI 边界：[cli/scope.md](cli/scope.md)

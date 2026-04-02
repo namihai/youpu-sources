@@ -3,15 +3,15 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from cli.argparse_utils import CliArgumentParser
-from cli.checks import ImportsCheck
-from cli.checks import run_imports_check
-from cli.errors import EXIT_OK
-from cli.errors import EXIT_USAGE_ERROR
-from cli.errors import EXIT_VALIDATION_FAILED
-from cli.output import CommandResult
-from cli.output import Diagnostic
-from cli.repo import get_staging_layout
+from youpu.app.checks import ImportsCheck
+from youpu.app.checks import run_imports_check
+from youpu.app.results import CommandResult
+from youpu.cli.argparse_utils import CliArgumentParser
+from youpu.cli.errors import EXIT_OK
+from youpu.cli.errors import EXIT_USAGE_ERROR
+from youpu.cli.errors import EXIT_VALIDATION_FAILED
+from youpu.domain.diagnostics import Diagnostic
+from youpu.infra.repo_layout import get_staging_layout
 
 
 def build_parser() -> argparse.ArgumentParser:

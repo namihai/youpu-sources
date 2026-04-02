@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from cli.repo import normalize_url
+from youpu.domain.urls import normalize_url
 
 
 class RepoUtilsTests(unittest.TestCase):

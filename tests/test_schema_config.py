@@ -5,10 +5,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from cli.accepted_schema import get_accepted_field_order
-from cli.schema_config import SchemaConfigError
-from cli.schema_config import get_schema_path
-from cli.schema_config import load_schema_document
+from youpu.domain.schema import get_accepted_field_order
+from youpu.infra.schema_store import SchemaConfigError
+from youpu.infra.schema_store import get_schema_path
+from youpu.infra.schema_store import load_schema_document
 
 
 class SchemaConfigTests(unittest.TestCase):
@@ -23,10 +23,10 @@ class SchemaConfigTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "accepted.json"
             path.write_text(json.dumps({"fields": [{"name": "title"}]}), encoding="utf-8")
-            first = load_schema_document(str(path))
+            first = load_schema_document(path)
 
             path.write_text(json.dumps({"fields": [{"name": "subtitle"}]}), encoding="utf-8")
-            second = load_schema_document(str(path))
+            second = load_schema_document(path)
 
         self.assertEqual(first, {"fields": [{"name": "title"}]})
         self.assertEqual(second, {"fields": [{"name": "subtitle"}]})
@@ -37,7 +37,7 @@ class SchemaConfigTests(unittest.TestCase):
             path.write_text('{"fields": [}', encoding="utf-8")
 
             with self.assertRaises(SchemaConfigError) as ctx:
-                load_schema_document(str(path))
+                load_schema_document(path)
 
         self.assertEqual(ctx.exception.code, "schema_parse_error")
         self.assertEqual(ctx.exception.path, path)
