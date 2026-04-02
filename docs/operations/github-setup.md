@@ -64,6 +64,7 @@
 
 - PR 来自主仓库分支
 - 评论者拥有 `write`、`maintain` 或 `admin` 权限
+- 评论内容以 `/ingest` 开头
 
 workflow 会：
 

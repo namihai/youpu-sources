@@ -4,13 +4,17 @@ on:
   issue_comment:
     types: [created]
 
+concurrency:
+  group: ingest-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
   pull-requests: write
 
 jobs:
   ingest:
-    if: ${{ github.event.issue.pull_request && github.event.comment.body == '/ingest' }}
+    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/ingest') }}
     runs-on: ubuntu-latest
     steps:
       - name: Validate commenter permission
