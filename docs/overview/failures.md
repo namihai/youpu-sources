@@ -89,6 +89,7 @@
 常见字段：
 
 - `title`
+- `subtitle`
 - `canonical_url`
 - `domain`
 - `content_type`
@@ -106,15 +107,16 @@
 - 根据 [`accepted 规范`](../specs/accepted.md) 补齐字段
 - 不要留空字符串
 
-### 5. 使用了不再允许的字段
+### 5. 使用了不属于 accepted schema 的字段
 
 常见现象：
 
-- `staging_accepted_disallowed_field`
+- `staging_accepted_unknown_field`
 
 常见原因：
 
-- 仍然写了 `id`、`subtitle`、`period`、`created_at` 等不属于 accepted 当前 schema 的字段
+- 写入了 `id`、`period`、`created_at` 等不属于 accepted 当前 schema 的字段
+- 字段名拼写错误，导致系统无法识别
 
 处理方式：
 

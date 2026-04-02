@@ -2,6 +2,7 @@
 
 ```yaml
 title: 标题
+subtitle: 一句话说明核心价值
 canonical_url: https://example.com/dataset
 domain: 领域
 content_type: 内容类型
@@ -18,6 +19,7 @@ use_cases: [用途1, 用途2]
 ## 数据集概览
 
 - **来源名称**：
+- **一句话价值**：
 - **覆盖内容**：
 - **核心价值**：
 - **适用场景**：

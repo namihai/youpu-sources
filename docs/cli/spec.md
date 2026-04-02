@@ -170,6 +170,8 @@ youpu <command> [options]
 
 ## 自动修正边界
 
+accepted metadata schema 应集中定义在单一来源中，由 CLI 的校验与序列化逻辑共享；新增或删除 accepted 字段时，应优先修改 schema 定义，而不是在多个命令中分别维护字段列表。
+
 允许自动修正：
 
 - URL 规范化

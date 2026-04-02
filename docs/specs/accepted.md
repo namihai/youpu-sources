@@ -96,6 +96,7 @@ accepted 记录使用精简字段集，只保留查询、校验和展示所需�
 
 ```yaml
 title:
+subtitle:
 canonical_url:
 domain:
 content_type:
@@ -112,6 +113,7 @@ use_cases:
 说明：
 
 - `title`：来源名称。
+- `subtitle`：一句话说明核心价值，用于检索和卡片展示。应简洁、明确，避免重复 `title`，也不要直接照抄正文中的长段说明。
 - `canonical_url`：来源的 `canonical_url`，通常应填写介绍该数据集或来源的数据集主页，作为 accepted 内部去重与交叉校验的主标识。它一般不是下载链接。下载链接应在 Markdown 正文中单独说明；如果该数据集没有独立主页、只有下载链接，可将下载链接作为 `canonical_url`。
 - `domain`：所属主题领域，例如文化资源。
 - `content_type`：内容类型，例如素材、名录、目录入口等。
@@ -150,6 +152,15 @@ use_cases: [研究分析, AI训练]
 - 正文应保留一级标题 `# 标题`
 - YAML 中必须包含 `title`
 - 正文 H1 与 YAML `title` 必须一致
+
+## subtitle 要求
+
+- YAML 中必须包含 `subtitle`
+- `subtitle` 应为一句话
+- 应突出“为什么这个来源值得收录”
+- 应便于检索和卡片展示
+- 不应只是重复 `title`
+- 不应写成长段背景说明
 
 ## 链接要求
 

@@ -34,6 +34,7 @@
 注意：
 
 - 文件名不能使用正式区的 `SRC-####-slug.md`
+- YAML 中必须包含 `subtitle`
 - 如果 `canonical_url` 已经存在于正式区，检查会失败
 
 ## 场景 2：新增 rejected

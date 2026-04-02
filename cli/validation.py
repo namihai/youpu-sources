@@ -3,37 +3,15 @@ from __future__ import annotations
 from collections import defaultdict
 from pathlib import Path
 
+from cli.accepted_schema import ACCEPTED_ALLOWED_FIELDS
+from cli.accepted_schema import ACCEPTED_ARRAY_FIELDS
+from cli.accepted_schema import ACCEPTED_REQUIRED_FIELDS
 from cli.output import Diagnostic
 from cli.repo import get_accepted_dir
 from cli.repo import get_rejected_csv_path
 from cli.repo import normalize_url
 from cli.repo import parse_accepted_document
 from cli.repo import parse_rejected_csv
-
-REQUIRED_NONEMPTY_FIELDS = [
-    "title",
-    "canonical_url",
-    "domain",
-    "content_type",
-    "data_form",
-    "data_type",
-    "region",
-    "source_type",
-    "source_org",
-    "permissions",
-    "tags",
-    "use_cases",
-]
-
-DISALLOWED_FIELDS = [
-    "id",
-    "subtitle",
-    "period",
-    "update_frequency",
-    "created_by",
-    "created_at",
-    "updated_at",
-]
 
 REJECTED_COLUMNS = ["url", "title", "reason"]
 
@@ -85,7 +63,7 @@ def validate_accepted(repo_root: Path) -> list[Diagnostic]:
                 )
             )
 
-        for key in REQUIRED_NONEMPTY_FIELDS:
+        for key in ACCEPTED_REQUIRED_FIELDS:
             value = doc.yaml_fields.get(key, "").strip()
             if not value:
                 diagnostics.append(
@@ -98,19 +76,19 @@ def validate_accepted(repo_root: Path) -> list[Diagnostic]:
                     )
                 )
 
-        for key in DISALLOWED_FIELDS:
-            if key in doc.yaml_fields:
+        for key in sorted(doc.yaml_fields):
+            if key not in ACCEPTED_ALLOWED_FIELDS:
                 diagnostics.append(
                     Diagnostic(
                         level="error",
-                        message=f"field `{key}` is no longer part of the accepted schema",
+                        message=f"field `{key}` is not part of the accepted schema",
                         path=str(path.relative_to(repo_root)),
-                        code="accepted_disallowed_field",
+                        code="accepted_unknown_field",
                         details={"field": key},
                     )
                 )
 
-        for key in ("tags", "use_cases"):
+        for key in ACCEPTED_ARRAY_FIELDS:
             value = doc.yaml_fields.get(key, "").strip()
             if value and not (value.startswith("[") and value.endswith("]")):
                 diagnostics.append(

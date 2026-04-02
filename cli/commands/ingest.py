@@ -7,6 +7,10 @@ from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
+from cli.accepted_schema import ACCEPTED_ALLOWED_FIELDS
+from cli.accepted_schema import ACCEPTED_ARRAY_FIELDS
+from cli.accepted_schema import ACCEPTED_FIELD_ORDER
+from cli.accepted_schema import ACCEPTED_REQUIRED_FIELDS
 from cli.argparse_utils import CliArgumentParser
 from cli.errors import EXIT_OK
 from cli.errors import EXIT_USAGE_ERROR
@@ -22,25 +26,9 @@ from cli.repo import normalize_url
 from cli.repo import parse_accepted_document
 from cli.repo import parse_rejected_csv
 from cli.repo import validate_staging_accepted_filename
-from cli.validation import DISALLOWED_FIELDS
 from cli.validation import REJECTED_COLUMNS
-from cli.validation import REQUIRED_NONEMPTY_FIELDS
 
 SLUG_CLEAN_RE = re.compile(r"[^a-z0-9]+")
-ACCEPTED_FIELD_ORDER = [
-    "title",
-    "canonical_url",
-    "domain",
-    "content_type",
-    "data_form",
-    "data_type",
-    "region",
-    "source_type",
-    "source_org",
-    "permissions",
-    "tags",
-    "use_cases",
-]
 ACCEPTED_FILENAME_RE = re.compile(r"^SRC-(\d{4})-[a-z0-9-]+\.md$")
 
 
@@ -216,7 +204,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
             )
             accepted_error_paths.add(rel_path)
 
-        for key in REQUIRED_NONEMPTY_FIELDS:
+        for key in ACCEPTED_REQUIRED_FIELDS:
             value = doc.yaml_fields.get(key, "").strip()
             if not value:
                 diagnostics.append(
@@ -230,20 +218,20 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
                 )
                 accepted_error_paths.add(rel_path)
 
-        for key in DISALLOWED_FIELDS:
-            if key in doc.yaml_fields:
+        for key in sorted(doc.yaml_fields):
+            if key not in ACCEPTED_ALLOWED_FIELDS:
                 diagnostics.append(
                     Diagnostic(
                         level="error",
-                        message=f"field `{key}` is no longer part of the accepted schema",
+                        message=f"field `{key}` is not part of the accepted schema",
                         path=rel_path,
-                        code="staging_accepted_disallowed_field",
+                        code="staging_accepted_unknown_field",
                         details={"field": key},
                     )
                 )
                 accepted_error_paths.add(rel_path)
 
-        for key in ("tags", "use_cases"):
+        for key in ACCEPTED_ARRAY_FIELDS:
             value = doc.yaml_fields.get(key, "").strip()
             if value and not (value.startswith("[") and value.endswith("]")):
                 diagnostics.append(
