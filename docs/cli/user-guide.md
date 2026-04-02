@@ -13,7 +13,7 @@
 
 - 内部协作者应使用主仓库分支提交 PR，这类 PR 支持维护者通过 `/ingest` 自动回写
 - 外部 fork PR 只作为输入检查入口，不支持自动回写 ingest 结果
-- 如果外部贡献需要正式入库，维护者应在内部分支接管对应 `imports/` 内容
+- 如果外部贡献需要正式入库，维护者应在内部分支接管对应 `staging/` 内容
 
 ## 命令列表
 
@@ -41,7 +41,7 @@ youpu check-pr
 这个命令会同时：
 
 - 检查正式区
-- 检查 `imports/`
+- 检查 `staging/`
 
 ### 准备合并
 
@@ -54,8 +54,8 @@ youpu check-merge
 这个命令要求：
 
 - 正式区合法
-- `imports/` 根目录没有待处理 Markdown
-- `imports/rejected.csv` 不存在
+- `staging/accepted/` 没有待处理 Markdown
+- `staging/rejected/rows.csv` 不存在
 - 当前分支没有遗留导入问题
 
 ### 执行正式入库
@@ -68,10 +68,10 @@ youpu ingest
 
 这个命令会：
 
-- 读取 `imports/`
+- 读取 `staging/`
 - 校验候选内容
 - 对允许自动修正的部分做确定性处理
-- 写入 `accepted/` / `rejected/`
+- 写入 `data/accepted/` / `data/rejected.csv`
 - 删除已处理的输入文件
 
 如果候选内容存在问题，命令会直接失败，不会做部分写入。
@@ -86,8 +86,8 @@ youpu validate-repo
 
 用于检查：
 
-- `accepted/`
-- `rejected.csv`
+- `data/accepted/`
+- `data/rejected.csv`
 - 正式区重复
 - accepted / rejected 冲突
 
@@ -99,10 +99,10 @@ youpu validate-imports
 
 用于检查：
 
-- `imports/*.md`
-- `imports/rejected.csv`
+- `staging/accepted/*.md`
+- `staging/rejected/rows.csv`
 - 与正式区的冲突
-- `imports/` 内部重复
+- `staging/` 内部重复
 
 这个命令是只读的，不会执行 ingest，也不会默认把报告写入版本控制。
 

@@ -44,7 +44,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
         diagnostics.append(
             Diagnostic(
                 level="error",
-                message="imports directory still contains pending files; run `youpu ingest` first",
+                message="staging directory still contains pending files; run `youpu ingest` first",
                 path=str(layout.root.relative_to(repo_root)),
                 code="merge_pending_imports",
                 details={

@@ -4,13 +4,13 @@
 
 默认流程是：
 
-1. 贡献者把候选内容放进 `imports/`
+1. 贡献者把候选内容放进 `staging/`
 2. 提交 PR
 3. `check-pr` 自动运行
 4. 根据反馈修正内容
 5. `check-pr` 通过后，由维护者触发 `/ingest`
 
-只要 `imports/` 中还存在任何 `error`，`check-pr` 就会失败，`youpu ingest` 也不会执行正式写入。
+只要 `staging/` 中还存在任何 `error`，`check-pr` 就会失败，`youpu ingest` 也不会执行正式写入。
 
 ## 看哪里
 
@@ -163,8 +163,8 @@ use_cases: [研究分析, AI训练]
 
 含义：
 
-- 该 `canonical_url` 规范化后已经存在于正式 `accepted/`
-- 或已经存在于正式 `rejected.csv`
+- 该 `canonical_url` 规范化后已经存在于正式 `data/accepted/`
+- 或已经存在于正式 `data/rejected.csv`
 
 处理方式：
 
@@ -193,14 +193,14 @@ use_cases: [研究分析, AI训练]
 
 常见原因：
 
-- 写成了 `imports/reject.csv`
-- 写成了 `imports/rejected-list.csv`
+- 写成了 `staging/reject.csv`
+- 写成了 `staging/rejected.csv`
 
 处理方式：
 
-- 文件名必须固定为 `imports/rejected.csv`
+- 文件路径必须固定为 `staging/rejected/rows.csv`
 
-### 11. imports 里出现了不支持的文件
+### 11. staging 里出现了不支持的文件
 
 常见现象：
 
@@ -208,13 +208,11 @@ use_cases: [研究分析, AI训练]
 
 常见原因：
 
-- `imports/` 下放了 `.txt`、`.json`、子目录内文件或其他临时文件
+- `staging/` 下放了不受支持的文件或目录
 
 处理方式：
 
-- `imports/` 只保留：
-  - 根目录下的 `*.md`
-  - `imports/rejected.csv`
+- `staging/` 只保留 `staging/accepted/*.md` 和 `staging/rejected/rows.csv`
 - 删除其余文件
 
 ### 12. rejected.csv 表头错误
@@ -264,7 +262,7 @@ url,title,reason
 
 含义：
 
-- 同一个 `imports/rejected.csv` 中，规范化后的 URL 重复出现
+- 同一个 `staging/rejected/rows.csv` 中，规范化后的 URL 重复出现
 
 处理方式：
 
@@ -280,8 +278,8 @@ url,title,reason
 
 含义：
 
-- 该 URL 已经存在于正式 `rejected.csv`
-- 或已存在于正式 `accepted/`
+- 该 URL 已经存在于正式 `data/rejected.csv`
+- 或已存在于正式 `data/accepted/`
 
 处理方式：
 
@@ -290,11 +288,11 @@ url,title,reason
 
 ## 正式区常见失败
 
-### 17. 正式 `accepted/` 本身不合法
+### 17. 正式 `data/accepted/` 本身不合法
 
 常见现象：
 
-- `check-pr` 失败，但 `imports/` 看起来没问题
+- `check-pr` 失败，但 `staging/` 看起来没问题
 - 日志里出现 `accepted_*` 错误码
 
 含义：
@@ -306,7 +304,7 @@ url,title,reason
 - 这类问题通常由维护者处理
 - 先修正式区，再继续处理内容 PR
 
-### 18. 正式 `rejected.csv` 本身不合法
+### 18. 正式 `data/rejected.csv` 本身不合法
 
 常见现象：
 
@@ -317,7 +315,7 @@ url,title,reason
 
 处理方式：
 
-- 由维护者修正正式 `rejected.csv`
+- 由维护者修正正式 `data/rejected.csv`
 - 修完后重新运行 `check-pr`
 
 ### 19. 正式区 accepted 和 rejected 互相冲突
@@ -328,7 +326,7 @@ url,title,reason
 
 含义：
 
-- 同一个规范化后的 URL 同时出现在 `accepted/` 和 `rejected.csv`
+- 同一个规范化后的 URL 同时出现在 `data/accepted/` 和 `data/rejected.csv`
 
 处理方式：
 
@@ -374,7 +372,7 @@ url,title,reason
 常见原因：
 
 - `check-pr` 其实还没通过
-- PR 分支里仍然有不合法 imports 内容
+- PR 分支里仍然有不合法 staging 内容
 - 评论者没有足够权限
 
 处理方式：
@@ -399,7 +397,7 @@ url,title,reason
 
 ## `check-merge` 常见失败
 
-### 24. 提示还有 pending imports
+### 24. 提示还有 pending staging
 
 常见现象：
 
@@ -407,7 +405,7 @@ url,title,reason
 
 含义：
 
-- `imports/*.md` 或 `imports/rejected.csv` 还存在
+- `staging/accepted/*.md` 或 `staging/rejected/rows.csv` 还存在
 
 处理方式：
 

@@ -11,8 +11,8 @@ from urllib.parse import urlunsplit
 
 
 REQUIRED_ROOT_ENTRIES = (
-    "accepted",
-    "rejected.csv",
+    "data",
+    "staging",
     "docs",
     "templates",
     "cli",
@@ -63,7 +63,17 @@ class RejectedCsv:
 @dataclass(frozen=True)
 class ImportsLayout:
     root: Path
+    accepted_dir: Path
+    rejected_dir: Path
     rejected_csv: Path
+
+
+def get_data_root(repo_root: Path) -> Path:
+    return repo_root / "data"
+
+
+def get_accepted_dir(repo_root: Path) -> Path:
+    return get_data_root(repo_root) / "accepted"
 
 
 def parse_simple_yaml_block(text: str) -> dict[str, str]:
@@ -200,29 +210,32 @@ def resolve_repo_root(root: str | None) -> Path:
 
 
 def get_imports_layout(repo_root: Path) -> ImportsLayout:
-    imports_root = repo_root / "imports"
+    imports_root = repo_root / "staging"
+    rejected_dir = imports_root / "rejected"
     return ImportsLayout(
         root=imports_root,
-        rejected_csv=imports_root / "rejected.csv",
+        accepted_dir=imports_root / "accepted",
+        rejected_dir=rejected_dir,
+        rejected_csv=rejected_dir / "rows.csv",
     )
 
 
 def get_rejected_csv_path(repo_root: Path) -> Path:
-    return repo_root / "rejected.csv"
+    return get_data_root(repo_root) / "rejected.csv"
 
 
 def get_import_accepted_paths(repo_root: Path) -> list[Path]:
-    imports_root = get_imports_layout(repo_root).root
-    if not imports_root.exists():
+    accepted_dir = get_imports_layout(repo_root).accepted_dir
+    if not accepted_dir.exists():
         return []
-    return sorted(path for path in imports_root.glob("*.md") if path.is_file())
+    return sorted(path for path in accepted_dir.glob("*.md") if path.is_file())
 
 
 def validate_import_accepted_filename(path: str | Path) -> str | None:
     candidate = Path(path)
     name = candidate.name
     if name.startswith("SRC-"):
-        return "imports markdown must not use the final `SRC-####-slug.md` naming"
+        return "staging markdown must not use the final `SRC-####-slug.md` naming"
     if not IMPORT_ACCEPTED_NAME_RE.match(name):
-        return "imports markdown filename must use lowercase letters, digits, and hyphens"
+        return "staging markdown filename must use lowercase letters, digits, and hyphens"
     return None

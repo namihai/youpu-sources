@@ -58,28 +58,28 @@ youpu <command> [options]
 
 检查范围：
 
-- `accepted/`
-- `rejected.csv`
+- `data/accepted/`
+- `data/rejected.csv`
 - 正式区重复
 - accepted / rejected 冲突
 
 约束：
 
 - 只读
-- 不检查 `imports/`
+- 不检查 `staging/`
 
 ### `validate-imports`
 
 用途：
 
-- 校验 `imports/` 中候选内容
+- 校验 `staging/` 中候选内容
 
 检查范围：
 
-- `imports/*.md`
-- `imports/rejected.csv`
+- `staging/accepted/*.md`
+- `staging/rejected/rows.csv`
 - 与正式区的冲突
-- `imports/` 内部重复
+- `staging/` 内部重复
 
 约束：
 
@@ -96,7 +96,7 @@ youpu <command> [options]
 
 - 调用 `validate-repo`
 - 调用 `validate-imports`
-- 允许 `imports/` 中存在待处理文件
+- 允许 `staging/` 中存在待处理文件
 
 ### `check-merge`
 
@@ -107,8 +107,8 @@ youpu <command> [options]
 行为：
 
 - 调用 `validate-repo`
-- 要求 `imports/` 根目录没有待处理 Markdown
-- 要求 `imports/rejected.csv` 不存在
+- 要求 `staging/accepted/` 没有待处理 Markdown
+- 要求 `staging/rejected/rows.csv` 不存在
 - 要求当前分支没有遗留导入问题
 
 ### `ingest`
@@ -119,16 +119,16 @@ youpu <command> [options]
 
 行为：
 
-- 读取 `imports/`
+- 读取 `staging/`
 - 校验候选内容
 - 进行确定性修正
-- 写入 `accepted/` / `rejected/`
+- 写入 `data/accepted/` / `data/rejected.csv`
 - 删除已处理输入
 
 输入约束：
 
-- `imports/*.md` 作为 accepted 候选输入
-- `imports/rejected.csv` 作为 rejected 候选输入
+- `staging/accepted/*.md` 作为 accepted 候选输入
+- `staging/rejected/rows.csv` 作为 rejected 候选输入
 
 约束：
 

@@ -4,6 +4,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from cli.output import Diagnostic
+from cli.repo import get_accepted_dir
 from cli.repo import get_rejected_csv_path
 from cli.repo import normalize_url
 from cli.repo import parse_accepted_document
@@ -39,7 +40,7 @@ REJECTED_COLUMNS = ["url", "title", "reason"]
 
 def validate_accepted(repo_root: Path) -> list[Diagnostic]:
     diagnostics: list[Diagnostic] = []
-    accepted_dir = repo_root / "accepted"
+    accepted_dir = get_accepted_dir(repo_root)
 
     for path in sorted(accepted_dir.glob("*.md")):
         try:
@@ -216,7 +217,7 @@ def validate_cross(repo_root: Path) -> list[Diagnostic]:
     accepted_urls: dict[str, list[str]] = defaultdict(list)
     rejected_urls: dict[str, list[int]] = defaultdict(list)
 
-    accepted_dir = repo_root / "accepted"
+    accepted_dir = get_accepted_dir(repo_root)
     for path in sorted(accepted_dir.glob("*.md")):
         try:
             doc = parse_accepted_document(path)
@@ -276,7 +277,7 @@ def validate_accepted_duplicates(repo_root: Path) -> list[Diagnostic]:
     by_canonical_url: dict[str, list[str]] = defaultdict(list)
     by_title: dict[str, list[str]] = defaultdict(list)
 
-    for path in sorted((repo_root / "accepted").glob("*.md")):
+    for path in sorted(get_accepted_dir(repo_root).glob("*.md")):
         try:
             doc = parse_accepted_document(path)
         except Exception:

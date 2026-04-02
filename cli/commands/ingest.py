@@ -14,6 +14,7 @@ from cli.errors import EXIT_VALIDATION_FAILED
 from cli.output import CommandResult
 from cli.output import Diagnostic
 from cli.repo import AcceptedDocument
+from cli.repo import get_accepted_dir
 from cli.repo import get_import_accepted_paths
 from cli.repo import get_imports_layout
 from cli.repo import get_rejected_csv_path
@@ -67,7 +68,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def accepted_url_index(repo_root: Path) -> dict[str, list[str]]:
     index: dict[str, list[str]] = defaultdict(list)
-    for path in sorted((repo_root / "accepted").glob("*.md")):
+    for path in sorted(get_accepted_dir(repo_root).glob("*.md")):
         try:
             doc = parse_accepted_document(path)
         except Exception:
@@ -132,16 +133,44 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
 
     if layout.root.exists():
         for path in sorted(layout.root.iterdir()):
-            if not path.is_file():
+            if path.name == ".gitkeep":
                 continue
-            if path.name in {layout.rejected_csv.name, ".gitkeep"}:
-                continue
-            if path.suffix == ".md":
+            if path == layout.accepted_dir or path == layout.rejected_dir:
                 continue
             diagnostics.append(
                 Diagnostic(
                     level="error",
-                    message="imports only accepts markdown files and `rejected.csv` at the root",
+                    message="staging root only accepts `accepted/` and `rejected/`",
+                    path=str(path.relative_to(repo_root)),
+                    code="import_unexpected_file",
+                )
+            )
+
+    if layout.accepted_dir.exists():
+        for path in sorted(layout.accepted_dir.iterdir()):
+            if path.name == ".gitkeep":
+                continue
+            if path.is_file() and path.suffix == ".md":
+                continue
+            diagnostics.append(
+                Diagnostic(
+                    level="error",
+                    message="staging/accepted only accepts markdown files",
+                    path=str(path.relative_to(repo_root)),
+                    code="import_unexpected_file",
+                )
+            )
+
+    if layout.rejected_dir.exists():
+        for path in sorted(layout.rejected_dir.iterdir()):
+            if path.name == ".gitkeep":
+                continue
+            if path == layout.rejected_csv:
+                continue
+            diagnostics.append(
+                Diagnostic(
+                    level="error",
+                    message="staging/rejected only accepts `rows.csv`",
                     path=str(path.relative_to(repo_root)),
                     code="import_unexpected_file",
                 )
@@ -269,7 +298,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
             diagnostics.append(
                 Diagnostic(
                     level="error",
-                    message=f"duplicate canonical_url inside imports: {normalized_url}",
+                    message=f"duplicate canonical_url inside staging: {normalized_url}",
                     path=rel_path,
                     code="import_accepted_duplicate_canonical_url",
                 )
@@ -360,7 +389,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
             diagnostics.append(
                 Diagnostic(
                     level="error",
-                    message=f"duplicate url inside imports/rejected.csv: {normalized_url}",
+                    message=f"duplicate url inside {layout.rejected_csv.relative_to(repo_root)}: {normalized_url}",
                     path=row_path,
                     code="import_rejected_duplicate_url",
                 )
@@ -405,7 +434,7 @@ def serialize_accepted(doc: AcceptedDocument) -> str:
 
 def target_accepted_path(repo_root: Path, doc: AcceptedDocument, index: int) -> Path:
     source_slug = slugify(doc.path.stem)
-    return repo_root / "accepted" / f"SRC-{index:04d}-{source_slug}.md"
+    return get_accepted_dir(repo_root) / f"SRC-{index:04d}-{source_slug}.md"
 
 
 def write_rejected_csv(csv_path: Path, rows: list[tuple[str, str, str]]) -> None:
@@ -416,7 +445,8 @@ def write_rejected_csv(csv_path: Path, rows: list[tuple[str, str, str]]) -> None
 
 
 def merge_ingest(repo_root: Path, analysis: IngestAnalysis) -> dict[str, int]:
-    accepted_dir = repo_root / "accepted"
+    accepted_dir = get_accepted_dir(repo_root)
+    accepted_dir.mkdir(parents=True, exist_ok=True)
     next_index = next_accepted_index(accepted_dir)
     imported_accepted = 0
     imported_rejected = 0
@@ -429,6 +459,7 @@ def merge_ingest(repo_root: Path, analysis: IngestAnalysis) -> dict[str, int]:
         imported_accepted += 1
 
     rejected_csv = get_rejected_csv_path(repo_root)
+    rejected_csv.parent.mkdir(parents=True, exist_ok=True)
     existing_rows: list[tuple[str, str, str]] = []
     if rejected_csv.exists():
         parsed = parse_rejected_csv(rejected_csv)
@@ -459,16 +490,17 @@ def merge_ingest(repo_root: Path, analysis: IngestAnalysis) -> dict[str, int]:
     return {
         "imported_accepted": imported_accepted,
         "imported_rejected": imported_rejected,
-        "imports_root": "imports",
+        "imports_root": "staging",
     }
 
 
-def build_summary(analysis: IngestAnalysis, *, dry_run: bool) -> str:
+def build_summary(analysis: IngestAnalysis, repo_root: Path, *, dry_run: bool) -> str:
     header = "Ingest dry-run completed" if dry_run else "Ingest completed"
+    layout = get_imports_layout(repo_root)
     return "\n".join(
         [
             header,
-            "imports root: imports",
+            f"staging root: {layout.root.relative_to(repo_root)}",
             f"accepted candidates ready: {len(analysis.accepted_ready)}",
             f"rejected candidates ready: {len(analysis.rejected_ready)}",
             f"issues: {len(analysis.diagnostics)}",
@@ -511,7 +543,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
         )
 
     merge_data = merge_ingest(repo_root, analysis)
-    summary = build_summary(analysis, dry_run=False)
+    summary = build_summary(analysis, repo_root, dry_run=False)
     return (
         CommandResult(
             ok=True,

@@ -6,7 +6,7 @@
 
 维护者主要负责：
 
-- 审查贡献者提交的 `imports/`
+- 审查贡献者提交的 `staging/`
 - 在 PR 检查通过后触发 `/ingest`
 - 确认正式区结果无误后合并
 - 在需要时本地复现和排查问题
@@ -17,7 +17,7 @@
 
 内容 PR 的正常顺序是：
 
-1. 贡献者把候选内容放进 `imports/`
+1. 贡献者把候选内容放进 `staging/`
 2. 提交 PR
 3. 等待 `check-pr`
 4. 根据检查结果修改 PR
@@ -53,8 +53,8 @@
 
 维护者需要确认：
 
-- `imports/*.md` 和 `imports/rejected.csv` 已被清空
-- `accepted/` 或 `rejected.csv` 的正式结果符合预期
+- `staging/accepted/*.md` 和 `staging/rejected/rows.csv` 已被清空
+- `data/accepted/` 或 `data/rejected.csv` 的正式结果符合预期
 - PR checks 最终为绿色
 
 ### 4. 合并 PR
@@ -95,7 +95,7 @@ youpu report
 - `youpu validate-repo`
   检查正式区
 - `youpu validate-imports`
-  检查当前 `imports/`
+  检查当前 `staging/`
 - `youpu check-pr`
   复现 PR 检查
 - `youpu ingest`

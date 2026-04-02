@@ -6,7 +6,7 @@
 
 本项目的核心目标只有一个：
 
-- 保证 `accepted/` 与 `rejected.csv` 中的结论可靠、可维护、可持续校验
+- 保证 `data/accepted/` 与 `data/rejected.csv` 中的结论可靠、可维护、可持续校验
 
 围绕这个目标，仓库只承担“守门”职责，不承担“发现”职责。
 
@@ -39,12 +39,12 @@
 
 输入边界：
 
-- 用户通过 `imports/*.md` 提供候选 `accepted` 文档
-- 用户通过 `imports/rejected.csv` 提供候选 `rejected` 记录
+- 用户通过 `staging/accepted/*.md` 提供候选 `accepted` 文档
+- 用户通过 `staging/rejected/rows.csv` 提供候选 `rejected` 记录
 
 输出边界：
 
-- 合法内容被安全合并到正式 `accepted/` 和 `rejected.csv`
+- 合法内容被安全合并到正式 `data/accepted/` 和 `data/rejected.csv`
 - 不合法或无法处理的内容进入问题清单，由用户手动处理
 
 系统不应替用户补事实，也不应为了完成导入而做高风险猜测。
@@ -70,7 +70,7 @@
 
 当前导入目录约束为：
 
-- `imports/*.md`：accepted 候选输入
-- `imports/rejected.csv`：rejected 候选输入
+- `staging/accepted/*.md`：accepted 候选输入
+- `staging/rejected/rows.csv`：rejected 候选输入
 
 CLI 的具体边界和命令收敛方向见 [`../cli/scope.md`](../cli/scope.md)。

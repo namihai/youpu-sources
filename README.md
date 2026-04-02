@@ -4,8 +4,8 @@
 
 这个仓库只保存两类已经有明确结论的记录：
 
-- `accepted/`：确认保留的数据集来源
-- `rejected.csv`：确认不保留的数据集来源
+- `data/accepted/`：确认保留的数据集来源
+- `data/rejected.csv`：确认不保留的数据集来源
 
 这个仓库不保存数据集文件本身，也不负责帮你发现外部来源。
 
@@ -13,7 +13,7 @@
 
 普通贡献者的主流程是：
 
-1. 把候选内容放进 `imports/`
+1. 把候选内容放进 `staging/`
 2. 提交 Pull Request
 3. 等待 GitHub Actions 自动检查
 4. 根据 CI 反馈修改内容
@@ -26,15 +26,17 @@
 把候选内容放到默认导入目录：
 
 ```text
-imports/
-  *.md
-  rejected.csv
+staging/
+  accepted/
+    *.md
+  rejected/
+    rows.csv
 ```
 
-- 放进 `imports/*.md` 的内容，表示你希望它进入 `accepted/`
-- 放进 `imports/rejected.csv` 的内容，表示你希望它进入 `rejected.csv`
+- 放进 `staging/accepted/*.md` 的内容，表示你希望它进入 `data/accepted/`
+- 放进 `staging/rejected/rows.csv` 的内容，表示你希望它进入 `data/rejected.csv`
 
-`imports/` 只接收两类输入：根目录下的候选 accepted Markdown，以及固定文件名 `imports/rejected.csv`。
+`staging/` 只接收两类输入：`staging/accepted/` 下的候选 accepted Markdown，以及固定文件名 `staging/rejected/rows.csv`。
 
 如果你不确定格式是否正确，先看：
 
@@ -47,8 +49,8 @@ imports/
 
 当你提交 PR 后，系统会自动执行检查：
 
-- 校验正式区 `accepted/` 和 `rejected.csv`
-- 校验 `imports/` 中的候选内容
+- 校验正式区 `data/accepted/` 和 `data/rejected.csv`
+- 校验 `staging/` 中的候选内容
 - 报出格式问题、重复和冲突
 
 如果检查失败，你只需要根据反馈修改 PR。
@@ -59,13 +61,13 @@ PR 检查通过后，维护者会接手后续入库和合并。
 
 仓库中几个主要目录的职责如下：
 
-- `imports/`：待处理输入区
-- `accepted/`：正式保留记录
-- `rejected.csv`：正式拒绝记录
+- `staging/`：待处理输入区
+- `data/accepted/`：正式保留记录
+- `data/rejected.csv`：正式拒绝记录
 - `templates/`：候选内容模板
 - `docs/`：详细文档
 
-`imports/` 不是归档区。内容一旦被成功 ingest，对应输入文件就应从 `imports/` 中移除。
+`staging/` 不是归档区。内容一旦被成功 ingest，对应输入文件就应从 `staging/` 中移除。
 
 ## 去哪里看详细说明
 

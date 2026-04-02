@@ -1,11 +1,11 @@
 # URL 规范
 
-这份文档定义本仓库中 `canonical_url` 与 `rejected.csv:url` 的统一规范。
+这份文档定义本仓库中 `canonical_url` 与 `data/rejected.csv:url` 的统一规范。
 
 适用范围：
 
-- `accepted/*.md` 中的 `canonical_url`
-- `rejected.csv` 中的 `url`
+- `data/accepted/*.md` 中的 `canonical_url`
+- `data/rejected.csv` 中的 `url`
 - `youpu ingest`
 - 任何做去重或交叉冲突检查的逻辑
 
@@ -23,7 +23,9 @@
 ## 基本原则
 
 - 优先使用来源的稳定主链接
-- 优先使用详情页、数据集主页面、仓库主页面等能代表来源本身的页面
+- `canonical_url` 代表来源的 canonical URL，通常应是介绍该数据集的主页、详情页、仓库主页面等能代表来源本身的页面
+- `canonical_url` 一般不是下载链接；下载链接应在 Markdown 正文中说明
+- 如果数据集没有独立主页、只有下载链接，可以使用下载链接作为 `canonical_url`
 - 如果同一来源同时存在详情页和下载页，优先保留更能代表来源本身的详情页
 - 对同一资源的不同跳转链接，应尽量归并到同一个主链接
 

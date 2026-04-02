@@ -10,18 +10,20 @@ from cli.errors import EXIT_USAGE_ERROR
 from cli.errors import EXIT_VALIDATION_FAILED
 from cli.output import CommandResult
 from cli.output import Diagnostic
+from cli.repo import get_imports_layout
 
 
 def build_parser() -> argparse.ArgumentParser:
     return CliArgumentParser(prog="youpu validate-imports", add_help=False)
 
 
-def build_summary(analysis: ingest_command.IngestAnalysis, *, ok: bool) -> str:
-    header = "Imports validation passed" if ok else "Imports validation failed"
+def build_summary(analysis: ingest_command.IngestAnalysis, repo_root: Path, *, ok: bool) -> str:
+    header = "Staging validation passed" if ok else "Staging validation failed"
+    layout = get_imports_layout(repo_root)
     return "\n".join(
         [
             header,
-            "imports root: imports",
+            f"staging root: {layout.root.relative_to(repo_root)}",
             f"accepted candidates ready: {len(analysis.accepted_ready)}",
             f"rejected candidates ready: {len(analysis.rejected_ready)}",
             f"issues: {len(analysis.diagnostics)}",
@@ -38,7 +40,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             CommandResult(
                 ok=False,
                 command="validate-imports",
-                summary="Imports validation failed",
+                summary="Staging validation failed",
                 diagnostics=[Diagnostic(level="error", message="invalid arguments", code="usage_error")],
             ),
             EXIT_USAGE_ERROR,
@@ -46,15 +48,15 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
 
     analysis = ingest_command.build_analysis(repo_root)
     ok = not any(diag.level == "error" for diag in analysis.diagnostics)
-    summary_prefix = "Imports validation passed" if ok else "Imports validation failed"
+    layout = get_imports_layout(repo_root)
     return (
         CommandResult(
             ok=ok,
             command="validate-imports",
-            summary=build_summary(analysis, ok=ok),
+            summary=build_summary(analysis, repo_root, ok=ok),
             diagnostics=analysis.diagnostics,
             data={
-                "imports_root": "imports",
+                "imports_root": str(layout.root.relative_to(repo_root)),
                 "accepted_ready": len(analysis.accepted_ready),
                 "rejected_ready": len(analysis.rejected_ready),
             },

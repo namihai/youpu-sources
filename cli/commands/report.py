@@ -11,6 +11,7 @@ from cli.errors import EXIT_OK
 from cli.errors import EXIT_USAGE_ERROR
 from cli.output import CommandResult
 from cli.output import Diagnostic
+from cli.repo import get_accepted_dir
 from cli.repo import get_import_accepted_paths
 from cli.repo import get_imports_layout
 from cli.repo import get_rejected_csv_path
@@ -25,7 +26,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def latest_accepted_id(repo_root: Path) -> str | None:
     latest = 0
-    for path in (repo_root / "accepted").glob("*.md"):
+    for path in get_accepted_dir(repo_root).glob("*.md"):
         match = ACCEPTED_FILENAME_RE.match(path.name)
         if not match:
             continue
@@ -56,7 +57,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             EXIT_USAGE_ERROR,
         )
 
-    accepted_count = len(list((repo_root / "accepted").glob("*.md")))
+    accepted_count = len(list(get_accepted_dir(repo_root).glob("*.md")))
     rejected = parse_rejected_csv(get_rejected_csv_path(repo_root))
     rejected_count = len(rejected.rows)
     latest_id = latest_accepted_id(repo_root)
@@ -84,9 +85,9 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             f"validation: {'passed' if validate_result.ok else 'failed'}",
             f"duplicates: {'none' if not duplicate_errors else 'found'}",
             f"cross-conflicts: {cross_conflicts}",
-            f"imports pending accepted: {pending_accepted}",
-            f"imports pending rejected: {pending_rejected}",
-            f"imports issues: {import_issues}",
+            f"staging pending accepted: {pending_accepted}",
+            f"staging pending rejected: {pending_rejected}",
+            f"staging issues: {import_issues}",
         ]
     )
 

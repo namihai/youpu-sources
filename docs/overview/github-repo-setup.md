@@ -6,7 +6,7 @@
 
 仓库当前的协作模型是：
 
-- 普通贡献者提交 `imports/`
+- 普通贡献者提交 `staging/`
 - PR 自动跑检查
 - 维护者评论 `/ingest`
 - 内部分支 PR 自动回写 ingest 结果
@@ -80,7 +80,7 @@ fork PR 不支持自动回写 ingest 结果。
 
 - `pr-check.yml` 仍然会自动检查输入是否合法
 - `/ingest` 会停止并给出提示
-- 维护者需要把对应 `imports/` 内容转移到内部分支后再执行 `/ingest`
+- 维护者需要把对应 `staging/` 内容转移到内部分支后再执行 `/ingest`
 
 ## 推荐团队约定
 

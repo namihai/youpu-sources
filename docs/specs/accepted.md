@@ -2,19 +2,19 @@
 
 ## 定义
 
-`accepted/` 中的记录表示：某个数据集来源已经过核验，确认真实存在，并值得在仓库中保留。
+`data/accepted/` 中的记录表示：某个数据集来源已经过核验，确认真实存在，并值得在仓库中保留。
 
 这里记录的是“来源”，不是数据集文件本身。
 
 ## 文件形式
 
 - 每条记录对应一个 Markdown 文件
-- 文件放在 `accepted/` 目录下
+- 文件放在 `data/accepted/` 目录下
 - 文件名遵循统一命名规则
 
 ## 文件命名
 
-`accepted/` 下的文件名统一使用以下格式：
+`data/accepted/` 下的文件名统一使用以下格式：
 
 ```text
 SRC-####-slug.md
@@ -45,14 +45,14 @@ SRC-0003-figshare-dunhuang-restoration.md
 
 维护者如果要在本地调试 accepted 导入流程，可以按下面方式验证：
 
-1. 用户先把候选 Markdown 放进 `imports/` 根目录
+1. 用户先把候选 Markdown 放进 `staging/accepted/`
 2. 运行 `youpu validate-imports`
 3. 修正问题后运行 `youpu ingest`
 
 `ingest` 会在正式合并时：
 
 - 自动计算下一个编号
-- 优先根据 imports 文件名生成 `slug`
+- 优先根据 staging 文件名生成 `slug`
 - 生成 `SRC-####-slug.md`
 - 写入正式 accepted 文件名
 
@@ -112,7 +112,7 @@ use_cases:
 说明：
 
 - `title`：来源名称。
-- `canonical_url`：该来源的稳定主链接，作为 accepted 内部去重与交叉校验的主标识。
+- `canonical_url`：来源的 `canonical_url`，通常应填写介绍该数据集或来源的数据集主页，作为 accepted 内部去重与交叉校验的主标识。它一般不是下载链接。下载链接应在 Markdown 正文中单独说明；如果该数据集没有独立主页、只有下载链接，可将下载链接作为 `canonical_url`。
 - `domain`：所属主题领域，例如文化资源。
 - `content_type`：内容类型，例如素材、名录、目录入口等。
 - `data_form`：数据呈现形态，例如文本、结构化表 / API、多媒体。
@@ -154,7 +154,8 @@ use_cases: [研究分析, AI训练]
 ## 链接要求
 
 - YAML 中必须包含 `canonical_url`
-- `canonical_url` 应尽量填写该来源的稳定主链接
+- `canonical_url` 应尽量填写该来源的数据集主页或详情页，而不是下载直链
+- 如果没有独立主页、只有下载链接，可以使用下载链接作为 `canonical_url`
 - 应尽量使用规范化后的主链接，避免追踪参数与无意义锚点
 - 输入阶段可以先使用原始 URL；系统会在校验和入库时按统一规则规范化
 - 具体规则见 [`url.md`](url.md)
