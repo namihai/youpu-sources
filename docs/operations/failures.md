@@ -10,7 +10,7 @@
 4. 根据反馈修正内容
 5. `check-pr` 通过后，由维护者触发 `/ingest`
 
-只要 `staging/` 中还存在任何 `error`，`check-pr` 就会失败，`youpu ingest` 也不会执行正式写入。
+只要 `staging/` 中还存在任何 `error`，`check-pr` 就会失败，`./scripts/youpu ingest` 也不会执行正式写入。
 
 ## 看哪里
 
@@ -397,7 +397,7 @@ url,title,reason
 
 处理方式：
 
-- 先运行 `youpu validate-schema`
+- 先运行 `./scripts/youpu validate-schema`
 - 先修 schema，再修 template
 - 不要只改模板而忘记同步 schema
 - 不是一条新的顶层评论
@@ -427,7 +427,7 @@ url,title,reason
 
 ### 25. `/ingest` 后没有正式结果
 
-当前实现下，只要存在任何 `error`，`youpu ingest` 就不会做部分导入。
+当前实现下，只要存在任何 `error`，`./scripts/youpu ingest` 就不会做部分导入。
 
 这意味着：
 
@@ -471,4 +471,4 @@ url,title,reason
 - [accepted 规范](../specs/accepted.md)
 - [rejected 规范](../specs/rejected.md)
 - [URL 规范](../specs/url.md)
-- [维护者操作手册](maintainer-guide.md)
+- [维护者指南](../guides/maintainer.md)

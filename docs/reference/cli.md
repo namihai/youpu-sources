@@ -1,6 +1,12 @@
-# youpu CLI 开发接口文档
+# youpu CLI 接口说明
 
 这份文档定义 `youpu` 的命令接口、返回码和行为边界。
+
+这里的 `youpu` 表示逻辑接口名。当前仓库内实际执行入口是 `./scripts/youpu`，例如：
+
+```bash
+./scripts/youpu check-pr
+```
 
 ## 目标
 
@@ -12,9 +18,21 @@
 - 执行确定性 ingest
 - 输出结构化结果
 
+## 不负责什么
+
+`youpu` 不负责：
+
+- Git 提交或推送
+- 外部来源发现
+- 自动补全事实字段
+- 接受或拒绝结论的主观判断
+- PR 权限控制
+
+这些职责应分别由 GitHub、维护者和仓库外围流程承担。
+
 ## 命令入口
 
-统一入口：
+逻辑入口：
 
 ```bash
 youpu <command> [options]
@@ -47,6 +65,18 @@ youpu <command> [options]
 2  参数错误
 3  运行时异常
 ```
+
+## 设计约束
+
+- 检查命令与写入命令分离
+- 退出码稳定
+- JSON 输出适合机器消费
+- 不为了方便而引入高风险自动修正
+
+CLI 识别的导入区边界为：
+
+- `staging/accepted/*.md`：accepted 候选输入
+- `staging/rejected/rows.csv`：rejected 候选输入
 
 ## 命令规格
 
@@ -213,6 +243,6 @@ accepted / rejected 的结构定义应集中放在 `schemas/*.json` 中，由 CL
 
 ## 相关文档
 
-- CLI 用户文档：[user-guide.md](user-guide.md)
-- CLI 边界：[scope.md](scope.md)
-- 项目边界：[../overview/project-scope.md](../overview/project-scope.md)
+- 维护者指南：[../guides/maintainer.md](../guides/maintainer.md)
+- 项目边界：[../architecture/project-boundary.md](../architecture/project-boundary.md)
+- 源码结构：[../architecture/source-layout.md](../architecture/source-layout.md)

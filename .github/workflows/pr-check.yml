@@ -16,4 +16,4 @@ jobs:
           python-version: "3.13"
 
       - name: Run PR checks
-        run: python3 youpu check-pr
+        run: ./scripts/youpu check-pr

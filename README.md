@@ -39,22 +39,12 @@ staging/
 
 如果你要修改或删除已有正式记录，不要使用 `staging/`，而是直接在分支中修改 `data/` 后提交 PR。
 
-## 测试
-
-运行当前 CLI 回归测试：
-
-```bash
-make test
-```
-
-源码当前采用分层结构，位于 `src/youpu/` 下；具体分层说明见 [源码结构文档](docs/overview/source-layout.md)。
-
 ## 进一步阅读
 
 完整流程见：
 
-- [操作手册](docs/overview/contributor-guide.md)
-- [常见失败与处理方式](docs/overview/failures.md)
+- [操作手册](docs/guides/contributor.md)
+- [常见失败与处理方式](docs/operations/failures.md)
 - [accepted 规范](docs/specs/accepted.md)
 - [rejected 规范](docs/specs/rejected.md)
 - [schema 规范](docs/specs/schema.md)
@@ -63,14 +53,12 @@ make test
 ## 去哪里看详细说明
 
 - 文档总入口：[docs/index.md](docs/index.md)
-- 操作手册：[docs/overview/contributor-guide.md](docs/overview/contributor-guide.md)
-- 常见失败与处理方式：[docs/overview/failures.md](docs/overview/failures.md)
-- 维护者操作手册：[docs/overview/maintainer-guide.md](docs/overview/maintainer-guide.md)
-- 源码结构：[docs/overview/source-layout.md](docs/overview/source-layout.md)
-- 项目边界：[docs/overview/project-scope.md](docs/overview/project-scope.md)
-- GitHub 仓库设置：[docs/overview/github-repo-setup.md](docs/overview/github-repo-setup.md)
-- CLI 用户文档：[docs/cli/user-guide.md](docs/cli/user-guide.md)
-- CLI 开发接口：[docs/cli/spec.md](docs/cli/spec.md)
+- 操作手册：[docs/guides/contributor.md](docs/guides/contributor.md)
+- 常见失败与处理方式：[docs/operations/failures.md](docs/operations/failures.md)
+- 维护者操作手册：[docs/guides/maintainer.md](docs/guides/maintainer.md)
+- 项目边界：[docs/architecture/project-boundary.md](docs/architecture/project-boundary.md)
+- GitHub 仓库设置：[docs/operations/github-setup.md](docs/operations/github-setup.md)
+- CLI 接口说明：[docs/reference/cli.md](docs/reference/cli.md)
 - accepted 规范：[docs/specs/accepted.md](docs/specs/accepted.md)
 - rejected 规范：[docs/specs/rejected.md](docs/specs/rejected.md)
 - schema 规范：[docs/specs/schema.md](docs/specs/schema.md)

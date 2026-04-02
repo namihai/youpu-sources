@@ -1,4 +1,4 @@
-# 维护者操作手册
+# 维护者指南
 
 这份文档面向仓库维护者，说明如何检查 PR、区分新增与正式区修改、触发 `/ingest`、以及在需要时做本地排障。
 
@@ -62,10 +62,10 @@
 
 `/ingest` 成功后，workflow 会：
 
-1. 再跑一次 `youpu check-pr`
-2. 执行 `youpu ingest`
+1. 再跑一次 `./scripts/youpu check-pr`
+2. 执行 `./scripts/youpu ingest`
 3. 自动提交结果回原分支
-4. 执行 `youpu check-merge`
+4. 执行 `./scripts/youpu check-merge`
 
 维护者需要确认：
 
@@ -106,41 +106,40 @@ fork PR 只支持检查，不支持自动回写 ingest 结果。
 如果需要在本地复现或排查，维护者可以使用：
 
 ```bash
-youpu validate-schema
-youpu validate-repo
-youpu validate-imports
-youpu check-pr
-youpu ingest
-youpu check-merge
-youpu report
+./scripts/youpu validate-schema
+./scripts/youpu validate-repo
+./scripts/youpu validate-imports
+./scripts/youpu check-pr
+./scripts/youpu ingest
+./scripts/youpu check-merge
+./scripts/youpu report
 ```
 
 常见用途：
 
-- `youpu validate-repo`
+- `./scripts/youpu validate-repo`
   检查正式区
-- `youpu validate-imports`
+- `./scripts/youpu validate-imports`
   检查当前 `staging/`
-- `youpu validate-schema`
+- `./scripts/youpu validate-schema`
   检查 `schemas/` 与 `templates/` 是否一致
-- `youpu check-pr`
+- `./scripts/youpu check-pr`
   复现 PR 检查
-- `youpu ingest`
+- `./scripts/youpu ingest`
   本地执行确定性入库
-- `youpu check-merge`
+- `./scripts/youpu check-merge`
   确认当前状态是否可合并
-- `youpu report`
+- `./scripts/youpu report`
   快速查看仓库摘要
 
-如果本次 PR 涉及字段调整、模板调整或 CLI schema 逻辑调整，建议先单独跑一次 `youpu validate-schema`，再看 `check-pr` / `check-merge`。
+如果本次 PR 涉及字段调整、模板调整或 CLI schema 逻辑调整，建议先单独跑一次 `./scripts/youpu validate-schema`，再看 `./scripts/youpu check-pr` 和 `./scripts/youpu check-merge`。
 
-如果需要继续修改 CLI 实现本身，源码当前位于 `src/youpu/`，并按 `cli / app / domain / infra` 分层；具体见 [source-layout.md](source-layout.md)。
+如果需要继续修改 CLI 实现本身，源码当前位于 `src/youpu/`，并按 `cli / app / domain / infra` 分层；具体见 [源码结构](../architecture/source-layout.md)。
 
 ## 相关文档
 
-- 常见失败与处理方式：[failures.md](failures.md)
-- 仓库设置：[github-repo-setup.md](github-repo-setup.md)
-- 源码结构：[source-layout.md](source-layout.md)
-- CLI 用户文档：[../cli/user-guide.md](../cli/user-guide.md)
-- CLI 开发接口：[../cli/spec.md](../cli/spec.md)
-- 项目边界：[project-scope.md](project-scope.md)
+- 常见失败与处理方式：[../operations/failures.md](../operations/failures.md)
+- 仓库设置：[../operations/github-setup.md](../operations/github-setup.md)
+- 源码结构：[../architecture/source-layout.md](../architecture/source-layout.md)
+- CLI 接口说明：[../reference/cli.md](../reference/cli.md)
+- 项目边界：[../architecture/project-boundary.md](../architecture/project-boundary.md)

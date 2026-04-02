@@ -8,14 +8,14 @@
 
 - `src/youpu/`
 
-主入口脚本位于：
+仓库内部执行入口位于：
 
-- 仓库根目录 `youpu`
+- `scripts/youpu`
 
-测试默认通过 `PYTHONPATH=src` 运行：
+测试默认通过下面的真实命令运行：
 
 ```bash
-make test
+PYTHONPATH=src python3 -m unittest discover -s tests
 ```
 
 ## 分层约定
@@ -109,12 +109,12 @@ make test
 
 ## 本地运行
 
-推荐方式：
+维护者或自动化流程推荐方式：
 
 ```bash
-./youpu report
-./youpu validate-schema
-make test
+./scripts/youpu report
+./scripts/youpu validate-schema
+PYTHONPATH=src python3 -m unittest discover -s tests
 ```
 
 如果需要直接通过 Python 模块运行，应显式带上 `src`：
@@ -126,6 +126,5 @@ PYTHONPATH=src python3 -m youpu.cli.main report
 
 ## 相关文档
 
-- CLI 边界：[../cli/scope.md](../cli/scope.md)
-- CLI 开发接口：[../cli/spec.md](../cli/spec.md)
-- 项目边界：[project-scope.md](project-scope.md)
+- CLI 接口说明：[../reference/cli.md](../reference/cli.md)
+- 项目边界：[project-boundary.md](project-boundary.md)

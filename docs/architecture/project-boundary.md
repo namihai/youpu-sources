@@ -86,4 +86,4 @@
 - `templates/*` 只作为面向人的展示模板
 - CLI 应从 schema 读取结构定义，不应把字段列表散落硬编码在多个命令中
 
-CLI 的具体边界和命令收敛方向见 [`../cli/scope.md`](../cli/scope.md)。
+CLI 的具体边界和命令收敛方向见 [`../reference/cli.md`](../reference/cli.md)。

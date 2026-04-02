@@ -58,7 +58,7 @@ schema 的作用不是给普通贡献者直接填写内容，而是作为仓库�
 1. 修改 `schemas/accepted.json` 或 `schemas/rejected.json`
 2. 同步修改对应 template
 3. 同步更新相关规范文档
-4. 运行 `youpu validate-schema`
+4. 运行 `./scripts/youpu validate-schema`
 5. 再运行相关数据检查命令
 
 不建议的做法：
@@ -69,7 +69,7 @@ schema 的作用不是给普通贡献者直接填写内容，而是作为仓库�
 
 ## `validate-schema` 的职责
 
-`youpu validate-schema` 当前主要检查：
+`./scripts/youpu validate-schema` 当前主要检查：
 
 - schema 文件存在且结构合法
 - `templates/accepted.md` 中 YAML 字段顺序与 accepted schema 一致

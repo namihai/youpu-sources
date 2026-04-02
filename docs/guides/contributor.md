@@ -141,8 +141,8 @@
 ## 相关文档
 
 - README：[../../README.md](../../README.md)
-- 常见失败与处理方式：[failures.md](failures.md)
-- 维护者操作手册：[maintainer-guide.md](maintainer-guide.md)
+- 常见失败与处理方式：[../operations/failures.md](../operations/failures.md)
+- 维护者操作手册：[maintainer.md](maintainer.md)
 - accepted 规范：[../specs/accepted.md](../specs/accepted.md)
 - rejected 规范：[../specs/rejected.md](../specs/rejected.md)
 - URL 规范：[../specs/url.md](../specs/url.md)

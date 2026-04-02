@@ -1,4 +1,4 @@
-# GitHub Repo Setup
+# GitHub 仓库设置
 
 这份文档说明 `youpu-sources` 在 GitHub 上需要开启哪些设置，才能让当前 PR / CI / `/ingest` 流程正常工作。
 
@@ -67,10 +67,10 @@
 
 workflow 会：
 
-1. 再跑一次 `youpu check-pr`
-2. 执行 `youpu ingest`
+1. 再跑一次 `./scripts/youpu check-pr`
+2. 执行 `./scripts/youpu ingest`
 3. 自动提交结果回原分支
-4. 执行 `youpu check-merge`
+4. 执行 `./scripts/youpu check-merge`
 
 ### fork PR
 

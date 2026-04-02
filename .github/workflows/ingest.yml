@@ -68,11 +68,11 @@ jobs:
 
       - name: Run PR checks
         if: ${{ steps.pr.outputs.is_fork != 'true' }}
-        run: python3 youpu check-pr
+        run: ./scripts/youpu check-pr
 
       - name: Run ingest
         if: ${{ steps.pr.outputs.is_fork != 'true' }}
-        run: python3 youpu ingest
+        run: ./scripts/youpu ingest
 
       - name: Commit ingest result
         if: ${{ steps.pr.outputs.is_fork != 'true' }}
@@ -89,4 +89,4 @@ jobs:
 
       - name: Run merge checks
         if: ${{ steps.pr.outputs.is_fork != 'true' }}
-        run: python3 youpu check-merge
+        run: ./scripts/youpu check-merge

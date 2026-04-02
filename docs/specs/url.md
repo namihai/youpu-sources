@@ -6,7 +6,7 @@
 
 - `data/accepted/*.md` 中的 `canonical_url`
 - `data/rejected.csv` 中的 `url`
-- `youpu ingest`
+- `./scripts/youpu ingest`
 - 任何做去重或交叉冲突检查的逻辑
 
 ## 目标
@@ -106,5 +106,4 @@ https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi%3A10.7910%2FDVN%2F7
 
 - accepted 规范：[accepted.md](accepted.md)
 - rejected 规范：[rejected.md](rejected.md)
-- CLI 开发接口文档：[spec.md](../cli/spec.md)
-- CLI 用户文档：[user-guide.md](../cli/user-guide.md)
+- CLI 接口说明：[../reference/cli.md](../reference/cli.md)
