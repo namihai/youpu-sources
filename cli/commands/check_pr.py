@@ -4,8 +4,7 @@ import argparse
 from pathlib import Path
 
 from cli.argparse_utils import CliArgumentParser
-from cli.commands import validate_imports as validate_imports_command
-from cli.commands import validate_repo as validate_repo_command
+from cli.checks import run_pr_check
 from cli.errors import EXIT_OK
 from cli.errors import EXIT_USAGE_ERROR
 from cli.errors import EXIT_VALIDATION_FAILED
@@ -32,25 +31,27 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             EXIT_USAGE_ERROR,
         )
 
-    validate_result, validate_exit = validate_repo_command.run([], repo_root)
-    staging_result, staging_exit = validate_imports_command.run([], repo_root)
-    diagnostics = [*validate_result.diagnostics, *staging_result.diagnostics]
-    ok = validate_result.ok and staging_result.ok
+    report = run_pr_check(repo_root)
+    ok = report.ok
     return (
         CommandResult(
             ok=ok,
             command="check-pr",
             summary="PR check passed" if ok else "PR check failed",
-            diagnostics=diagnostics,
+            diagnostics=report.diagnostics,
             data={
-                "validate_ok": validate_result.ok,
-                "validate_exit_code": validate_exit,
-                "validate_summary": validate_result.summary,
-                "validate_command": validate_result.command,
-                "staging_ok": staging_result.ok,
-                "staging_exit_code": staging_exit,
-                "staging_summary": staging_result.summary,
-                "staging_command": staging_result.command,
+                "validate_ok": report.repo.ok,
+                "validate_exit_code": EXIT_OK if report.repo.ok else EXIT_VALIDATION_FAILED,
+                "validate_summary": "Repository validation passed" if report.repo.ok else "Repository validation failed",
+                "validate_command": "validate-repo",
+                "schema_ok": report.schema.ok,
+                "schema_exit_code": EXIT_OK if report.schema.ok else EXIT_VALIDATION_FAILED,
+                "schema_summary": "Schema validation passed" if report.schema.ok else "Schema validation failed",
+                "schema_command": "validate-schema",
+                "staging_ok": report.imports.ok,
+                "staging_exit_code": EXIT_OK if report.imports.ok else EXIT_VALIDATION_FAILED,
+                "staging_summary": "Staging validation passed" if report.imports.ok else "Staging validation failed",
+                "staging_command": "validate-imports",
             },
         ),
         EXIT_OK if ok else EXIT_VALIDATION_FAILED,

@@ -11,6 +11,9 @@
 - 每条记录对应一个 Markdown 文件
 - 文件放在 `data/accepted/` 目录下
 - 文件名遵循统一命名规则
+- accepted 的字段定义以 [`../../schemas/accepted.json`](../../schemas/accepted.json) 为准
+- [`../../templates/accepted.md`](../../templates/accepted.md) 是面向贡献者的填写模板，结构需要与 schema 保持一致
+- schema / template / CLI 的维护关系见 [`schema.md`](schema.md)
 
 ## 文件命名
 

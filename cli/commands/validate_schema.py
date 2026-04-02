@@ -4,7 +4,7 @@ import argparse
 from pathlib import Path
 
 from cli.argparse_utils import CliArgumentParser
-from cli.checks import run_repo_check
+from cli.checks import run_schema_check
 from cli.errors import EXIT_OK
 from cli.errors import EXIT_USAGE_ERROR
 from cli.errors import EXIT_VALIDATION_FAILED
@@ -13,7 +13,7 @@ from cli.output import Diagnostic
 
 
 def build_parser() -> argparse.ArgumentParser:
-    return CliArgumentParser(prog="youpu validate-repo", add_help=False)
+    return CliArgumentParser(prog="youpu validate-schema", add_help=False)
 
 
 def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
@@ -24,20 +24,20 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
         return (
             CommandResult(
                 ok=False,
-                command="validate-repo",
-                summary="Repository validation failed",
+                command="validate-schema",
+                summary="Schema validation failed",
                 diagnostics=[Diagnostic(level="error", message="invalid arguments", code="usage_error")],
             ),
             EXIT_USAGE_ERROR,
         )
 
-    report = run_repo_check(repo_root)
+    report = run_schema_check(repo_root)
     ok = report.ok
     return (
         CommandResult(
             ok=ok,
-            command="validate-repo",
-            summary="Repository validation passed" if ok else "Repository validation failed",
+            command="validate-schema",
+            summary="Schema validation passed" if ok else "Schema validation failed",
             diagnostics=report.diagnostics,
         ),
         EXIT_OK if ok else EXIT_VALIDATION_FAILED,

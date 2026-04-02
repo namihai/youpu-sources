@@ -16,6 +16,7 @@
 
 - 保存最终的 `accepted` 结论
 - 保存最终的 `rejected` 结论
+- 维护 schema 真源与人工 template 的一致性
 - 维护 `accepted`、`rejected`、命名和 URL 规范
 - 校验仓库结构、字段、去重和交叉冲突
 - 对候选导入内容做安全合并
@@ -78,5 +79,11 @@
 
 - 修改和删除不通过 `staging/`
 - 修改和删除直接发生在 `data/`
+
+结构规则约束为：
+
+- `schemas/*.json` 是 accepted / rejected 结构的真源
+- `templates/*` 只作为面向人的展示模板
+- CLI 应从 schema 读取结构定义，不应把字段列表散落硬编码在多个命令中
 
 CLI 的具体边界和命令收敛方向见 [`../cli/scope.md`](../cli/scope.md)。

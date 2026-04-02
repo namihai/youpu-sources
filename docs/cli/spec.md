@@ -24,6 +24,7 @@ youpu <command> [options]
 
 - `youpu validate-repo`
 - `youpu validate-imports`
+- `youpu validate-schema`
 - `youpu check-pr`
 - `youpu check-merge`
 - `youpu ingest`
@@ -35,7 +36,6 @@ youpu <command> [options]
 
 ```bash
 --format text|json
---no-color
 --root <path>
 ```
 
@@ -50,6 +50,24 @@ youpu <command> [options]
 
 ## 命令规格
 
+### `validate-schema`
+
+用途：
+
+- 校验 schema 配置与模板的一致性
+
+检查范围：
+
+- `schemas/accepted.json`
+- `schemas/rejected.json`
+- `templates/accepted.md`
+- `templates/rejected.rows.csv`
+
+约束：
+
+- 只读
+- 不检查正式数据和 staging 数据本身
+
 ### `validate-repo`
 
 用途：
@@ -62,6 +80,10 @@ youpu <command> [options]
 - `data/rejected.csv`
 - 正式区重复
 - accepted / rejected 冲突
+
+补充：
+
+- 缺失 `data/rejected.csv` 时，按“正式 rejected 为空表”处理，不单独报错
 
 约束：
 
@@ -94,9 +116,11 @@ youpu <command> [options]
 
 行为：
 
+- 调用 `validate-schema`
 - 调用 `validate-repo`
 - 调用 `validate-imports`
 - 允许 `staging/` 中存在待处理文件
+- 如果 `staging/` 中没有任何候选内容，返回 `staging_empty`
 
 ### `check-merge`
 
@@ -106,6 +130,7 @@ youpu <command> [options]
 
 行为：
 
+- 调用 `validate-schema`
 - 调用 `validate-repo`
 - 要求 `staging/accepted/` 没有待处理 Markdown
 - 要求 `staging/rejected/rows.csv` 不存在
@@ -124,6 +149,7 @@ youpu <command> [options]
 - 进行确定性修正
 - 写入 `data/accepted/` / `data/rejected.csv`
 - 删除已处理输入
+- 如果正式 `data/rejected.csv` 不存在且本次有合法 rejected 候选，会自动创建该文件
 
 输入约束：
 
@@ -133,6 +159,7 @@ youpu <command> [options]
 约束：
 
 - 如果存在诊断问题，命令失败且不做部分写入
+- 如果 `staging/` 中没有任何候选内容，命令失败并返回 `staging_empty`
 - 不负责 git 提交
 
 ### `report`
@@ -170,7 +197,7 @@ youpu <command> [options]
 
 ## 自动修正边界
 
-accepted metadata schema 应集中定义在单一来源中，由 CLI 的校验与序列化逻辑共享；新增或删除 accepted 字段时，应优先修改 schema 定义，而不是在多个命令中分别维护字段列表。
+accepted / rejected 的结构定义应集中放在 `schemas/*.json` 中，由 CLI 的校验与序列化逻辑共享；新增或删除字段时，应优先修改 schema 定义，而不是在多个命令中分别维护字段列表。模板目前保持手写，但必须通过 `validate-schema` 与 schema 保持一致。schema 的维护关系与修改顺序见 [`../specs/schema.md`](../specs/schema.md)。
 
 允许自动修正：
 

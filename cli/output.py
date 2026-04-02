@@ -26,8 +26,7 @@ class CommandResult:
     data: dict[str, Any] = field(default_factory=dict)
 
 
-def render_text(result: CommandResult, *, no_color: bool = False, stderr: bool = False) -> None:
-    del no_color
+def render_text(result: CommandResult, *, stderr: bool = False) -> None:
     target = sys.stderr if stderr else sys.stdout
     print(result.summary, file=target)
 
@@ -56,7 +55,6 @@ def emit_result(
     result: CommandResult,
     *,
     output_format: str = "text",
-    no_color: bool = False,
     stderr: bool = False,
 ) -> None:
     if output_format == "json":
@@ -64,4 +62,4 @@ def emit_result(
         print(render_json(result), file=target)
         return
 
-    render_text(result, no_color=no_color, stderr=stderr)
+    render_text(result, stderr=stderr)

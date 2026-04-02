@@ -43,6 +43,7 @@ CLI 识别的导入区边界为：
 
 - `youpu validate-repo`
 - `youpu validate-imports`
+- `youpu validate-schema`
 - `youpu check-pr`
 - `youpu check-merge`
 - `youpu ingest`
@@ -50,7 +51,7 @@ CLI 识别的导入区边界为：
 
 其中：
 
-- `validate-repo` / `validate-imports` 是基础检查命令
+- `validate-schema` / `validate-repo` / `validate-imports` 是基础检查命令
 - `check-pr` / `check-merge` 是协作状态命令
 - `ingest` 是唯一写入命令
 - `report` 是辅助观测命令

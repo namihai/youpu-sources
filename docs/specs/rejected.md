@@ -18,15 +18,20 @@
 
 - rejected 只维护一个 CSV 文件：`data/rejected.csv`
 - 每一行代表一个已拒绝来源
+- 如果正式区还没有任何 rejected 记录，`data/rejected.csv` 可以暂时不存在；系统会在首次 ingest rejected 候选时自动创建它
+- rejected 的列定义以 [`../../schemas/rejected.json`](../../schemas/rejected.json) 为准
+- [`../../templates/rejected.rows.csv`](../../templates/rejected.rows.csv) 提供面向贡献者的结构示例，并需要与 schema 保持一致
+- schema / template / CLI 的维护关系见 [`schema.md`](schema.md)
 
 导入候选时使用的输入文件也固定为单个 CSV：
 
 - `staging/rejected/rows.csv`
 - CSV 头与正式 `data/rejected.csv` 保持一致
+- `templates/rejected.rows.csv` 对应的是 staging 输入结构示例，不是正式库文件名示例
 
 ## 字段定义
 
-CSV 头应固定为：
+CSV 头由 rejected schema 定义，当前固定为：
 
 ```csv
 url,title,reason

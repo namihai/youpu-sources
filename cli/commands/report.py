@@ -58,7 +58,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
         )
 
     accepted_count = len(list(get_accepted_dir(repo_root).glob("*.md")))
-    rejected = parse_rejected_csv(get_rejected_csv_path(repo_root))
+    rejected = parse_rejected_csv(get_rejected_csv_path(repo_root), allow_missing=True)
     rejected_count = len(rejected.rows)
     latest_id = latest_accepted_id(repo_root)
     layout = get_staging_layout(repo_root)

@@ -3,8 +3,9 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from cli.commands import ingest as ingest_command
 from cli.argparse_utils import CliArgumentParser
+from cli.checks import ImportsCheck
+from cli.checks import run_imports_check
 from cli.errors import EXIT_OK
 from cli.errors import EXIT_USAGE_ERROR
 from cli.errors import EXIT_VALIDATION_FAILED
@@ -17,16 +18,16 @@ def build_parser() -> argparse.ArgumentParser:
     return CliArgumentParser(prog="youpu validate-imports", add_help=False)
 
 
-def build_summary(analysis: ingest_command.IngestAnalysis, repo_root: Path, *, ok: bool) -> str:
+def build_summary(report: ImportsCheck, repo_root: Path, *, ok: bool) -> str:
     header = "Staging validation passed" if ok else "Staging validation failed"
     layout = get_staging_layout(repo_root)
     return "\n".join(
         [
             header,
             f"staging root: {layout.root.relative_to(repo_root)}",
-            f"accepted candidates ready: {len(analysis.accepted_ready)}",
-            f"rejected candidates ready: {len(analysis.rejected_ready)}",
-            f"issues: {len(analysis.diagnostics)}",
+            f"accepted candidates ready: {report.accepted_ready}",
+            f"rejected candidates ready: {report.rejected_ready}",
+            f"issues: {len(report.diagnostics)}",
         ]
     )
 
@@ -46,19 +47,19 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             EXIT_USAGE_ERROR,
         )
 
-    analysis = ingest_command.build_analysis(repo_root)
-    ok = not any(diag.level == "error" for diag in analysis.diagnostics)
+    report = run_imports_check(repo_root)
+    ok = report.ok
     layout = get_staging_layout(repo_root)
     return (
         CommandResult(
             ok=ok,
             command="validate-imports",
-            summary=build_summary(analysis, repo_root, ok=ok),
-            diagnostics=analysis.diagnostics,
+            summary=build_summary(report, repo_root, ok=ok),
+            diagnostics=report.diagnostics,
             data={
                 "staging_root": str(layout.root.relative_to(repo_root)),
-                "accepted_ready": len(analysis.accepted_ready),
-                "rejected_ready": len(analysis.rejected_ready),
+                "accepted_ready": report.accepted_ready,
+                "rejected_ready": report.rejected_ready,
             },
         ),
         EXIT_OK if ok else EXIT_VALIDATION_FAILED,

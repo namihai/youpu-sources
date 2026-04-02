@@ -54,6 +54,7 @@
 
 - staging 中 rejected 的输入文件名固定为 `staging/rejected/rows.csv`
 - 如果 URL 已经存在于正式区，检查会失败
+- 如果正式区还没有 `data/rejected.csv`，系统会把它视为空表；首次 ingest rejected 候选时会自动创建
 
 ## 场景 3：修改已有 accepted
 

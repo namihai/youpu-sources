@@ -3,24 +3,30 @@ from __future__ import annotations
 from collections import defaultdict
 from pathlib import Path
 
-from cli.accepted_schema import ACCEPTED_ALLOWED_FIELDS
-from cli.accepted_schema import ACCEPTED_ARRAY_FIELDS
-from cli.accepted_schema import ACCEPTED_REQUIRED_FIELDS
+from cli.content_rules import load_schema_rules
+from cli.content_rules import schema_error_diagnostic
+from cli.content_rules import validate_accepted_document
+from cli.content_rules import validate_rejected_values
 from cli.output import Diagnostic
 from cli.repo import get_accepted_dir
 from cli.repo import get_rejected_csv_path
 from cli.repo import normalize_url
 from cli.repo import parse_accepted_document
 from cli.repo import parse_rejected_csv
-
-REJECTED_COLUMNS = ["url", "title", "reason"]
+from cli.schema_config import SchemaConfigError
 
 
 def validate_accepted(repo_root: Path) -> list[Diagnostic]:
     diagnostics: list[Diagnostic] = []
     accepted_dir = get_accepted_dir(repo_root)
+    try:
+        rules = load_schema_rules(repo_root)
+    except SchemaConfigError as exc:
+        diagnostics.append(schema_error_diagnostic(exc, repo_root))
+        return diagnostics
 
     for path in sorted(accepted_dir.glob("*.md")):
+        rel_path = str(path.relative_to(repo_root))
         try:
             doc = parse_accepted_document(path)
         except Exception as exc:
@@ -28,7 +34,7 @@ def validate_accepted(repo_root: Path) -> list[Diagnostic]:
                 Diagnostic(
                     level="error",
                     message=str(exc),
-                    path=str(path.relative_to(repo_root)),
+                    path=rel_path,
                     code="accepted_parse_error",
                 )
             )
@@ -39,81 +45,18 @@ def validate_accepted(repo_root: Path) -> list[Diagnostic]:
                 Diagnostic(
                     level="error",
                     message="invalid filename, expected SRC-####-slug.md",
-                    path=str(path.relative_to(repo_root)),
+                    path=rel_path,
                     code="accepted_invalid_filename",
                 )
             )
 
-        if not doc.heading:
-            diagnostics.append(
-                Diagnostic(
-                    level="error",
-                    message="missing H1 title",
-                    path=str(path.relative_to(repo_root)),
-                    code="accepted_missing_h1",
-                )
-            )
-        elif doc.yaml_fields.get("title", "").strip() and doc.heading != doc.yaml_fields.get("title", "").strip():
-            diagnostics.append(
-                Diagnostic(
-                    level="error",
-                    message="H1 title does not match YAML `title`",
-                    path=str(path.relative_to(repo_root)),
-                    code="accepted_title_mismatch",
-                )
-            )
-
-        for key in ACCEPTED_REQUIRED_FIELDS:
-            value = doc.yaml_fields.get(key, "").strip()
-            if not value:
-                diagnostics.append(
-                    Diagnostic(
-                        level="error",
-                        message=f"missing required field `{key}`",
-                        path=str(path.relative_to(repo_root)),
-                        code="accepted_missing_field",
-                        details={"field": key},
-                    )
-                )
-
-        for key in sorted(doc.yaml_fields):
-            if key not in ACCEPTED_ALLOWED_FIELDS:
-                diagnostics.append(
-                    Diagnostic(
-                        level="error",
-                        message=f"field `{key}` is not part of the accepted schema",
-                        path=str(path.relative_to(repo_root)),
-                        code="accepted_unknown_field",
-                        details={"field": key},
-                    )
-                )
-
-        for key in ACCEPTED_ARRAY_FIELDS:
-            value = doc.yaml_fields.get(key, "").strip()
-            if value and not (value.startswith("[") and value.endswith("]")):
-                diagnostics.append(
-                    Diagnostic(
-                        level="error",
-                        message=f"field `{key}` must use inline array syntax like [a, b]",
-                        path=str(path.relative_to(repo_root)),
-                        code="accepted_invalid_array",
-                        details={"field": key},
-                    )
-                )
-
-        canonical_url = doc.yaml_fields.get("canonical_url", "").strip()
-        if canonical_url:
-            try:
-                normalize_url(canonical_url)
-            except ValueError as exc:
-                diagnostics.append(
-                    Diagnostic(
-                        level="error",
-                        message=str(exc),
-                        path=str(path.relative_to(repo_root)),
-                        code="accepted_invalid_canonical_url",
-                    )
-                )
+        doc_diagnostics, _ = validate_accepted_document(
+            doc,
+            rel_path=rel_path,
+            rules=rules,
+            code_prefix="accepted",
+        )
+        diagnostics.extend(doc_diagnostics)
 
     return diagnostics
 
@@ -121,9 +64,17 @@ def validate_accepted(repo_root: Path) -> list[Diagnostic]:
 def validate_rejected(repo_root: Path) -> list[Diagnostic]:
     diagnostics: list[Diagnostic] = []
     csv_path = get_rejected_csv_path(repo_root)
+    try:
+        rules = load_schema_rules(repo_root)
+    except SchemaConfigError as exc:
+        diagnostics.append(schema_error_diagnostic(exc, repo_root))
+        return diagnostics
+
+    if not csv_path.exists():
+        return diagnostics
 
     try:
-        rejected = parse_rejected_csv(csv_path)
+        rejected = parse_rejected_csv(csv_path, allow_missing=True)
     except Exception as exc:
         diagnostics.append(
             Diagnostic(
@@ -135,57 +86,25 @@ def validate_rejected(repo_root: Path) -> list[Diagnostic]:
         )
         return diagnostics
 
-    if rejected.columns != REJECTED_COLUMNS:
+    if rejected.columns != rules.rejected_column_names:
         diagnostics.append(
             Diagnostic(
                 level="error",
-                message=f"invalid header, expected {','.join(REJECTED_COLUMNS)}",
+                message=f"invalid header, expected {','.join(rules.rejected_column_names)}",
                 path=str(csv_path.relative_to(repo_root)),
                 code="rejected_invalid_header",
             )
         )
 
     for row in rejected.rows:
-        if not row.url:
-            diagnostics.append(
-                Diagnostic(
-                    level="error",
-                    message="missing `url`",
-                    path=f"{csv_path.relative_to(repo_root)}:{row.row_number}",
-                    code="rejected_missing_url",
-                )
-            )
-        else:
-            try:
-                normalize_url(row.url)
-            except ValueError as exc:
-                diagnostics.append(
-                    Diagnostic(
-                        level="error",
-                        message=str(exc),
-                        path=f"{csv_path.relative_to(repo_root)}:{row.row_number}",
-                        code="rejected_invalid_url",
-                    )
-                )
-
-        if not row.title:
-            diagnostics.append(
-                Diagnostic(
-                    level="error",
-                    message="missing `title`",
-                    path=f"{csv_path.relative_to(repo_root)}:{row.row_number}",
-                    code="rejected_missing_title",
-                )
-            )
-        if not row.reason:
-            diagnostics.append(
-                Diagnostic(
-                    level="error",
-                    message="missing `reason`",
-                    path=f"{csv_path.relative_to(repo_root)}:{row.row_number}",
-                    code="rejected_missing_reason",
-                )
-            )
+        row_diagnostics, _ = validate_rejected_values(
+            url=row.url,
+            title=row.title,
+            reason=row.reason,
+            path=f"{csv_path.relative_to(repo_root)}:{row.row_number}",
+            code_prefix="rejected",
+        )
+        diagnostics.extend(row_diagnostics)
 
     return diagnostics
 
@@ -214,7 +133,7 @@ def validate_cross(repo_root: Path) -> list[Diagnostic]:
 
     csv_path = get_rejected_csv_path(repo_root)
     try:
-        rejected = parse_rejected_csv(csv_path)
+        rejected = parse_rejected_csv(csv_path, allow_missing=True)
     except Exception:
         return diagnostics
 
@@ -309,7 +228,7 @@ def validate_rejected_duplicates(repo_root: Path) -> list[Diagnostic]:
     csv_path = get_rejected_csv_path(repo_root)
 
     try:
-        rejected = parse_rejected_csv(csv_path)
+        rejected = parse_rejected_csv(csv_path, allow_missing=True)
     except Exception:
         return diagnostics
 

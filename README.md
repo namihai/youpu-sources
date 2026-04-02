@@ -7,6 +7,11 @@
 - `data/accepted/`：确认保留的数据集来源
 - `data/rejected.csv`：确认不保留的数据集来源
 
+同时，仓库使用配置化 schema 描述 accepted / rejected 的结构：
+
+- `schemas/accepted.json`
+- `schemas/rejected.json`
+
 这个仓库不保存数据集文件本身，也不负责帮你发现外部来源。
 
 ## 快速开始
@@ -34,6 +39,14 @@ staging/
 
 如果你要修改或删除已有正式记录，不要使用 `staging/`，而是直接在分支中修改 `data/` 后提交 PR。
 
+## 测试
+
+运行当前 CLI 回归测试：
+
+```bash
+make test
+```
+
 ## 进一步阅读
 
 完整流程见：
@@ -42,6 +55,7 @@ staging/
 - [常见失败与处理方式](docs/overview/failures.md)
 - [accepted 规范](docs/specs/accepted.md)
 - [rejected 规范](docs/specs/rejected.md)
+- [schema 规范](docs/specs/schema.md)
 - [URL 规范](docs/specs/url.md)
 
 ## 去哪里看详细说明
@@ -56,4 +70,5 @@ staging/
 - CLI 开发接口：[docs/cli/spec.md](docs/cli/spec.md)
 - accepted 规范：[docs/specs/accepted.md](docs/specs/accepted.md)
 - rejected 规范：[docs/specs/rejected.md](docs/specs/rejected.md)
+- schema 规范：[docs/specs/schema.md](docs/specs/schema.md)
 - URL 规范：[docs/specs/url.md](docs/specs/url.md)

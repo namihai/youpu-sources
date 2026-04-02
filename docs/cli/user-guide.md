@@ -9,6 +9,8 @@
 
 普通贡献者的主流程见 [README.md](../../README.md)。
 
+如果你要修改字段定义、模板结构或 schema 校验逻辑，建议同时阅读 [schema 规范](../specs/schema.md)。
+
 ## 协作约定
 
 - 内部协作者应使用主仓库分支提交 PR，这类 PR 支持维护者通过 `/ingest` 自动回写
@@ -22,6 +24,7 @@
 ```bash
 youpu validate-repo
 youpu validate-imports
+youpu validate-schema
 youpu check-pr
 youpu check-merge
 youpu ingest
@@ -29,6 +32,21 @@ youpu report
 ```
 
 ## 你通常怎么用
+
+### 检查 schema 和模板
+
+```bash
+youpu validate-schema
+```
+
+用于检查：
+
+- `schemas/accepted.json`
+- `schemas/rejected.json`
+- `templates/accepted.md`
+- `templates/rejected.rows.csv`
+
+这个命令适合在修改字段定义、模板结构或 CLI schema 逻辑后单独运行。
 
 ### 维护 PR
 
@@ -40,8 +58,10 @@ youpu check-pr
 
 这个命令会同时：
 
+- 检查 schema 与模板
 - 检查正式区
 - 检查 `staging/`
+- 如果 `staging/` 中没有任何候选内容，会以 `staging_empty` 失败
 
 ### 准备合并
 
@@ -75,6 +95,7 @@ youpu ingest
 - 删除已处理的输入文件
 
 如果候选内容存在问题，命令会直接失败，不会做部分写入。
+如果 `staging/` 为空，命令也会失败，因为没有任何可导入内容。
 
 ## 单独检查命令
 

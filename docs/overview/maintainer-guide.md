@@ -33,6 +33,7 @@
 - 候选内容本身是否合理
 - `check-pr` 是否通过
 - PR diff 是否只包含本次候选输入
+- 如果是 staging PR，`staging/` 里必须真的有候选内容；空 staging PR 会以 `staging_empty` 失败
 
 如果是修改或删除正式记录，维护者应确认：
 
@@ -105,6 +106,7 @@ fork PR 只支持检查，不支持自动回写 ingest 结果。
 如果需要在本地复现或排查，维护者可以使用：
 
 ```bash
+youpu validate-schema
 youpu validate-repo
 youpu validate-imports
 youpu check-pr
@@ -119,6 +121,8 @@ youpu report
   检查正式区
 - `youpu validate-imports`
   检查当前 `staging/`
+- `youpu validate-schema`
+  检查 `schemas/` 与 `templates/` 是否一致
 - `youpu check-pr`
   复现 PR 检查
 - `youpu ingest`
@@ -127,6 +131,8 @@ youpu report
   确认当前状态是否可合并
 - `youpu report`
   快速查看仓库摘要
+
+如果本次 PR 涉及字段调整、模板调整或 CLI schema 逻辑调整，建议先单独跑一次 `youpu validate-schema`，再看 `check-pr` / `check-merge`。
 
 ## 相关文档
 

@@ -7,11 +7,12 @@ from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
-from cli.accepted_schema import ACCEPTED_ALLOWED_FIELDS
-from cli.accepted_schema import ACCEPTED_ARRAY_FIELDS
-from cli.accepted_schema import ACCEPTED_FIELD_ORDER
-from cli.accepted_schema import ACCEPTED_REQUIRED_FIELDS
+from cli.accepted_schema import get_accepted_field_order
 from cli.argparse_utils import CliArgumentParser
+from cli.content_rules import load_schema_rules
+from cli.content_rules import schema_error_diagnostic
+from cli.content_rules import validate_accepted_document
+from cli.content_rules import validate_rejected_values
 from cli.errors import EXIT_OK
 from cli.errors import EXIT_USAGE_ERROR
 from cli.errors import EXIT_VALIDATION_FAILED
@@ -25,8 +26,9 @@ from cli.repo import get_staging_layout
 from cli.repo import normalize_url
 from cli.repo import parse_accepted_document
 from cli.repo import parse_rejected_csv
+from cli.repo import serialize_simple_yaml_mapping
 from cli.repo import validate_staging_accepted_filename
-from cli.validation import REJECTED_COLUMNS
+from cli.schema_config import SchemaConfigError
 
 SLUG_CLEAN_RE = re.compile(r"[^a-z0-9]+")
 ACCEPTED_FILENAME_RE = re.compile(r"^SRC-(\d{4})-[a-z0-9-]+\.md$")
@@ -48,6 +50,10 @@ class IngestAnalysis:
     accepted_ready: list[AcceptedDocument]
     rejected_rows: list[RejectedImportRow]
     rejected_ready: list[RejectedImportRow]
+
+
+def has_staging_candidates(analysis: IngestAnalysis) -> bool:
+    return bool(analysis.accepted_docs or analysis.rejected_rows)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -115,6 +121,17 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
     rejected_error_paths: set[str] = set()
     accepted_seen_urls: dict[str, list[str]] = defaultdict(list)
     rejected_seen_urls: dict[str, list[str]] = defaultdict(list)
+    try:
+        rules = load_schema_rules(repo_root)
+    except SchemaConfigError as exc:
+        diagnostics.append(schema_error_diagnostic(exc, repo_root))
+        return IngestAnalysis(
+            diagnostics=diagnostics,
+            accepted_docs=[],
+            accepted_ready=[],
+            rejected_rows=[],
+            rejected_ready=[],
+        )
     accepted_urls = accepted_url_index(repo_root)
     rejected_urls = rejected_url_index(repo_root)
     layout = get_staging_layout(repo_root)
@@ -188,96 +205,39 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
 
         accepted_docs.append(doc)
 
-        if not doc.heading:
-            diagnostics.append(
-                Diagnostic(level="error", message="missing H1 title", path=rel_path, code="staging_accepted_missing_h1")
-            )
+        doc_diagnostics, normalized_url = validate_accepted_document(
+            doc,
+            rel_path=rel_path,
+            rules=rules,
+            code_prefix="staging_accepted",
+        )
+        diagnostics.extend(doc_diagnostics)
+        if doc_diagnostics:
             accepted_error_paths.add(rel_path)
-        elif doc.yaml_fields.get("title", "").strip() and doc.heading != doc.yaml_fields.get("title", "").strip():
-            diagnostics.append(
-                Diagnostic(
-                    level="error",
-                    message="H1 title does not match YAML `title`",
-                    path=rel_path,
-                    code="staging_accepted_title_mismatch",
-                )
-            )
-            accepted_error_paths.add(rel_path)
-
-        for key in ACCEPTED_REQUIRED_FIELDS:
-            value = doc.yaml_fields.get(key, "").strip()
-            if not value:
+        if normalized_url:
+            accepted_seen_urls[normalized_url].append(rel_path)
+            if normalized_url in accepted_urls:
                 diagnostics.append(
                     Diagnostic(
                         level="error",
-                        message=f"missing required field `{key}`",
+                        message=f"canonical_url already exists in accepted: {normalized_url}",
                         path=rel_path,
-                        code="staging_accepted_missing_field",
-                        details={"field": key},
+                        code="staging_accepted_conflict_accepted",
+                        details={"matches": accepted_urls[normalized_url]},
                     )
                 )
                 accepted_error_paths.add(rel_path)
-
-        for key in sorted(doc.yaml_fields):
-            if key not in ACCEPTED_ALLOWED_FIELDS:
+            if normalized_url in rejected_urls:
                 diagnostics.append(
                     Diagnostic(
                         level="error",
-                        message=f"field `{key}` is not part of the accepted schema",
+                        message=f"canonical_url already exists in rejected: {normalized_url}",
                         path=rel_path,
-                        code="staging_accepted_unknown_field",
-                        details={"field": key},
+                        code="staging_accepted_conflict_rejected",
+                        details={"matches": rejected_urls[normalized_url]},
                     )
                 )
                 accepted_error_paths.add(rel_path)
-
-        for key in ACCEPTED_ARRAY_FIELDS:
-            value = doc.yaml_fields.get(key, "").strip()
-            if value and not (value.startswith("[") and value.endswith("]")):
-                diagnostics.append(
-                    Diagnostic(
-                        level="error",
-                        message=f"field `{key}` must use inline array syntax like [a, b]",
-                        path=rel_path,
-                        code="staging_accepted_invalid_array",
-                        details={"field": key},
-                    )
-                )
-                accepted_error_paths.add(rel_path)
-
-        canonical_url = doc.yaml_fields.get("canonical_url", "").strip()
-        if canonical_url:
-            try:
-                normalized_url = normalize_url(canonical_url)
-            except ValueError as exc:
-                diagnostics.append(
-                    Diagnostic(level="error", message=str(exc), path=rel_path, code="staging_accepted_invalid_canonical_url")
-                )
-                accepted_error_paths.add(rel_path)
-            else:
-                accepted_seen_urls[normalized_url].append(rel_path)
-                if normalized_url in accepted_urls:
-                    diagnostics.append(
-                        Diagnostic(
-                            level="error",
-                            message=f"canonical_url already exists in accepted: {normalized_url}",
-                            path=rel_path,
-                            code="staging_accepted_conflict_accepted",
-                            details={"matches": accepted_urls[normalized_url]},
-                        )
-                    )
-                    accepted_error_paths.add(rel_path)
-                if normalized_url in rejected_urls:
-                    diagnostics.append(
-                        Diagnostic(
-                            level="error",
-                            message=f"canonical_url already exists in rejected: {normalized_url}",
-                            path=rel_path,
-                            code="staging_accepted_conflict_rejected",
-                            details={"matches": rejected_urls[normalized_url]},
-                        )
-                    )
-                    accepted_error_paths.add(rel_path)
 
     for normalized_url, paths in sorted(accepted_seen_urls.items()):
         if len(paths) < 2:
@@ -304,11 +264,11 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
             )
             continue
 
-        if rejected.columns != REJECTED_COLUMNS:
+        if rejected.columns != rules.rejected_column_names:
             diagnostics.append(
                 Diagnostic(
                     level="error",
-                    message=f"invalid header, expected {','.join(REJECTED_COLUMNS)}",
+                    message=f"invalid header, expected {','.join(rules.rejected_column_names)}",
                     path=rel_csv_path,
                     code="staging_rejected_invalid_header",
                 )
@@ -327,24 +287,19 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
                 )
             )
 
-            if not row.url:
-                diagnostics.append(Diagnostic(level="error", message="missing `url`", path=row_path, code="staging_rejected_missing_url"))
+            row_diagnostics, normalized_url = validate_rejected_values(
+                url=row.url,
+                title=row.title,
+                reason=row.reason,
+                path=row_path,
+                code_prefix="staging_rejected",
+            )
+            diagnostics.extend(row_diagnostics)
+            if row_diagnostics:
                 rejected_error_paths.add(row_path)
+            if normalized_url is None:
                 continue
 
-            try:
-                normalized_url = normalize_url(row.url)
-            except ValueError as exc:
-                diagnostics.append(Diagnostic(level="error", message=str(exc), path=row_path, code="staging_rejected_invalid_url"))
-                rejected_error_paths.add(row_path)
-                continue
-
-            if not row.title:
-                diagnostics.append(Diagnostic(level="error", message="missing `title`", path=row_path, code="staging_rejected_missing_title"))
-                rejected_error_paths.add(row_path)
-            if not row.reason:
-                diagnostics.append(Diagnostic(level="error", message="missing `reason`", path=row_path, code="staging_rejected_missing_reason"))
-                rejected_error_paths.add(row_path)
             if normalized_url in accepted_urls:
                 diagnostics.append(
                     Diagnostic(
@@ -401,12 +356,12 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
     )
 
 
-def serialize_accepted(doc: AcceptedDocument) -> str:
+def serialize_accepted(doc: AcceptedDocument, repo_root: Path) -> str:
     heading = doc.yaml_fields.get("title", "").strip() or doc.heading or "标题"
     normalized_fields = dict(doc.yaml_fields)
     normalized_fields["title"] = heading
     normalized_fields["canonical_url"] = normalize_url(doc.yaml_fields["canonical_url"].strip())
-    yaml_lines = [f"{key}: {normalized_fields.get(key, '').strip()}" for key in ACCEPTED_FIELD_ORDER]
+    yaml_lines = serialize_simple_yaml_mapping(normalized_fields, get_accepted_field_order(repo_root)).splitlines()
     body = doc.body.rstrip()
     parts = [
         f"# {heading}",
@@ -425,10 +380,10 @@ def target_accepted_path(repo_root: Path, doc: AcceptedDocument, index: int) -> 
     return get_accepted_dir(repo_root) / f"SRC-{index:04d}-{source_slug}.md"
 
 
-def write_rejected_csv(csv_path: Path, rows: list[tuple[str, str, str]]) -> None:
+def write_rejected_csv(repo_root: Path, csv_path: Path, rows: list[tuple[str, str, str]]) -> None:
     with csv_path.open("w", encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(REJECTED_COLUMNS)
+        writer.writerow(load_schema_rules(repo_root).rejected_column_names)
         writer.writerows(rows)
 
 
@@ -442,7 +397,7 @@ def merge_ingest(repo_root: Path, analysis: IngestAnalysis) -> dict[str, int]:
     for doc in analysis.accepted_ready:
         target = target_accepted_path(repo_root, doc, next_index)
         next_index += 1
-        target.write_text(serialize_accepted(doc), encoding="utf-8")
+        target.write_text(serialize_accepted(doc, repo_root), encoding="utf-8")
         doc.path.unlink()
         imported_accepted += 1
 
@@ -463,7 +418,7 @@ def merge_ingest(repo_root: Path, analysis: IngestAnalysis) -> dict[str, int]:
         imported_rejected += 1
 
     if analysis.rejected_ready:
-        write_rejected_csv(rejected_csv, existing_rows)
+        write_rejected_csv(repo_root, rejected_csv, existing_rows)
 
     for source_path, rows in rows_by_file.items():
         remaining = [row for row in rows if (row.source_path, row.row_number) not in ready_row_keys]
@@ -471,6 +426,7 @@ def merge_ingest(repo_root: Path, analysis: IngestAnalysis) -> dict[str, int]:
             source_path.unlink()
             continue
         write_rejected_csv(
+            repo_root,
             source_path,
             [(row.url, row.title, row.reason) for row in remaining],
         )
@@ -482,12 +438,11 @@ def merge_ingest(repo_root: Path, analysis: IngestAnalysis) -> dict[str, int]:
     }
 
 
-def build_summary(analysis: IngestAnalysis, repo_root: Path, *, dry_run: bool) -> str:
-    header = "Ingest dry-run completed" if dry_run else "Ingest completed"
+def build_summary(analysis: IngestAnalysis, repo_root: Path) -> str:
     layout = get_staging_layout(repo_root)
     return "\n".join(
         [
-            header,
+            "Ingest completed",
             f"staging root: {layout.root.relative_to(repo_root)}",
             f"accepted candidates ready: {len(analysis.accepted_ready)}",
             f"rejected candidates ready: {len(analysis.rejected_ready)}",
@@ -524,14 +479,35 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
                     "staging_root": str(layout.root.relative_to(repo_root)),
                     "accepted_ready": len(analysis.accepted_ready),
                     "rejected_ready": len(analysis.rejected_ready),
-                    "dry_run": False,
+                },
+            ),
+            EXIT_VALIDATION_FAILED,
+        )
+
+    if not has_staging_candidates(analysis):
+        return (
+            CommandResult(
+                ok=False,
+                command="ingest",
+                summary="Ingest failed",
+                diagnostics=[
+                    Diagnostic(
+                        level="error",
+                        message="no staging candidates found",
+                        code="staging_empty",
+                    )
+                ],
+                data={
+                    "staging_root": str(layout.root.relative_to(repo_root)),
+                    "accepted_ready": len(analysis.accepted_ready),
+                    "rejected_ready": len(analysis.rejected_ready),
                 },
             ),
             EXIT_VALIDATION_FAILED,
         )
 
     merge_data = merge_ingest(repo_root, analysis)
-    summary = build_summary(analysis, repo_root, dry_run=False)
+    summary = build_summary(analysis, repo_root)
     return (
         CommandResult(
             ok=True,
@@ -542,7 +518,6 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
                 **merge_data,
                 "accepted_ready": len(analysis.accepted_ready),
                 "rejected_ready": len(analysis.rejected_ready),
-                "dry_run": False,
             },
         ),
         EXIT_OK,

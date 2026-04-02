@@ -315,6 +315,11 @@ url,title,reason
 - `rejected_invalid_url`
 - `rejected_duplicate_url`
 
+说明：
+
+- 如果 `data/rejected.csv` 根本不存在，当前会被视为空表，不会单独报错
+- 只有文件已存在但内容不合法时，才会出现这些错误
+
 处理方式：
 
 - 由维护者修正正式 `data/rejected.csv`
@@ -358,6 +363,43 @@ url,title,reason
 常见原因：
 
 - 评论位置不对
+
+### 22. staging 为空
+
+常见现象：
+
+- `staging_empty`
+
+含义：
+
+- 当前 `staging/` 中没有任何 accepted 候选
+- 也没有任何 rejected 候选
+- 仓库本身仍然可以是合法的，但这不是一个可 ingest 的新增候选 PR
+
+处理方式：
+
+- 如果这是新增来源 PR，就补充 `staging/accepted/*.md` 或 `staging/rejected/rows.csv`
+- 如果这是修改或删除正式记录的 PR，就不应该再依赖 staging 流程
+
+### 23. schema 和 template 不一致
+
+常见现象：
+
+- `accepted_schema_invalid`
+- `rejected_schema_invalid`
+- `accepted_template_field_order_mismatch`
+- `rejected_template_header_mismatch`
+
+含义：
+
+- `schemas/accepted.json` 或 `schemas/rejected.json` 结构不合法
+- 或 `templates/accepted.md` / `templates/rejected.rows.csv` 没有和 schema 保持一致
+
+处理方式：
+
+- 先运行 `youpu validate-schema`
+- 先修 schema，再修 template
+- 不要只改模板而忘记同步 schema
 - 不是一条新的顶层评论
 - workflow 尚未在默认分支生效
 
@@ -369,7 +411,7 @@ url,title,reason
 /ingest
 ```
 
-### 22. `/ingest` 被触发但失败
+### 24. `/ingest` 被触发但失败
 
 常见原因：
 
@@ -383,7 +425,7 @@ url,title,reason
 - 确认评论者有 `write`、`maintain` 或 `admin`
 - 再重新评论 `/ingest`
 
-### 23. `/ingest` 后没有正式结果
+### 25. `/ingest` 后没有正式结果
 
 当前实现下，只要存在任何 `error`，`youpu ingest` 就不会做部分导入。
 

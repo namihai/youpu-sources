@@ -8,6 +8,7 @@ from cli.commands import ingest as ingest_command
 from cli.commands import report as report_command
 from cli.commands import validate_imports as validate_imports_command
 from cli.commands import validate_repo as validate_repo_command
+from cli.commands import validate_schema as validate_schema_command
 from cli.errors import CliError
 from cli.errors import EXIT_OK
 from cli.errors import EXIT_RUNTIME_ERROR
@@ -19,6 +20,7 @@ from cli.output import emit_result
 from cli.repo import resolve_repo_root
 
 COMMAND_HANDLERS = {
+    "validate-schema": validate_schema_command.run,
     "validate-repo": validate_repo_command.run,
     "validate-imports": validate_imports_command.run,
     "check-pr": check_pr_command.run,
@@ -38,11 +40,6 @@ def build_parser() -> argparse.ArgumentParser:
         choices=("text", "json"),
         default="text",
         help="Output format. Default: text.",
-    )
-    parser.add_argument(
-        "--no-color",
-        action="store_true",
-        help="Disable colorized output.",
     )
     parser.add_argument(
         "--root",
@@ -82,7 +79,6 @@ def main(argv: list[str] | None = None) -> int:
                 diagnostics=[Diagnostic(level="error", message=str(err), code="runtime_error")],
             ),
             output_format=args.format,
-            no_color=args.no_color,
             stderr=True,
         )
         return err.exit_code
@@ -101,7 +97,6 @@ def main(argv: list[str] | None = None) -> int:
                 diagnostics=[Diagnostic(level="error", message=str(err), code="usage_error")],
             ),
             output_format=args.format,
-            no_color=args.no_color,
             stderr=True,
         )
         return err.exit_code
@@ -117,7 +112,6 @@ def main(argv: list[str] | None = None) -> int:
                 diagnostics=[Diagnostic(level="error", message=str(exc), code="runtime_error")],
             ),
             output_format=args.format,
-            no_color=args.no_color,
             stderr=True,
         )
         return exc.exit_code
@@ -130,14 +124,16 @@ def main(argv: list[str] | None = None) -> int:
                 diagnostics=[Diagnostic(level="error", message=str(exc), code="runtime_error")],
             ),
             output_format=args.format,
-            no_color=args.no_color,
             stderr=True,
         )
         return EXIT_RUNTIME_ERROR
     emit_result(
         result,
         output_format=args.format,
-        no_color=args.no_color,
         stderr=not result.ok,
     )
     return exit_code
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
