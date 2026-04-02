@@ -29,13 +29,12 @@ def build_analysis(repo_root: Path) -> StagingAnalysis:
 
 
 def serialize_accepted(doc: AcceptedDocument, repo_root: Path) -> str:
-    heading = doc.yaml_fields.get("title", "").strip() or doc.heading or "标题"
     normalized_fields = dict(doc.yaml_fields)
-    normalized_fields["title"] = heading
+    normalized_fields["title"] = doc.yaml_fields.get("title", "").strip() or "标题"
     normalized_fields["canonical_url"] = normalize_url(doc.yaml_fields["canonical_url"].strip())
     yaml_lines = serialize_simple_yaml_mapping(normalized_fields, get_accepted_field_order(repo_root)).splitlines()
     body = doc.body.rstrip()
-    parts = [f"# {heading}", "", "```yaml", *yaml_lines, "```"]
+    parts = ["---", *yaml_lines, "---"]
     if body:
         parts.extend(["", body])
     return "\n".join(parts) + "\n"
@@ -49,8 +48,9 @@ def merge_ingest(repo_root: Path, analysis: StagingAnalysis) -> dict[str, int | 
     imported_rejected = 0
     temp_paths: list[Path] = []
     replace_pairs: list[tuple[Path, Path]] = []
-    staging_cleanup_files: list[Path] = []
-    staging_delete_files: list[Path] = []
+    delete_targets: list[Path] = []
+    backup_paths: list[tuple[Path, Path]] = []
+    applied_targets: list[Path] = []
 
     ready_accepted_targets: list[tuple[AcceptedDocument, Path]] = []
     for doc in analysis.accepted_ready:
@@ -80,7 +80,7 @@ def merge_ingest(repo_root: Path, analysis: StagingAnalysis) -> dict[str, int | 
             temp_path.write_text(serialize_accepted(doc, repo_root), encoding="utf-8")
             temp_paths.append(temp_path)
             replace_pairs.append((temp_path, target))
-            staging_cleanup_files.append(doc.path)
+            delete_targets.append(doc.path)
             imported_accepted += 1
 
         if analysis.rejected_ready:
@@ -92,7 +92,7 @@ def merge_ingest(repo_root: Path, analysis: StagingAnalysis) -> dict[str, int | 
         for source_path, rows in rows_by_file.items():
             remaining = [row for row in rows if (row.source_path, row.row_number) not in ready_row_keys]
             if not remaining:
-                staging_delete_files.append(source_path)
+                delete_targets.append(source_path)
                 continue
             temp_path = _temp_path_for(source_path)
             write_rejected_csv(temp_path, columns, [(row.url, row.title, row.reason) for row in remaining])
@@ -100,16 +100,34 @@ def merge_ingest(repo_root: Path, analysis: StagingAnalysis) -> dict[str, int | 
             replace_pairs.append((temp_path, source_path))
 
         for temp_path, target_path in replace_pairs:
+            backup_path = _backup_path_for(target_path)
+            if target_path.exists():
+                target_path.replace(backup_path)
+                backup_paths.append((target_path, backup_path))
             temp_path.replace(target_path)
+            applied_targets.append(target_path)
 
-        for path in staging_cleanup_files:
-            path.unlink()
-        for path in staging_delete_files:
-            path.unlink()
+        for path in delete_targets:
+            backup_path = _backup_path_for(path)
+            if path.exists():
+                path.replace(backup_path)
+                backup_paths.append((path, backup_path))
+                applied_targets.append(path)
     finally:
-        for temp_path in temp_paths:
-            if temp_path.exists():
-                temp_path.unlink()
+        if any(path.exists() for path in temp_paths):
+            for target_path in reversed(applied_targets):
+                if target_path.exists():
+                    target_path.unlink()
+            for target_path, backup_path in reversed(backup_paths):
+                if backup_path.exists():
+                    backup_path.replace(target_path)
+            for temp_path in temp_paths:
+                if temp_path.exists():
+                    temp_path.unlink()
+        else:
+            for _, backup_path in backup_paths:
+                if backup_path.exists():
+                    backup_path.unlink()
 
     return {"imported_accepted": imported_accepted, "imported_rejected": imported_rejected, "staging_root": "staging"}
 
@@ -121,7 +139,6 @@ def build_summary(analysis: StagingAnalysis, repo_root: Path) -> str:
         f"staging root: {layout.root.relative_to(repo_root)}",
         f"accepted candidates ready: {len(analysis.accepted_ready)}",
         f"rejected candidates ready: {len(analysis.rejected_ready)}",
-        f"issues: {len(analysis.diagnostics)}",
     ])
 def slugify(text: str) -> str:
     lowered = text.strip().lower()
@@ -145,3 +162,7 @@ def target_accepted_path(repo_root: Path, doc: AcceptedDocument, index: int) -> 
 
 def _temp_path_for(path: Path) -> Path:
     return path.with_name(f".{path.name}.{uuid4().hex}.tmp")
+
+
+def _backup_path_for(path: Path) -> Path:
+    return path.with_name(f".{path.name}.{uuid4().hex}.bak")

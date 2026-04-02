@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+from youpu.domain.accepted import ACCEPTED_FIELD_NAME_RE
 from youpu.domain.accepted import AcceptedField
 from youpu.domain.rejected import RejectedColumn
 from youpu.infra.schema_store import SchemaConfigError
@@ -57,6 +58,8 @@ def _parse_accepted_schema(repo_root: Path, raw: object) -> AcceptedSchemaConfig
 
         if not isinstance(name, str) or not name:
             raise _schema_error(repo_root, "accepted", f"accepted schema field #{index} is missing a valid `name`", "accepted_schema_invalid")
+        if not ACCEPTED_FIELD_NAME_RE.match(name):
+            raise _schema_error(repo_root, "accepted", f"accepted schema field `{name}` must use YAML-safe identifier syntax", "accepted_schema_invalid")
         if name in seen_names:
             raise _schema_error(repo_root, "accepted", f"accepted schema field `{name}` is duplicated", "accepted_schema_invalid")
         if field_type not in {"string", "url", "inline_array"}:
@@ -120,20 +123,18 @@ def _parse_rejected_schema(repo_root: Path, raw: object) -> RejectedSchemaConfig
 
 
 def load_schema_config(repo_root: Path) -> SchemaConfig:
-    accepted_raw = load_schema_document(get_schema_path(repo_root, "accepted"))
-    rejected_raw = load_schema_document(get_schema_path(repo_root, "rejected"))
     return SchemaConfig(
-        accepted=_parse_accepted_schema(repo_root, accepted_raw),
-        rejected=_parse_rejected_schema(repo_root, rejected_raw),
+        accepted=load_accepted_schema_config(repo_root),
+        rejected=load_rejected_schema_config(repo_root),
     )
 
 
 def get_accepted_fields(repo_root: Path) -> list[AcceptedField]:
-    return load_schema_config(repo_root).accepted.fields
+    return load_accepted_schema_config(repo_root).fields
 
 
 def get_rejected_columns(repo_root: Path) -> list[RejectedColumn]:
-    return load_schema_config(repo_root).rejected.columns
+    return load_rejected_schema_config(repo_root).columns
 
 
 def get_accepted_field_order(repo_root: Path) -> list[str]:
@@ -153,7 +154,7 @@ def get_accepted_allowed_fields(repo_root: Path) -> set[str]:
 
 
 def get_accepted_template_path(repo_root: Path) -> Path:
-    return load_schema_config(repo_root).accepted.template_path
+    return load_accepted_schema_config(repo_root).template_path
 
 
 def get_rejected_column_names(repo_root: Path) -> list[str]:
@@ -161,7 +162,7 @@ def get_rejected_column_names(repo_root: Path) -> list[str]:
 
 
 def get_rejected_template_path(repo_root: Path) -> Path:
-    return load_schema_config(repo_root).rejected.template_path
+    return load_rejected_schema_config(repo_root).template_path
 
 
 @dataclass(frozen=True)
@@ -180,3 +181,13 @@ def load_schema_rules(repo_root: Path) -> SchemaRules:
         accepted_array_fields=[field.name for field in config.accepted.fields if field.is_array],
         rejected_column_names=[column.name for column in config.rejected.columns],
     )
+
+
+def load_accepted_schema_config(repo_root: Path) -> AcceptedSchemaConfig:
+    accepted_raw = load_schema_document(get_schema_path(repo_root, "accepted"))
+    return _parse_accepted_schema(repo_root, accepted_raw)
+
+
+def load_rejected_schema_config(repo_root: Path) -> RejectedSchemaConfig:
+    rejected_raw = load_schema_document(get_schema_path(repo_root, "rejected"))
+    return _parse_rejected_schema(repo_root, rejected_raw)

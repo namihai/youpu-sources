@@ -14,9 +14,7 @@ class AppChecksTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             repo_root = create_repo_skeleton(Path(tmp))
             (repo_root / "staging" / "accepted" / "sample.md").write_text(
-                """# Sample
-
-```yaml
+                """---
 title: "Sample"
 subtitle: "Subtitle"
 canonical_url: "https://example.com/path"
@@ -30,7 +28,7 @@ source_org: "Org"
 permissions: "公开"
 tags: [tag-a]
 use_cases: [case-a]
-```
+---
 """,
                 encoding="utf-8",
             )
@@ -50,9 +48,7 @@ use_cases: [case-a]
         with tempfile.TemporaryDirectory() as tmp:
             repo_root = create_repo_skeleton(Path(tmp))
             (repo_root / "staging" / "accepted" / "sample.md").write_text(
-                """# Sample
-
-```yaml
+                """---
 title: "Sample"
 subtitle: "Subtitle"
 canonical_url: "https://example.com/path"
@@ -66,7 +62,7 @@ source_org: "Org"
 permissions: "公开"
 tags: [tag-a]
 use_cases: [case-a]
-```
+---
 """,
                 encoding="utf-8",
             )

@@ -4,36 +4,26 @@ import json
 import re
 from pathlib import Path
 
+from youpu.domain.accepted import ACCEPTED_FIELD_NAME_RE
 from youpu.domain.accepted import AcceptedDocument
 
 ACCEPTED_NAME_RE = re.compile(r"^SRC-(\d{4})-([a-z0-9-]+)\.md$")
-TITLE_RE = re.compile(r"^#\s+(.+?)\s*$", re.MULTILINE)
 
-
-def extract_simple_yaml_block(text: str) -> tuple[str, int]:
+def extract_front_matter(text: str) -> tuple[str, int]:
     lines = text.splitlines(keepends=True)
-    start_line: int | None = None
-    offset = 0
+    if not lines:
+        raise ValueError("missing YAML front matter")
+    if lines[0].strip() != "---":
+        raise ValueError("accepted documents must start with YAML front matter delimited by ---")
 
-    for index, line in enumerate(lines):
-        stripped = line.strip()
-        if stripped.startswith("```") and stripped[3:].strip() == "yaml":
-            offset += len(line)
-            start_line = index + 1
-            break
-        offset += len(line)
-
-    if start_line is None:
-        raise ValueError("missing ```yaml fenced block")
-
+    offset = len(lines[0])
     block_lines: list[str] = []
-    for line in lines[start_line:]:
-        stripped = line.strip()
-        if stripped == "```":
+    for line in lines[1:]:
+        if line.strip() == "---":
             return "".join(block_lines), offset + sum(len(item) for item in block_lines) + len(line)
         block_lines.append(line)
 
-    raise ValueError("missing closing ``` for yaml fenced block")
+    raise ValueError("missing closing --- for YAML front matter")
 
 
 def parse_simple_yaml_scalar(raw_value: str, *, line_number: int) -> str:
@@ -54,7 +44,7 @@ def parse_simple_yaml_scalar(raw_value: str, *, line_number: int) -> str:
 
 
 def parse_simple_yaml_block(text: str) -> dict[str, str]:
-    block, _ = extract_simple_yaml_block(text)
+    block, _ = extract_front_matter(text)
     fields: dict[str, str] = {}
     for line_number, raw_line in enumerate(block.splitlines(), start=1):
         line = raw_line.strip()
@@ -64,7 +54,7 @@ def parse_simple_yaml_block(text: str) -> dict[str, str]:
             raise ValueError(f"invalid yaml line {line_number}: expected `key: value`")
         key, value = raw_line.split(":", 1)
         key = key.strip()
-        if not re.match(r"^[A-Za-z_][A-Za-z0-9_]*$", key):
+        if not ACCEPTED_FIELD_NAME_RE.match(key):
             raise ValueError(f"invalid yaml key at line {line_number}: {key!r}")
         if key in fields:
             raise ValueError(f"duplicate yaml key at line {line_number}: {key}")
@@ -91,9 +81,7 @@ def parse_accepted_document(path: str | Path) -> AcceptedDocument:
     index = int(name_match.group(1)) if name_match else None
     slug = name_match.group(2) if name_match else None
 
-    title_match = TITLE_RE.search(text)
-    heading = title_match.group(1).strip() if title_match else None
-    _, yaml_block_end = extract_simple_yaml_block(text)
+    _, yaml_block_end = extract_front_matter(text)
     yaml_fields = parse_simple_yaml_block(text)
     body = text[yaml_block_end:].lstrip()
 
@@ -101,7 +89,6 @@ def parse_accepted_document(path: str | Path) -> AcceptedDocument:
         path=doc_path,
         index=index,
         slug=slug,
-        heading=heading,
         yaml_fields=yaml_fields,
         body=body,
     )

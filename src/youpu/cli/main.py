@@ -67,22 +67,6 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(raw_args)
 
-    try:
-        repo_root = resolve_repo_root(args.root)
-    except FileNotFoundError as exc:
-        err = RuntimeCliError(str(exc))
-        emit_result(
-            CommandResult(
-                ok=False,
-                command="bootstrap",
-                summary=f"youpu: {err}",
-                diagnostics=[Diagnostic(level="error", message=str(err), code="runtime_error")],
-            ),
-            output_format=args.format,
-            stderr=True,
-        )
-        return err.exit_code
-
     if not args.command:
         parser.print_help()
         return EXIT_OK
@@ -102,14 +86,31 @@ def main(argv: list[str] | None = None) -> int:
         return err.exit_code
 
     try:
+        repo_root = resolve_repo_root(args.root)
+    except FileNotFoundError as exc:
+        err = RuntimeCliError(str(exc))
+        emit_result(
+            CommandResult(
+                ok=False,
+                command="bootstrap",
+                summary=f"youpu: {err}",
+                diagnostics=[Diagnostic(level="error", message=str(err), code="runtime_error")],
+            ),
+            output_format=args.format,
+            stderr=True,
+        )
+        return err.exit_code
+
+    try:
         result, exit_code = COMMAND_HANDLERS[args.command](args.command_args, repo_root)
     except CliError as exc:
+        code = "usage_error" if isinstance(exc, UsageError) else "runtime_error"
         emit_result(
             CommandResult(
                 ok=False,
                 command=args.command,
                 summary=f"youpu: {exc}",
-                diagnostics=[Diagnostic(level="error", message=str(exc), code="runtime_error")],
+                diagnostics=[Diagnostic(level="error", message=str(exc), code=code)],
             ),
             output_format=args.format,
             stderr=True,

@@ -23,7 +23,6 @@ class ContentRulesTests(unittest.TestCase):
             path=Path("example.md"),
             index=1,
             slug="example",
-            heading=None,
             yaml_fields={
                 "title": "Example",
                 "canonical_url": "not-a-url",
@@ -44,7 +43,6 @@ class ContentRulesTests(unittest.TestCase):
         self.assertEqual(
             [item.code for item in diagnostics],
             [
-                "accepted_missing_h1",
                 "accepted_unknown_field",
                 "accepted_invalid_array",
                 "accepted_invalid_canonical_url",
@@ -56,7 +54,6 @@ class ContentRulesTests(unittest.TestCase):
             path=Path("example.md"),
             index=1,
             slug="example",
-            heading="Example",
             yaml_fields={
                 "title": "Example",
                 "canonical_url": "https://EXAMPLE.com/path?utm_source=x&id=1",
@@ -99,7 +96,6 @@ class ContentRulesTests(unittest.TestCase):
             path=Path("example.md"),
             index=1,
             slug="example",
-            heading="Example",
             yaml_fields={
                 "title": "Example",
                 "canonical_url": "https://example.com/path",

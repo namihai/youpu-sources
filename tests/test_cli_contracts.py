@@ -37,9 +37,7 @@ class CliContractsTests(unittest.TestCase):
             repo_root = create_repo_skeleton(Path(tmp))
             staging_doc = repo_root / "staging" / "accepted" / "sample.md"
             staging_doc.write_text(
-                """# Sample
-
-```yaml
+                """---
 title: "Sample"
 subtitle: "Subtitle"
 canonical_url: "https://example.com/path"
@@ -53,7 +51,7 @@ source_org: "Org"
 permissions: "公开"
 tags: [tag-a]
 use_cases: [case-a]
-```
+---
 """,
                 encoding="utf-8",
             )

@@ -12,13 +12,11 @@ from youpu.infra.accepted_store import parse_simple_yaml_block
 
 class AcceptedYamlIoTests(unittest.TestCase):
     def test_parse_simple_yaml_block_supports_quoted_scalars(self) -> None:
-        text = """# Example
-
-```yaml
+        text = """---
 title: "Title: Example"
 subtitle: "Quoted \\\"value\\\""
 tags: [tag-a, tag-b]
-```
+---
 """
 
         fields = parse_simple_yaml_block(text)
@@ -28,11 +26,9 @@ tags: [tag-a, tag-b]
         self.assertEqual(fields["tags"], "[tag-a, tag-b]")
 
     def test_parse_simple_yaml_block_rejects_invalid_lines(self) -> None:
-        text = """# Example
-
-```yaml
+        text = """---
 title = invalid
-```
+---
 """
 
         with self.assertRaisesRegex(ValueError, "expected `key: value`"):
@@ -44,7 +40,6 @@ title = invalid
             path=repo_root / "staging/accepted/example.md",
             index=None,
             slug=None,
-            heading="Title: Example",
             yaml_fields={
                 "title": "Title: Example",
                 "subtitle": 'Quoted "value"',
@@ -70,7 +65,6 @@ title = invalid
             path.write_text(rendered, encoding="utf-8")
             parsed = parse_accepted_document(path)
 
-        self.assertEqual(parsed.heading, "Title: Example")
         self.assertEqual(parsed.yaml_fields["subtitle"], 'Quoted "value"')
         self.assertEqual(parsed.yaml_fields["domain"], "文化:艺术")
         self.assertEqual(parsed.yaml_fields["permissions"], "restricted: review")

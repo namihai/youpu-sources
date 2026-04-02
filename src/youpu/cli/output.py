@@ -18,6 +18,8 @@ def render_text(result: CommandResult, *, stderr: bool = False) -> None:
             parts.append(f"path={diag.path}")
         if diag.code:
             parts.append(f"code={diag.code}")
+        if diag.details:
+            parts.append(f"details={json.dumps(diag.details, ensure_ascii=False, sort_keys=True)}")
         print(" | ".join(parts), file=target)
 
 

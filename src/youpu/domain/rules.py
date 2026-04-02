@@ -29,11 +29,6 @@ def validate_accepted_document(
     diagnostics: list[Diagnostic] = []
     normalized_url: str | None = None
 
-    if not doc.heading:
-        diagnostics.append(Diagnostic(level="error", message="missing H1 title", path=rel_path, code=f"{code_prefix}_missing_h1"))
-    elif doc.yaml_fields.get("title", "").strip() and doc.heading != doc.yaml_fields.get("title", "").strip():
-        diagnostics.append(Diagnostic(level="error", message="H1 title does not match YAML `title`", path=rel_path, code=f"{code_prefix}_title_mismatch"))
-
     for key in rules.accepted_required_fields:
         if not doc.yaml_fields.get(key, "").strip():
             diagnostics.append(Diagnostic(level="error", message=f"missing required field `{key}`", path=rel_path, code=f"{code_prefix}_missing_field", details={"field": key}))

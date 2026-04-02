@@ -1,6 +1,4 @@
-# 标题
-
-```yaml
+---
 title: 标题
 subtitle: 一句话说明核心价值
 canonical_url: https://example.com/dataset
@@ -14,7 +12,7 @@ source_org: 来源机构
 permissions: 不明
 tags: [标签1, 标签2]
 use_cases: [用途1, 用途2]
-```
+---
 
 ## 数据集概览
 

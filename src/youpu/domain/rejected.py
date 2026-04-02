@@ -13,10 +13,18 @@ class RejectedRow:
 
 
 @dataclass(frozen=True)
+class RejectedRowStructureIssue:
+    row_number: int
+    actual_width: int
+    expected_width: int
+
+
+@dataclass(frozen=True)
 class RejectedCsv:
     path: Path
     columns: list[str]
     rows: list[RejectedRow]
+    structural_issues: list[RejectedRowStructureIssue]
 
 
 @dataclass(frozen=True)

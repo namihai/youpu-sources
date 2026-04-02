@@ -16,13 +16,13 @@ def parse_no_args(command_args: list[str], *, prog: str) -> bool:
     return True
 
 
-def usage_error_result(command: str, summary: str) -> tuple[CommandResult, int]:
+def usage_error_result(command: str, summary: str, *, message: str = "invalid arguments") -> tuple[CommandResult, int]:
     return (
         CommandResult(
             ok=False,
             command=command,
             summary=summary,
-            diagnostics=[Diagnostic(level="error", message="invalid arguments", code="usage_error")],
+            diagnostics=[Diagnostic(level="error", message=message, code="usage_error")],
         ),
         EXIT_USAGE_ERROR,
     )

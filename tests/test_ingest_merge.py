@@ -18,9 +18,7 @@ class IngestMergeTests(unittest.TestCase):
             repo_root = create_repo_skeleton(Path(tmp))
             accepted_path = repo_root / "staging" / "accepted" / "sample.md"
             accepted_path.write_text(
-                """# Sample Title
-
-```yaml
+                """---
 title: "Sample Title"
 subtitle: "Subtitle: value"
 canonical_url: "https://example.com/dataset?utm_source=x&id=1"
@@ -34,7 +32,7 @@ source_org: "Example Org"
 permissions: "internal: review"
 tags: [tag-a, tag-b]
 use_cases: [case-a]
-```
+---
 
 ## Notes
 
@@ -72,9 +70,7 @@ Body text.
             repo_root = create_repo_skeleton(Path(tmp))
             accepted_path = repo_root / "staging" / "accepted" / "sample.md"
             accepted_path.write_text(
-                """# Sample Title
-
-```yaml
+                """---
 title: "Sample Title"
 subtitle: "Subtitle"
 canonical_url: "https://example.com/dataset"
@@ -88,7 +84,7 @@ source_org: "Example Org"
 permissions: "公开"
 tags: [tag-a, tag-b]
 use_cases: [case-a]
-```
+---
 """,
                 encoding="utf-8",
             )

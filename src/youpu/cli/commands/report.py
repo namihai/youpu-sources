@@ -20,7 +20,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             ok=True,
             command="report",
             summary=report.summary,
-            diagnostics=[],
+            diagnostics=report.diagnostics,
             data=report.data,
         ),
         EXIT_OK,

@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+import re
+
+
+ACCEPTED_FIELD_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 
 
 def parse_inline_array(value: str) -> list[str]:
@@ -77,7 +81,6 @@ class AcceptedDocument:
     path: Path
     index: int | None
     slug: str | None
-    heading: str | None
     yaml_fields: dict[str, str]
     body: str
 

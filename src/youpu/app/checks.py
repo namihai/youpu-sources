@@ -9,6 +9,7 @@ from youpu.domain.diagnostics import Diagnostic
 from youpu.domain.rules import schema_error_diagnostic
 from youpu.domain.rules import validate_accepted_document
 from youpu.domain.rules import validate_rejected_values
+from youpu.domain.schema import SchemaRules
 from youpu.domain.schema import get_accepted_field_order
 from youpu.domain.schema import get_accepted_template_path
 from youpu.domain.schema import get_rejected_column_names
@@ -159,20 +160,29 @@ def _validate_rejected_schema(repo_root: Path) -> list[Diagnostic]:
 
 def run_repo_check(repo_root: Path) -> RepoCheck:
     diagnostics: list[Diagnostic] = []
-    diagnostics.extend(_validate_repo_accepted(repo_root))
-    diagnostics.extend(_validate_accepted_duplicates(repo_root))
-    diagnostics.extend(_validate_repo_rejected(repo_root))
-    diagnostics.extend(_validate_rejected_duplicates(repo_root))
-    diagnostics.extend(_validate_cross(repo_root))
+    try:
+        rules = load_schema_rules(repo_root)
+    except SchemaConfigError:
+        return RepoCheck(
+            diagnostics=[
+                Diagnostic(
+                    level="error",
+                    message="schema validation must pass before repository content validation",
+                    code="repo_schema_prerequisite_failed",
+                )
+            ]
+        )
+
+    diagnostics.extend(_validate_repo_accepted(repo_root, rules))
+    diagnostics.extend(_validate_accepted_duplicates(repo_root, rules))
+    diagnostics.extend(_validate_repo_rejected(repo_root, rules))
+    diagnostics.extend(_validate_rejected_duplicates(repo_root, rules))
+    diagnostics.extend(_validate_cross(repo_root, rules))
     return RepoCheck(diagnostics=diagnostics)
 
 
-def _validate_repo_accepted(repo_root: Path) -> list[Diagnostic]:
+def _validate_repo_accepted(repo_root: Path, rules: SchemaRules) -> list[Diagnostic]:
     diagnostics: list[Diagnostic] = []
-    try:
-        rules = load_schema_rules(repo_root)
-    except SchemaConfigError as exc:
-        return [schema_error_diagnostic(exc, repo_root)]
 
     for path in sorted(get_accepted_dir(repo_root).glob("*.md")):
         rel_path = str(path.relative_to(repo_root))
@@ -190,13 +200,9 @@ def _validate_repo_accepted(repo_root: Path) -> list[Diagnostic]:
     return diagnostics
 
 
-def _validate_repo_rejected(repo_root: Path) -> list[Diagnostic]:
+def _validate_repo_rejected(repo_root: Path, rules: SchemaRules) -> list[Diagnostic]:
     diagnostics: list[Diagnostic] = []
     csv_path = get_rejected_csv_path(repo_root)
-    try:
-        rules = load_schema_rules(repo_root)
-    except SchemaConfigError as exc:
-        return [schema_error_diagnostic(exc, repo_root)]
 
     if not csv_path.exists():
         return diagnostics
@@ -208,14 +214,26 @@ def _validate_repo_rejected(repo_root: Path) -> list[Diagnostic]:
 
     if rejected.columns != rules.rejected_column_names:
         diagnostics.append(Diagnostic(level="error", message=f"invalid header, expected {','.join(rules.rejected_column_names)}", path=str(csv_path.relative_to(repo_root)), code="rejected_invalid_header"))
+        return diagnostics
 
+    for issue in rejected.structural_issues:
+        diagnostics.append(
+            Diagnostic(
+                level="error",
+                message=f"row has {issue.actual_width} columns, expected {issue.expected_width}",
+                path=f"{csv_path.relative_to(repo_root)}:{issue.row_number}",
+                code="rejected_invalid_row_shape",
+            )
+        )
     for row in rejected.rows:
+        if any(issue.row_number == row.row_number for issue in rejected.structural_issues):
+            continue
         row_diags, _ = validate_rejected_values(url=row.url, title=row.title, reason=row.reason, path=f"{csv_path.relative_to(repo_root)}:{row.row_number}", code_prefix="rejected")
         diagnostics.extend(row_diags)
     return diagnostics
 
 
-def _validate_cross(repo_root: Path) -> list[Diagnostic]:
+def _validate_cross(repo_root: Path, rules: SchemaRules) -> list[Diagnostic]:
     diagnostics: list[Diagnostic] = []
     accepted_urls: dict[str, list[str]] = defaultdict(list)
     rejected_urls: dict[str, list[int]] = defaultdict(list)
@@ -223,21 +241,29 @@ def _validate_cross(repo_root: Path) -> list[Diagnostic]:
     for path in sorted(get_accepted_dir(repo_root).glob("*.md")):
         try:
             doc = parse_accepted_document(path)
-        except Exception:
+        except Exception as exc:
+            diagnostics.append(Diagnostic(level="warning", message=f"cross-file checks skipped for unreadable accepted file: {exc}", path=str(path.relative_to(repo_root)), code="cross_partial_due_to_parse_error"))
             continue
-        canonical_url = doc.yaml_fields.get("canonical_url", "").strip()
-        if not canonical_url:
+        doc_diagnostics, normalized = validate_accepted_document(doc, rel_path=str(path.relative_to(repo_root)), rules=rules, code_prefix="accepted")
+        if doc_diagnostics:
+            diagnostics.append(Diagnostic(level="warning", message="cross-file checks skipped for invalid accepted file", path=str(path.relative_to(repo_root)), code="cross_partial_due_to_parse_error"))
             continue
-        try:
-            normalized = normalize_url(canonical_url)
-        except ValueError:
+        if not normalized:
             continue
         accepted_urls[normalized].append(str(path.relative_to(repo_root)))
 
     csv_path = get_rejected_csv_path(repo_root)
     try:
         rejected = parse_rejected_csv(csv_path, allow_missing=True)
-    except Exception:
+    except Exception as exc:
+        diagnostics.append(Diagnostic(level="warning", message=f"cross-file checks skipped for unreadable rejected CSV: {exc}", path=str(csv_path.relative_to(repo_root)), code="cross_partial_due_to_parse_error"))
+        return diagnostics
+    if rejected.columns and rejected.columns != rules.rejected_column_names:
+        diagnostics.append(Diagnostic(level="warning", message="cross-file checks skipped because rejected CSV header is invalid", path=str(csv_path.relative_to(repo_root)), code="cross_partial_due_to_parse_error"))
+        return diagnostics
+    if rejected.structural_issues:
+        for issue in rejected.structural_issues:
+            diagnostics.append(Diagnostic(level="warning", message="cross-file checks skipped for structurally invalid rejected row", path=f"{csv_path.relative_to(repo_root)}:{issue.row_number}", code="cross_partial_due_to_parse_error"))
         return diagnostics
     for row in rejected.rows:
         if not row.url:
@@ -263,24 +289,24 @@ def _validate_cross(repo_root: Path) -> list[Diagnostic]:
     return diagnostics
 
 
-def _validate_accepted_duplicates(repo_root: Path) -> list[Diagnostic]:
+def _validate_accepted_duplicates(repo_root: Path, rules: SchemaRules) -> list[Diagnostic]:
     diagnostics: list[Diagnostic] = []
     by_canonical_url: dict[str, list[str]] = defaultdict(list)
     by_title: dict[str, list[str]] = defaultdict(list)
     for path in sorted(get_accepted_dir(repo_root).glob("*.md")):
         try:
             doc = parse_accepted_document(path)
-        except Exception:
+        except Exception as exc:
+            diagnostics.append(Diagnostic(level="warning", message=f"duplicate checks skipped for unreadable accepted file: {exc}", path=str(path.relative_to(repo_root)), code="accepted_duplicates_partial"))
+            continue
+        doc_diagnostics, normalized = validate_accepted_document(doc, rel_path=str(path.relative_to(repo_root)), rules=rules, code_prefix="accepted")
+        if doc_diagnostics:
+            diagnostics.append(Diagnostic(level="warning", message="duplicate checks skipped for invalid accepted file", path=str(path.relative_to(repo_root)), code="accepted_duplicates_partial"))
             continue
         title = doc.yaml_fields.get("title", "").strip()
         if title:
             by_title[title].append(str(path.relative_to(repo_root)))
-        canonical_url = doc.yaml_fields.get("canonical_url", "").strip()
-        if not canonical_url:
-            continue
-        try:
-            normalized = normalize_url(canonical_url)
-        except ValueError:
+        if not normalized:
             continue
         by_canonical_url[normalized].append(str(path.relative_to(repo_root)))
     for canonical_url, paths in sorted(by_canonical_url.items()):
@@ -292,13 +318,21 @@ def _validate_accepted_duplicates(repo_root: Path) -> list[Diagnostic]:
     return diagnostics
 
 
-def _validate_rejected_duplicates(repo_root: Path) -> list[Diagnostic]:
+def _validate_rejected_duplicates(repo_root: Path, rules: SchemaRules) -> list[Diagnostic]:
     diagnostics: list[Diagnostic] = []
     by_url: dict[str, list[int]] = defaultdict(list)
     csv_path = get_rejected_csv_path(repo_root)
     try:
         rejected = parse_rejected_csv(csv_path, allow_missing=True)
-    except Exception:
+    except Exception as exc:
+        diagnostics.append(Diagnostic(level="warning", message=f"duplicate checks skipped for unreadable rejected CSV: {exc}", path=str(csv_path.relative_to(repo_root)), code="rejected_duplicates_partial"))
+        return diagnostics
+    if rejected.columns and rejected.columns != rules.rejected_column_names:
+        diagnostics.append(Diagnostic(level="warning", message="duplicate checks skipped because rejected CSV header is invalid", path=str(csv_path.relative_to(repo_root)), code="rejected_duplicates_partial"))
+        return diagnostics
+    if rejected.structural_issues:
+        for issue in rejected.structural_issues:
+            diagnostics.append(Diagnostic(level="warning", message="duplicate checks skipped for structurally invalid rejected row", path=f"{csv_path.relative_to(repo_root)}:{issue.row_number}", code="rejected_duplicates_partial"))
         return diagnostics
     for row in rejected.rows:
         if not row.url:
@@ -316,27 +350,29 @@ def _validate_rejected_duplicates(repo_root: Path) -> list[Diagnostic]:
 
 def run_imports_check(repo_root: Path) -> ImportsCheck:
     analysis = build_staging_analysis(repo_root)
+    has_candidates = bool(analysis.accepted_docs or analysis.rejected_rows)
+    diagnostics = list(analysis.diagnostics)
+    if not diagnostics and not has_candidates:
+        diagnostics.append(Diagnostic(level="error", message="no staging candidates found", code="staging_empty"))
     return ImportsCheck(
-        diagnostics=analysis.diagnostics,
+        diagnostics=diagnostics,
         accepted_ready=len(analysis.accepted_ready),
         rejected_ready=len(analysis.rejected_ready),
-        has_candidates=bool(analysis.accepted_docs or analysis.rejected_rows),
+        has_candidates=has_candidates,
     )
 
 
 def run_pr_check(repo_root: Path) -> PrCheck:
     schema = run_schema_check(repo_root)
-    repo = run_repo_check(repo_root)
-    imports = run_imports_check(repo_root)
+    repo = run_repo_check(repo_root) if schema.ok else RepoCheck(diagnostics=[])
+    imports = run_imports_check(repo_root) if schema.ok else ImportsCheck(diagnostics=[], accepted_ready=0, rejected_ready=0, has_candidates=False)
     diagnostics = [*schema.diagnostics, *repo.diagnostics, *imports.diagnostics]
-    if imports.ok and not imports.has_candidates:
-        diagnostics.append(Diagnostic(level="error", message="no staging candidates found", code="staging_empty"))
     return PrCheck(diagnostics=diagnostics, schema=schema, repo=repo, imports=imports)
 
 
 def run_merge_check(repo_root: Path) -> MergeCheck:
     schema = run_schema_check(repo_root)
-    repo = run_repo_check(repo_root)
+    repo = run_repo_check(repo_root) if schema.ok else RepoCheck(diagnostics=[])
     diagnostics = [*schema.diagnostics, *repo.diagnostics]
     layout = get_staging_layout(repo_root)
     accepted_files = get_staging_accepted_paths(repo_root)
@@ -355,6 +391,6 @@ def run_merge_check(repo_root: Path) -> MergeCheck:
                 },
             )
         )
-    imports = run_imports_check(repo_root)
+    imports = run_imports_check(repo_root) if schema.ok else ImportsCheck(diagnostics=[], accepted_ready=0, rejected_ready=0, has_candidates=False)
     diagnostics.extend(imports.diagnostics)
     return MergeCheck(diagnostics=diagnostics, schema=schema, repo=repo, pending_staging=pending_staging, staging_issues=len(imports.diagnostics))
