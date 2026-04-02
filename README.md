@@ -9,21 +9,15 @@
 
 这个仓库不保存数据集文件本身，也不负责帮你发现外部来源。
 
-## 贡献流程
+## 快速开始
 
-普通贡献者的主流程是：
+先区分三种操作：
 
-1. 把候选内容放进 `staging/`
-2. 提交 Pull Request
-3. 等待 GitHub Actions 自动检查
-4. 根据 CI 反馈修改内容
-5. 等维护者完成入库和合并
+- 新增：使用 `staging/`
+- 修改：直接改 `data/`
+- 删除：直接改 `data/`
 
-普通贡献者不需要依赖本地命令行完成主流程。
-
-## 你需要提交什么
-
-把候选内容放到默认导入目录：
+新增 accepted / rejected 时，把候选内容放到默认导入目录：
 
 ```text
 staging/
@@ -38,40 +32,22 @@ staging/
 
 `staging/` 只接收两类输入：`staging/accepted/` 下的候选 accepted Markdown，以及固定文件名 `staging/rejected/rows.csv`。
 
-如果你不确定格式是否正确，先看：
+如果你要修改或删除已有正式记录，不要使用 `staging/`，而是直接在分支中修改 `data/` 后提交 PR。
 
-- [`docs/specs/accepted.md`](docs/specs/accepted.md)
-- [`docs/specs/rejected.md`](docs/specs/rejected.md)
-- [`docs/specs/url.md`](docs/specs/url.md)
-- [`docs/overview/failures.md`](docs/overview/failures.md)
+## 进一步阅读
 
-## PR 中会发生什么
+完整流程见：
 
-当你提交 PR 后，系统会自动执行检查：
-
-- 校验正式区 `data/accepted/` 和 `data/rejected.csv`
-- 校验 `staging/` 中的候选内容
-- 报出格式问题、重复和冲突
-
-如果检查失败，你只需要根据反馈修改 PR。
-
-PR 检查通过后，维护者会接手后续入库和合并。
-
-## 目录职责
-
-仓库中几个主要目录的职责如下：
-
-- `staging/`：待处理输入区
-- `data/accepted/`：正式保留记录
-- `data/rejected.csv`：正式拒绝记录
-- `templates/`：候选内容模板
-- `docs/`：详细文档
-
-`staging/` 不是归档区。内容一旦被成功 ingest，对应输入文件就应从 `staging/` 中移除。
+- [操作手册](docs/overview/contributor-guide.md)
+- [常见失败与处理方式](docs/overview/failures.md)
+- [accepted 规范](docs/specs/accepted.md)
+- [rejected 规范](docs/specs/rejected.md)
+- [URL 规范](docs/specs/url.md)
 
 ## 去哪里看详细说明
 
 - 文档总入口：[docs/index.md](docs/index.md)
+- 操作手册：[docs/overview/contributor-guide.md](docs/overview/contributor-guide.md)
 - 常见失败与处理方式：[docs/overview/failures.md](docs/overview/failures.md)
 - 维护者操作手册：[docs/overview/maintainer-guide.md](docs/overview/maintainer-guide.md)
 - 项目边界：[docs/overview/project-scope.md](docs/overview/project-scope.md)

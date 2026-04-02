@@ -32,7 +32,7 @@
 常见现象：
 
 - `check-pr` 失败
-- 报错 `import_accepted_invalid_filename`
+- 报错 `staging_accepted_invalid_filename`
 
 常见原因：
 
@@ -56,7 +56,7 @@
 常见现象：
 
 - `check-pr` 失败
-- 报错 `import_accepted_parse_error`
+- 报错 `staging_accepted_parse_error`
 
 常见原因：
 
@@ -72,8 +72,8 @@
 
 常见现象：
 
-- `import_accepted_missing_h1`
-- `import_accepted_title_mismatch`
+- `staging_accepted_missing_h1`
+- `staging_accepted_title_mismatch`
 
 处理方式：
 
@@ -84,7 +84,7 @@
 
 常见现象：
 
-- `import_accepted_missing_field`
+- `staging_accepted_missing_field`
 
 常见字段：
 
@@ -110,7 +110,7 @@
 
 常见现象：
 
-- `import_accepted_disallowed_field`
+- `staging_accepted_disallowed_field`
 
 常见原因：
 
@@ -125,7 +125,7 @@
 
 常见现象：
 
-- `import_accepted_invalid_array`
+- `staging_accepted_invalid_array`
 
 处理方式：
 
@@ -142,7 +142,7 @@ use_cases: [研究分析, AI训练]
 
 常见现象：
 
-- `import_accepted_invalid_canonical_url`
+- `staging_accepted_invalid_canonical_url`
 
 常见原因：
 
@@ -158,8 +158,8 @@ use_cases: [研究分析, AI训练]
 
 常见现象：
 
-- `import_accepted_conflict_accepted`
-- `import_accepted_conflict_rejected`
+- `staging_accepted_conflict_accepted`
+- `staging_accepted_conflict_rejected`
 
 含义：
 
@@ -176,20 +176,20 @@ use_cases: [研究分析, AI训练]
 
 常见现象：
 
-- `import_accepted_duplicate_canonical_url`
+- `staging_accepted_duplicate_canonical_url`
 
 处理方式：
 
 - 删掉重复文件
 - 或把重复候选合并成一个文件
 
-## rejected.csv 常见失败
+## staging/rejected/rows.csv 常见失败
 
 ### 10. rejected 文件名不对
 
 常见现象：
 
-- `import_unexpected_file`
+- `staging_unexpected_file`
 
 常见原因：
 
@@ -204,7 +204,7 @@ use_cases: [研究分析, AI训练]
 
 常见现象：
 
-- `import_unexpected_file`
+- `staging_unexpected_file`
 
 常见原因：
 
@@ -215,11 +215,11 @@ use_cases: [研究分析, AI训练]
 - `staging/` 只保留 `staging/accepted/*.md` 和 `staging/rejected/rows.csv`
 - 删除其余文件
 
-### 12. rejected.csv 表头错误
+### 12. staging/rejected/rows.csv 表头错误
 
 常见现象：
 
-- `import_rejected_invalid_header`
+- `staging_rejected_invalid_header`
 
 处理方式：
 
@@ -231,34 +231,34 @@ url,title,reason
 
 - 列顺序也要一致
 
-### 13. rejected.csv 某一行缺字段
+### 13. staging/rejected/rows.csv 某一行缺字段
 
 常见现象：
 
-- `import_rejected_missing_url`
-- `import_rejected_missing_title`
-- `import_rejected_missing_reason`
+- `staging_rejected_missing_url`
+- `staging_rejected_missing_title`
+- `staging_rejected_missing_reason`
 
 处理方式：
 
 - 根据报错行号补齐对应列
 
-### 14. rejected.csv 里的 URL 非法
+### 14. staging/rejected/rows.csv 里的 URL 非法
 
 常见现象：
 
-- `import_rejected_invalid_url`
+- `staging_rejected_invalid_url`
 
 处理方式：
 
 - 改成合法绝对 URL
 - 输入时可以先写原始 URL；系统会在入库时自动规范化
 
-### 15. rejected.csv 内部重复
+### 15. staging/rejected/rows.csv 内部重复
 
 常见现象：
 
-- `import_rejected_duplicate_url`
+- `staging_rejected_duplicate_url`
 
 含义：
 
@@ -273,8 +273,8 @@ url,title,reason
 
 常见现象：
 
-- `import_rejected_conflict_rejected`
-- `import_rejected_conflict_accepted`
+- `staging_rejected_conflict_rejected`
+- `staging_rejected_conflict_accepted`
 
 含义：
 
@@ -401,7 +401,7 @@ url,title,reason
 
 常见现象：
 
-- `merge_pending_imports`
+- `merge_pending_staging`
 
 含义：
 

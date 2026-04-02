@@ -10,7 +10,7 @@ from cli.errors import EXIT_USAGE_ERROR
 from cli.errors import EXIT_VALIDATION_FAILED
 from cli.output import CommandResult
 from cli.output import Diagnostic
-from cli.repo import get_imports_layout
+from cli.repo import get_staging_layout
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -19,7 +19,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def build_summary(analysis: ingest_command.IngestAnalysis, repo_root: Path, *, ok: bool) -> str:
     header = "Staging validation passed" if ok else "Staging validation failed"
-    layout = get_imports_layout(repo_root)
+    layout = get_staging_layout(repo_root)
     return "\n".join(
         [
             header,
@@ -48,7 +48,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
 
     analysis = ingest_command.build_analysis(repo_root)
     ok = not any(diag.level == "error" for diag in analysis.diagnostics)
-    layout = get_imports_layout(repo_root)
+    layout = get_staging_layout(repo_root)
     return (
         CommandResult(
             ok=ok,
@@ -56,7 +56,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             summary=build_summary(analysis, repo_root, ok=ok),
             diagnostics=analysis.diagnostics,
             data={
-                "imports_root": str(layout.root.relative_to(repo_root)),
+                "staging_root": str(layout.root.relative_to(repo_root)),
                 "accepted_ready": len(analysis.accepted_ready),
                 "rejected_ready": len(analysis.rejected_ready),
             },

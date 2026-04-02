@@ -12,9 +12,9 @@ from cli.errors import EXIT_USAGE_ERROR
 from cli.output import CommandResult
 from cli.output import Diagnostic
 from cli.repo import get_accepted_dir
-from cli.repo import get_import_accepted_paths
-from cli.repo import get_imports_layout
 from cli.repo import get_rejected_csv_path
+from cli.repo import get_staging_accepted_paths
+from cli.repo import get_staging_layout
 from cli.repo import parse_rejected_csv
 
 ACCEPTED_FILENAME_RE = re.compile(r"^SRC-(\d{4})-[a-z0-9-]+\.md$")
@@ -61,8 +61,8 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
     rejected = parse_rejected_csv(get_rejected_csv_path(repo_root))
     rejected_count = len(rejected.rows)
     latest_id = latest_accepted_id(repo_root)
-    layout = get_imports_layout(repo_root)
-    pending_accepted = len(get_import_accepted_paths(repo_root))
+    layout = get_staging_layout(repo_root)
+    pending_accepted = len(get_staging_accepted_paths(repo_root))
     pending_rejected = 1 if layout.rejected_csv.exists() else 0
 
     validate_result, _ = validate_repo_command.run([], repo_root)
@@ -73,8 +73,8 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
         if item.code in {"accepted_duplicate_canonical_url", "accepted_duplicate_title", "rejected_duplicate_url"}
     ]
     cross_conflicts = sum(1 for item in validation_diagnostics if item.code == "cross_url_conflict")
-    import_analysis = ingest_command.build_analysis(repo_root)
-    import_issues = len(import_analysis.diagnostics)
+    staging_analysis = ingest_command.build_analysis(repo_root)
+    staging_issues = len(staging_analysis.diagnostics)
 
     summary = "\n".join(
         [
@@ -87,7 +87,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             f"cross-conflicts: {cross_conflicts}",
             f"staging pending accepted: {pending_accepted}",
             f"staging pending rejected: {pending_rejected}",
-            f"staging issues: {import_issues}",
+            f"staging issues: {staging_issues}",
         ]
     )
 
@@ -104,9 +104,9 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
                 "validation_ok": validate_result.ok,
                 "duplicates_ok": not duplicate_errors,
                 "cross_conflicts": cross_conflicts,
-                "imports_pending_accepted": pending_accepted,
-                "imports_pending_rejected": pending_rejected,
-                "imports_issues": import_issues,
+                "staging_pending_accepted": pending_accepted,
+                "staging_pending_rejected": pending_rejected,
+                "staging_issues": staging_issues,
             },
         ),
         EXIT_OK,

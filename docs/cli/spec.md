@@ -163,6 +163,11 @@ youpu <command> [options]
 - `code`
 - `details`
 
+`data` 的具体字段按命令不同而不同，但当前命名约定应与仓库结构保持一致：
+
+- staging 相关字段使用 `staging_*`
+- 不再新增 `imports_*` 风格字段
+
 ## 自动修正边界
 
 允许自动修正：

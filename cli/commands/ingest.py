@@ -15,13 +15,13 @@ from cli.output import CommandResult
 from cli.output import Diagnostic
 from cli.repo import AcceptedDocument
 from cli.repo import get_accepted_dir
-from cli.repo import get_import_accepted_paths
-from cli.repo import get_imports_layout
 from cli.repo import get_rejected_csv_path
+from cli.repo import get_staging_accepted_paths
+from cli.repo import get_staging_layout
 from cli.repo import normalize_url
 from cli.repo import parse_accepted_document
 from cli.repo import parse_rejected_csv
-from cli.repo import validate_import_accepted_filename
+from cli.repo import validate_staging_accepted_filename
 from cli.validation import DISALLOWED_FIELDS
 from cli.validation import REJECTED_COLUMNS
 from cli.validation import REQUIRED_NONEMPTY_FIELDS
@@ -129,7 +129,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
     rejected_seen_urls: dict[str, list[str]] = defaultdict(list)
     accepted_urls = accepted_url_index(repo_root)
     rejected_urls = rejected_url_index(repo_root)
-    layout = get_imports_layout(repo_root)
+    layout = get_staging_layout(repo_root)
 
     if layout.root.exists():
         for path in sorted(layout.root.iterdir()):
@@ -142,7 +142,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
                     level="error",
                     message="staging root only accepts `accepted/` and `rejected/`",
                     path=str(path.relative_to(repo_root)),
-                    code="import_unexpected_file",
+                    code="staging_unexpected_file",
                 )
             )
 
@@ -157,7 +157,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
                     level="error",
                     message="staging/accepted only accepts markdown files",
                     path=str(path.relative_to(repo_root)),
-                    code="import_unexpected_file",
+                    code="staging_unexpected_file",
                 )
             )
 
@@ -172,20 +172,20 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
                     level="error",
                     message="staging/rejected only accepts `rows.csv`",
                     path=str(path.relative_to(repo_root)),
-                    code="import_unexpected_file",
+                    code="staging_unexpected_file",
                 )
             )
 
-    for path in get_import_accepted_paths(repo_root):
+    for path in get_staging_accepted_paths(repo_root):
         rel_path = str(path.relative_to(repo_root))
-        filename_error = validate_import_accepted_filename(path)
+        filename_error = validate_staging_accepted_filename(path)
         if filename_error:
             diagnostics.append(
                 Diagnostic(
                     level="error",
                     message=filename_error,
                     path=rel_path,
-                    code="import_accepted_invalid_filename",
+                    code="staging_accepted_invalid_filename",
                 )
             )
             accepted_error_paths.add(rel_path)
@@ -193,7 +193,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
             doc = parse_accepted_document(path)
         except Exception as exc:
             diagnostics.append(
-                Diagnostic(level="error", message=str(exc), path=rel_path, code="import_accepted_parse_error")
+                Diagnostic(level="error", message=str(exc), path=rel_path, code="staging_accepted_parse_error")
             )
             accepted_error_paths.add(rel_path)
             continue
@@ -202,7 +202,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
 
         if not doc.heading:
             diagnostics.append(
-                Diagnostic(level="error", message="missing H1 title", path=rel_path, code="import_accepted_missing_h1")
+                Diagnostic(level="error", message="missing H1 title", path=rel_path, code="staging_accepted_missing_h1")
             )
             accepted_error_paths.add(rel_path)
         elif doc.yaml_fields.get("title", "").strip() and doc.heading != doc.yaml_fields.get("title", "").strip():
@@ -211,7 +211,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
                     level="error",
                     message="H1 title does not match YAML `title`",
                     path=rel_path,
-                    code="import_accepted_title_mismatch",
+                    code="staging_accepted_title_mismatch",
                 )
             )
             accepted_error_paths.add(rel_path)
@@ -224,7 +224,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
                         level="error",
                         message=f"missing required field `{key}`",
                         path=rel_path,
-                        code="import_accepted_missing_field",
+                        code="staging_accepted_missing_field",
                         details={"field": key},
                     )
                 )
@@ -237,7 +237,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
                         level="error",
                         message=f"field `{key}` is no longer part of the accepted schema",
                         path=rel_path,
-                        code="import_accepted_disallowed_field",
+                        code="staging_accepted_disallowed_field",
                         details={"field": key},
                     )
                 )
@@ -251,7 +251,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
                         level="error",
                         message=f"field `{key}` must use inline array syntax like [a, b]",
                         path=rel_path,
-                        code="import_accepted_invalid_array",
+                        code="staging_accepted_invalid_array",
                         details={"field": key},
                     )
                 )
@@ -263,7 +263,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
                 normalized_url = normalize_url(canonical_url)
             except ValueError as exc:
                 diagnostics.append(
-                    Diagnostic(level="error", message=str(exc), path=rel_path, code="import_accepted_invalid_canonical_url")
+                    Diagnostic(level="error", message=str(exc), path=rel_path, code="staging_accepted_invalid_canonical_url")
                 )
                 accepted_error_paths.add(rel_path)
             else:
@@ -274,7 +274,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
                             level="error",
                             message=f"canonical_url already exists in accepted: {normalized_url}",
                             path=rel_path,
-                            code="import_accepted_conflict_accepted",
+                            code="staging_accepted_conflict_accepted",
                             details={"matches": accepted_urls[normalized_url]},
                         )
                     )
@@ -285,7 +285,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
                             level="error",
                             message=f"canonical_url already exists in rejected: {normalized_url}",
                             path=rel_path,
-                            code="import_accepted_conflict_rejected",
+                            code="staging_accepted_conflict_rejected",
                             details={"matches": rejected_urls[normalized_url]},
                         )
                     )
@@ -300,7 +300,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
                     level="error",
                     message=f"duplicate canonical_url inside staging: {normalized_url}",
                     path=rel_path,
-                    code="import_accepted_duplicate_canonical_url",
+                    code="staging_accepted_duplicate_canonical_url",
                 )
             )
             accepted_error_paths.add(rel_path)
@@ -312,7 +312,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
             rejected = parse_rejected_csv(path)
         except Exception as exc:
             diagnostics.append(
-                Diagnostic(level="error", message=str(exc), path=rel_csv_path, code="import_rejected_parse_error")
+                Diagnostic(level="error", message=str(exc), path=rel_csv_path, code="staging_rejected_parse_error")
             )
             continue
 
@@ -322,7 +322,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
                     level="error",
                     message=f"invalid header, expected {','.join(REJECTED_COLUMNS)}",
                     path=rel_csv_path,
-                    code="import_rejected_invalid_header",
+                    code="staging_rejected_invalid_header",
                 )
             )
             continue
@@ -340,22 +340,22 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
             )
 
             if not row.url:
-                diagnostics.append(Diagnostic(level="error", message="missing `url`", path=row_path, code="import_rejected_missing_url"))
+                diagnostics.append(Diagnostic(level="error", message="missing `url`", path=row_path, code="staging_rejected_missing_url"))
                 rejected_error_paths.add(row_path)
                 continue
 
             try:
                 normalized_url = normalize_url(row.url)
             except ValueError as exc:
-                diagnostics.append(Diagnostic(level="error", message=str(exc), path=row_path, code="import_rejected_invalid_url"))
+                diagnostics.append(Diagnostic(level="error", message=str(exc), path=row_path, code="staging_rejected_invalid_url"))
                 rejected_error_paths.add(row_path)
                 continue
 
             if not row.title:
-                diagnostics.append(Diagnostic(level="error", message="missing `title`", path=row_path, code="import_rejected_missing_title"))
+                diagnostics.append(Diagnostic(level="error", message="missing `title`", path=row_path, code="staging_rejected_missing_title"))
                 rejected_error_paths.add(row_path)
             if not row.reason:
-                diagnostics.append(Diagnostic(level="error", message="missing `reason`", path=row_path, code="import_rejected_missing_reason"))
+                diagnostics.append(Diagnostic(level="error", message="missing `reason`", path=row_path, code="staging_rejected_missing_reason"))
                 rejected_error_paths.add(row_path)
             if normalized_url in accepted_urls:
                 diagnostics.append(
@@ -363,7 +363,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
                         level="error",
                         message=f"url already exists in accepted: {normalized_url}",
                         path=row_path,
-                        code="import_rejected_conflict_accepted",
+                        code="staging_rejected_conflict_accepted",
                         details={"matches": accepted_urls[normalized_url]},
                     )
                 )
@@ -374,7 +374,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
                         level="error",
                         message=f"url already exists in rejected: {normalized_url}",
                         path=row_path,
-                        code="import_rejected_conflict_rejected",
+                        code="staging_rejected_conflict_rejected",
                         details={"matches": rejected_urls[normalized_url]},
                     )
                 )
@@ -391,7 +391,7 @@ def build_analysis(repo_root: Path) -> IngestAnalysis:
                     level="error",
                     message=f"duplicate url inside {layout.rejected_csv.relative_to(repo_root)}: {normalized_url}",
                     path=row_path,
-                    code="import_rejected_duplicate_url",
+                    code="staging_rejected_duplicate_url",
                 )
             )
             rejected_error_paths.add(row_path)
@@ -490,13 +490,13 @@ def merge_ingest(repo_root: Path, analysis: IngestAnalysis) -> dict[str, int]:
     return {
         "imported_accepted": imported_accepted,
         "imported_rejected": imported_rejected,
-        "imports_root": "staging",
+        "staging_root": "staging",
     }
 
 
 def build_summary(analysis: IngestAnalysis, repo_root: Path, *, dry_run: bool) -> str:
     header = "Ingest dry-run completed" if dry_run else "Ingest completed"
-    layout = get_imports_layout(repo_root)
+    layout = get_staging_layout(repo_root)
     return "\n".join(
         [
             header,
@@ -523,7 +523,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             EXIT_USAGE_ERROR,
         )
 
-    layout = get_imports_layout(repo_root)
+    layout = get_staging_layout(repo_root)
     analysis = build_analysis(repo_root)
     if analysis.diagnostics:
         return (
@@ -533,7 +533,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
                 summary="Ingest failed",
                 diagnostics=analysis.diagnostics,
                 data={
-                    "imports_root": str(layout.root.relative_to(repo_root)),
+                    "staging_root": str(layout.root.relative_to(repo_root)),
                     "accepted_ready": len(analysis.accepted_ready),
                     "rejected_ready": len(analysis.rejected_ready),
                     "dry_run": False,

@@ -5,13 +5,14 @@
 如果你刚开始使用仓库，建议按这个顺序阅读：
 
 1. [README.md](../README.md)
-2. [项目边界](overview/project-scope.md)
-3. [CLI 用户文档](cli/user-guide.md)
+2. [操作手册](overview/contributor-guide.md)
+3. [项目边界](overview/project-scope.md)
 4. 需要时再看具体规范
 
 ## 面向贡献者
 
 - README：[../README.md](../README.md)
+- 操作手册：[overview/contributor-guide.md](overview/contributor-guide.md)
 - 常见失败与处理方式：[overview/failures.md](overview/failures.md)
 - CLI 用户文档：[cli/user-guide.md](cli/user-guide.md)
 - accepted 规范：[specs/accepted.md](specs/accepted.md)
@@ -31,5 +32,5 @@
 ## 说明
 
 - `youpu` 现在主要是 GitHub Actions 和维护者使用的规则接口
-- 普通贡献者的主流程是提交 `staging/` 并通过 PR 协作完成入库
-- `staging/` 的有效输入只有两类：`staging/accepted/*.md` 和 `staging/rejected/rows.csv`
+- 新增来源走 `staging/`
+- 修改和删除正式记录直接改 `data/`

@@ -41,6 +41,7 @@
 
 - 用户通过 `staging/accepted/*.md` 提供候选 `accepted` 文档
 - 用户通过 `staging/rejected/rows.csv` 提供候选 `rejected` 记录
+- 用户通过直接修改 `data/` 来修订或删除正式记录
 
 输出边界：
 
@@ -72,5 +73,10 @@
 
 - `staging/accepted/*.md`：accepted 候选输入
 - `staging/rejected/rows.csv`：rejected 候选输入
+
+正式区修订约束为：
+
+- 修改和删除不通过 `staging/`
+- 修改和删除直接发生在 `data/`
 
 CLI 的具体边界和命令收敛方向见 [`../cli/scope.md`](../cli/scope.md)。

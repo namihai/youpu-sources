@@ -8,13 +8,16 @@ from cli.commands import ingest as ingest_command
 from cli.commands import report as report_command
 from cli.commands import validate_imports as validate_imports_command
 from cli.commands import validate_repo as validate_repo_command
+from cli.errors import CliError
 from cli.errors import EXIT_OK
+from cli.errors import EXIT_RUNTIME_ERROR
 from cli.errors import RuntimeCliError
 from cli.errors import UsageError
 from cli.output import CommandResult
 from cli.output import Diagnostic
 from cli.output import emit_result
 from cli.repo import resolve_repo_root
+
 COMMAND_HANDLERS = {
     "validate-repo": validate_repo_command.run,
     "validate-imports": validate_imports_command.run,
@@ -103,7 +106,34 @@ def main(argv: list[str] | None = None) -> int:
         )
         return err.exit_code
 
-    result, exit_code = COMMAND_HANDLERS[args.command](args.command_args, repo_root)
+    try:
+        result, exit_code = COMMAND_HANDLERS[args.command](args.command_args, repo_root)
+    except CliError as exc:
+        emit_result(
+            CommandResult(
+                ok=False,
+                command=args.command,
+                summary=f"youpu: {exc}",
+                diagnostics=[Diagnostic(level="error", message=str(exc), code="runtime_error")],
+            ),
+            output_format=args.format,
+            no_color=args.no_color,
+            stderr=True,
+        )
+        return exc.exit_code
+    except Exception as exc:
+        emit_result(
+            CommandResult(
+                ok=False,
+                command=args.command,
+                summary=f"youpu: {exc}",
+                diagnostics=[Diagnostic(level="error", message=str(exc), code="runtime_error")],
+            ),
+            output_format=args.format,
+            no_color=args.no_color,
+            stderr=True,
+        )
+        return EXIT_RUNTIME_ERROR
     emit_result(
         result,
         output_format=args.format,

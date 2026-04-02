@@ -11,8 +11,8 @@ from cli.errors import EXIT_USAGE_ERROR
 from cli.errors import EXIT_VALIDATION_FAILED
 from cli.output import CommandResult
 from cli.output import Diagnostic
-from cli.repo import get_import_accepted_paths
-from cli.repo import get_imports_layout
+from cli.repo import get_staging_accepted_paths
+from cli.repo import get_staging_layout
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -37,8 +37,8 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
     validate_result, validate_exit = validate_repo_command.run([], repo_root)
     diagnostics = list(validate_result.diagnostics)
 
-    layout = get_imports_layout(repo_root)
-    accepted_files = get_import_accepted_paths(repo_root)
+    layout = get_staging_layout(repo_root)
+    accepted_files = get_staging_accepted_paths(repo_root)
     rejected_files = [layout.rejected_csv] if layout.rejected_csv.exists() else []
     if accepted_files or rejected_files:
         diagnostics.append(
@@ -46,7 +46,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
                 level="error",
                 message="staging directory still contains pending files; run `youpu ingest` first",
                 path=str(layout.root.relative_to(repo_root)),
-                code="merge_pending_imports",
+                code="merge_pending_staging",
                 details={
                     "accepted_files": [str(path.relative_to(repo_root)) for path in accepted_files],
                     "rejected_files": [str(path.relative_to(repo_root)) for path in rejected_files],
@@ -66,8 +66,8 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             data={
                 "validate_ok": validate_result.ok,
                 "validate_exit_code": validate_exit,
-                "pending_imports": bool(accepted_files or rejected_files),
-                "imports_issues": len(analysis.diagnostics),
+                "pending_staging": bool(accepted_files or rejected_files),
+                "staging_issues": len(analysis.diagnostics),
             },
         ),
         EXIT_OK if ok else EXIT_VALIDATION_FAILED,

@@ -33,9 +33,9 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
         )
 
     validate_result, validate_exit = validate_repo_command.run([], repo_root)
-    imports_result, imports_exit = validate_imports_command.run([], repo_root)
-    diagnostics = [*validate_result.diagnostics, *imports_result.diagnostics]
-    ok = validate_result.ok and imports_result.ok
+    staging_result, staging_exit = validate_imports_command.run([], repo_root)
+    diagnostics = [*validate_result.diagnostics, *staging_result.diagnostics]
+    ok = validate_result.ok and staging_result.ok
     return (
         CommandResult(
             ok=ok,
@@ -47,10 +47,10 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
                 "validate_exit_code": validate_exit,
                 "validate_summary": validate_result.summary,
                 "validate_command": validate_result.command,
-                "imports_ok": imports_result.ok,
-                "imports_exit_code": imports_exit,
-                "imports_summary": imports_result.summary,
-                "imports_command": imports_result.command,
+                "staging_ok": staging_result.ok,
+                "staging_exit_code": staging_exit,
+                "staging_summary": staging_result.summary,
+                "staging_command": staging_result.command,
             },
         ),
         EXIT_OK if ok else EXIT_VALIDATION_FAILED,
