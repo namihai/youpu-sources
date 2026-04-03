@@ -4,9 +4,11 @@ import unittest
 from pathlib import Path
 
 from youpu.domain.accepted import AcceptedDocument
+from youpu.domain.accepted import parse_inline_array
 from youpu.domain.rules import validate_accepted_document
 from youpu.domain.rules import validate_rejected_values
 from youpu.domain.schema import SchemaRules
+from youpu.domain.urls import normalize_url
 
 
 class ContentRulesTests(unittest.TestCase):
@@ -113,6 +115,15 @@ class ContentRulesTests(unittest.TestCase):
 
         self.assertEqual(normalized_url, "https://example.com/path")
         self.assertEqual([item.code for item in diagnostics], ["staging_accepted_invalid_array"])
+
+    def test_normalize_url_preserves_ipv6_host_syntax(self) -> None:
+        self.assertEqual(
+            normalize_url("https://[2001:db8::1]/path?utm_source=x&id=1"),
+            "https://[2001:db8::1]/path?id=1",
+        )
+
+    def test_parse_inline_array_accepts_escaped_double_quotes(self) -> None:
+        self.assertEqual(parse_inline_array(r'["a\"b", plain]'), ['a"b', "plain"])
 
 
 if __name__ == "__main__":

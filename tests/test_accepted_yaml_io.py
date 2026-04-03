@@ -71,6 +71,23 @@ title = invalid
         self.assertEqual(parsed.yaml_fields["canonical_url"], "https://example.com/path?id=1")
         self.assertEqual(parsed.body, "## Notes\n\nBody text.\n")
 
+    def test_parse_accepted_document_preserves_leading_indentation_in_body(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "SRC-0001-example.md"
+            path.write_text(
+                """---
+title: "Title"
+canonical_url: "https://example.com"
+---
+    code block
+""",
+                encoding="utf-8",
+            )
+
+            parsed = parse_accepted_document(path)
+
+        self.assertEqual(parsed.body, "    code block\n")
+
 
 if __name__ == "__main__":
     unittest.main()

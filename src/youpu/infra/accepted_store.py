@@ -83,7 +83,11 @@ def parse_accepted_document(path: str | Path) -> AcceptedDocument:
 
     _, yaml_block_end = extract_front_matter(text)
     yaml_fields = parse_simple_yaml_block(text)
-    body = text[yaml_block_end:].lstrip()
+    body = text[yaml_block_end:]
+    if body.startswith("\r\n"):
+        body = body[2:]
+    elif body.startswith("\n"):
+        body = body[1:]
 
     return AcceptedDocument(
         path=doc_path,

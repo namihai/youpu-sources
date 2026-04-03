@@ -25,7 +25,7 @@ def parse_inline_array(value: str) -> list[str]:
     for char in inner:
         if quote is not None:
             current.append(char)
-            if char == quote:
+            if char == quote and not _is_escaped_double_quote(current, quote):
                 quote = None
             continue
 
@@ -53,6 +53,18 @@ def parse_inline_array(value: str) -> list[str]:
 
     items.append(_parse_inline_array_item("".join(current)))
     return items
+
+
+def _is_escaped_double_quote(current: list[str], quote: str) -> bool:
+    if quote != '"':
+        return False
+
+    backslash_count = 0
+    for char in reversed(current[:-1]):
+        if char != "\\":
+            break
+        backslash_count += 1
+    return backslash_count % 2 == 1
 
 
 def _parse_inline_array_item(raw: str) -> str:

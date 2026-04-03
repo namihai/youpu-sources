@@ -29,12 +29,24 @@ def normalize_url(url: str) -> str:
     hostname = (split.hostname or "").lower()
     port = split.port
 
-    if port is None:
-        netloc = hostname
-    elif (scheme == "http" and port == 80) or (scheme == "https" and port == 443):
-        netloc = hostname
+    if ":" in hostname:
+        host = f"[{hostname}]"
     else:
-        netloc = f"{hostname}:{port}"
+        host = hostname
+
+    userinfo = ""
+    if split.username is not None:
+        userinfo = split.username
+        if split.password is not None:
+            userinfo = f"{userinfo}:{split.password}"
+        userinfo = f"{userinfo}@"
+
+    if port is None:
+        netloc = f"{userinfo}{host}"
+    elif (scheme == "http" and port == 80) or (scheme == "https" and port == 443):
+        netloc = f"{userinfo}{host}"
+    else:
+        netloc = f"{userinfo}{host}:{port}"
 
     filtered_query: list[tuple[str, str]] = []
     for key, value in parse_qsl(split.query, keep_blank_values=True):
