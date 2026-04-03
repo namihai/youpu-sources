@@ -7,6 +7,7 @@ from youpu.app.results import CommandResult
 from youpu.cli.errors import EXIT_OK
 from youpu.cli.errors import EXIT_VALIDATION_FAILED
 from youpu.cli.commands.common import parse_no_args
+from youpu.cli.commands.common import sub_check_data
 from youpu.cli.commands.common import usage_error_result
 
 
@@ -23,18 +24,24 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             summary="PR check passed" if ok else "PR check failed",
             diagnostics=report.diagnostics,
             data={
-                "validate_ok": report.repo.ok,
-                "validate_exit_code": EXIT_OK if report.repo.ok else EXIT_VALIDATION_FAILED,
-                "validate_summary": "Repository validation passed" if report.repo.ok else "Repository validation failed",
-                "validate_command": "validate-repo",
-                "schema_ok": report.schema.ok,
-                "schema_exit_code": EXIT_OK if report.schema.ok else EXIT_VALIDATION_FAILED,
-                "schema_summary": "Schema validation passed" if report.schema.ok else "Schema validation failed",
-                "schema_command": "validate-schema",
-                "staging_ok": report.imports.ok,
-                "staging_exit_code": EXIT_OK if report.imports.ok else EXIT_VALIDATION_FAILED,
-                "staging_summary": "Staging validation passed" if report.imports.ok else "Staging validation failed",
-                "staging_command": "validate-imports",
+                **sub_check_data(
+                    "validate", report.repo.ok,
+                    command="validate-repo",
+                    summary_passed="Repository validation passed",
+                    summary_failed="Repository validation failed",
+                ),
+                **sub_check_data(
+                    "schema", report.schema.ok,
+                    command="validate-schema",
+                    summary_passed="Schema validation passed",
+                    summary_failed="Schema validation failed",
+                ),
+                **sub_check_data(
+                    "staging", report.imports.ok,
+                    command="validate-imports",
+                    summary_passed="Staging validation passed",
+                    summary_failed="Staging validation failed",
+                ),
             },
         ),
         EXIT_OK if ok else EXIT_VALIDATION_FAILED,

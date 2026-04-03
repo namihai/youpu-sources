@@ -17,7 +17,7 @@ from youpu.infra.repo_layout import get_staging_layout
 
 def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
     if not parse_no_args(command_args, prog="youpu ingest"):
-        return usage_error_result("ingest", "Ingest failed")
+        return usage_error_result("ingest", "Ingest operation failed")
 
     layout = get_staging_layout(repo_root)
     analysis = build_analysis(repo_root)
@@ -26,7 +26,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             CommandResult(
                 ok=False,
                 command="ingest",
-                summary="Ingest failed",
+                summary="Ingest operation failed",
                 diagnostics=analysis.diagnostics,
                 data={
                     "staging_root": str(layout.root.relative_to(repo_root)),
@@ -42,7 +42,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             CommandResult(
                 ok=False,
                 command="ingest",
-                summary="Ingest failed",
+                summary="Ingest operation failed",
                 diagnostics=[Diagnostic(level="error", message="no staging candidates found", code="staging_empty")],
                 data={
                     "staging_root": str(layout.root.relative_to(repo_root)),
@@ -53,7 +53,23 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             EXIT_VALIDATION_FAILED,
         )
 
-    merge_data = merge_ingest(repo_root, analysis)
+    try:
+        merge_data = merge_ingest(repo_root, analysis)
+    except OSError as exc:
+        return (
+            CommandResult(
+                ok=False,
+                command="ingest",
+                summary="Ingest operation failed",
+                diagnostics=[Diagnostic(level="error", message=str(exc), code="ingest_io_error")],
+                data={
+                    "staging_root": str(layout.root.relative_to(repo_root)),
+                    "accepted_ready": len(analysis.accepted_ready),
+                    "rejected_ready": len(analysis.rejected_ready),
+                },
+            ),
+            EXIT_VALIDATION_FAILED,
+        )
     return (
         CommandResult(
             ok=True,

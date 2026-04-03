@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 
 from youpu.cli.commands import check_merge as check_merge_command
 from youpu.cli.commands import check_pr as check_pr_command
@@ -60,10 +61,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
-    raw_args = list([] if argv is None else argv)
-    if argv is None:
-        import sys
-        raw_args = list(sys.argv[1:])
+    raw_args = list(sys.argv[1:]) if argv is None else list(argv)
     parser = build_parser()
     args = parser.parse_args(raw_args)
 
@@ -92,7 +90,7 @@ def main(argv: list[str] | None = None) -> int:
         emit_result(
             CommandResult(
                 ok=False,
-                command="bootstrap",
+                command=args.command,
                 summary=f"youpu: {err}",
                 diagnostics=[Diagnostic(level="error", message=str(err), code="runtime_error")],
             ),

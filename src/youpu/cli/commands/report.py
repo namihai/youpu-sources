@@ -11,7 +11,7 @@ from youpu.cli.errors import EXIT_OK
 
 def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
     if not parse_no_args(command_args, prog="youpu report"):
-        return usage_error_result("report", "Report failed")
+        return usage_error_result("report", "Report generation failed")
 
     report = build_repository_report(repo_root)
 

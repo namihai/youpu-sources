@@ -9,12 +9,12 @@ from youpu.cli.commands.common import parse_no_args
 from youpu.cli.commands.common import usage_error_result
 from youpu.cli.errors import EXIT_OK
 from youpu.cli.errors import EXIT_VALIDATION_FAILED
+from youpu.infra.repo_layout import StagingLayout
 from youpu.infra.repo_layout import get_staging_layout
 
 
-def build_summary(report: ImportsCheck, repo_root: Path, *, ok: bool) -> str:
+def build_summary(report: ImportsCheck, layout: StagingLayout, repo_root: Path, *, ok: bool) -> str:
     header = "Staging validation passed" if ok else "Staging validation failed"
-    layout = get_staging_layout(repo_root)
     return "\n".join(
         [
             header,
@@ -37,7 +37,7 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
         CommandResult(
             ok=ok,
             command="validate-imports",
-            summary=build_summary(report, repo_root, ok=ok),
+            summary=build_summary(report, layout, repo_root, ok=ok),
             diagnostics=report.diagnostics,
             data={
                 "staging_root": str(layout.root.relative_to(repo_root)),
