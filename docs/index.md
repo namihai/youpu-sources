@@ -39,6 +39,6 @@
 
 ## 说明
 
-- `youpu` 是逻辑命令接口名；当前仓库内实际执行入口为 `./scripts/youpu`
+- `youpu` 是逻辑命令接口名；仓库内实际执行入口为 `./scripts/youpu`
 - 新增来源走 `staging/`
 - 修改和删除正式记录直接改 `data/`

@@ -15,7 +15,7 @@ schema 的作用不是给普通贡献者直接填写内容，而是作为仓库�
 
 ## 文件位置
 
-当前 schema 配置位于：
+schema 配置位于：
 
 - `schemas/accepted.json`
 - `schemas/rejected.json`
@@ -27,7 +27,7 @@ schema 的作用不是给普通贡献者直接填写内容，而是作为仓库�
 
 ## 真源关系
 
-当前仓库采用以下关系：
+仓库采用以下关系：
 
 - `schemas/*.json` 是结构真源
 - `templates/*` 是面向人的展示模板
@@ -40,9 +40,9 @@ schema 的作用不是给普通贡献者直接填写内容，而是作为仓库�
 - 修改字段时，应优先改 schema
 - template 需要随后同步，但不是规则来源
 
-## 当前实现约束
+## 实现约束
 
-当前 schema 明确使用 JSON 文件。
+schema 使用 JSON 文件。
 
 这样做的原因是：
 
@@ -69,7 +69,7 @@ schema 的作用不是给普通贡献者直接填写内容，而是作为仓库�
 
 ## `validate-schema` 的职责
 
-`./scripts/youpu validate-schema` 当前主要检查：
+`./scripts/youpu validate-schema` 主要检查：
 
 - schema 文件存在且结构合法
 - `templates/accepted.md` 中 YAML 字段顺序与 accepted schema 一致

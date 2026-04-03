@@ -102,7 +102,7 @@ fork PR 不支持自动回写 ingest 结果。
 - 根据团队需要补充 PR 模板
 - 根据团队需要补充 issue 模板
 
-## 当前仓库对应文件
+## 仓库对应文件
 
 - PR 检查 workflow：[../../.github/workflows/pr-check.yml](../../.github/workflows/pr-check.yml)
 - `/ingest` workflow：[../../.github/workflows/ingest.yml](../../.github/workflows/ingest.yml)

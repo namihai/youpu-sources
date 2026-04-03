@@ -2,7 +2,7 @@
 
 这份文档定义 `youpu` 的命令接口、返回码和行为边界。
 
-这里的 `youpu` 表示逻辑接口名。当前仓库内实际执行入口是 `./scripts/youpu`，例如：
+这里的 `youpu` 表示逻辑接口名。仓库内实际执行入口是 `./scripts/youpu`，例如：
 
 ```bash
 ./scripts/youpu check-pr
@@ -38,7 +38,7 @@
 youpu [--format text|json] [--root <path>] <command> [command_args]
 ```
 
-当前命令：
+命令列表：
 
 - `youpu validate-repo`
 - `youpu validate-imports`
@@ -220,19 +220,18 @@ JSON 输出固定包含：
 - `code`
 - `details`
 
-`data` 的具体字段按命令不同而不同，但当前命名约定应与仓库结构保持一致：
+`data` 的具体字段按命令不同而不同，但命名应与仓库结构保持一致：
 
 - staging 相关字段使用 `staging_*`
-- 不再新增 `imports_*` 风格字段
 
-文本输出不承诺与 JSON 同构。当前文本输出只保证：
+文本输出不承诺与 JSON 同构。文本输出保证：
 
 - 第一行输出摘要 `summary`
 - 后续按行输出 diagnostics
 
 ## 自动修正边界
 
-accepted / rejected 的结构定义应集中放在 `schemas/*.json` 中，由 CLI 的校验与序列化逻辑共享；新增或删除字段时，应优先修改 schema 定义，而不是在多个命令中分别维护字段列表。模板目前保持手写，但必须通过 `validate-schema` 与 schema 保持一致。schema 的维护关系与修改顺序见 [`../specs/schema.md`](../specs/schema.md)。
+accepted / rejected 的结构定义应集中放在 `schemas/*.json` 中，由 CLI 的校验与序列化逻辑共享；新增或删除字段时，应优先修改 schema 定义，而不是在多个命令中分别维护字段列表。模板保持手写，但必须通过 `validate-schema` 与 schema 保持一致。schema 的维护关系与修改顺序见 [`../specs/schema.md`](../specs/schema.md)。
 
 允许自动修正：
 

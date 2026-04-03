@@ -1,10 +1,10 @@
 # 源码结构
 
-这份文档说明 `youpu-sources` 当前 CLI 代码的源码布局，以及新增逻辑时应放在哪一层。
+这份文档说明 `youpu-sources` CLI 代码的源码布局，以及新增逻辑时应放在哪一层。
 
 ## 总体结构
 
-当前源码位于：
+源码位于：
 
 - `src/youpu/`
 
@@ -52,7 +52,7 @@ PYTHONPATH=src python3 -m unittest discover -s tests
 - 聚合多个检查或流程步骤
 - 把 domain / infra 组织成完整的业务动作
 
-当前典型内容：
+典型内容：
 
 - `checks.py`
 - `ingest.py`

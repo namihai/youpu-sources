@@ -68,26 +68,33 @@ SRC-0003-figshare-dunhuang-restoration.md
 
 ## 标准结构
 
-accepted 文档由三部分组成：
+accepted 文档由两部分组成：
 
-1. 一级标题 `# 标题`
-2. YAML 元信息块
-3. 正文内容
+1. 文件开头的 YAML front matter
+2. front matter 之后的 Markdown 正文
 
 示意：
 
-````md
-# 标题
-
-```yaml
-title: ...
-canonical_url: ...
-...
-```
+```md
+---
+title: 标题
+subtitle: 一句话说明核心价值
+canonical_url: https://example.com/dataset
+domain: 领域
+content_type: 内容类型
+data_form: 数据形态
+data_type: 数据类型
+region: 不明/待确认
+source_type: 来源类型
+source_org: 来源机构
+permissions: 不明
+tags: [标签1, 标签2]
+use_cases: [用途1, 用途2]
+---
 
 ## 数据集概览
 ...
-````
+```
 
 ## YAML 字段要求
 
@@ -150,12 +157,6 @@ tags: [敦煌, 壁画, 图像修复, 文物修复]
 use_cases: [研究分析, AI训练]
 ```
 
-## 标题要求
-
-- 正文应保留一级标题 `# 标题`
-- YAML 中必须包含 `title`
-- 正文 H1 与 YAML `title` 必须一致
-
 ## subtitle 要求
 
 - YAML 中必须包含 `subtitle`
@@ -190,10 +191,8 @@ use_cases: [研究分析, AI训练]
 自动化工具优先校验以下内容：
 
 - 文件名是否合规
-- 是否存在 H1 标题
-- 是否存在 YAML 元信息块
+- 是否存在以 `---` 包裹的 YAML front matter
 - 必填字段是否齐全
-- H1 标题与 YAML `title` 是否一致
 - `tags` 和 `use_cases` 是否为数组
 
-正文内容本身不作为严格校验对象；自动化工具主要校验文件名、H1、YAML 结构和必填字段。
+正文内容本身不作为严格校验对象；自动化工具主要校验文件名、YAML 结构和必填字段。
