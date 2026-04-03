@@ -78,18 +78,12 @@
 常见字段：
 
 - `title`
-- `subtitle`
+- `summary`
 - `canonical_url`
-- `domain`
-- `content_type`
-- `data_form`
-- `data_type`
-- `region`
-- `source_type`
-- `source_org`
-- `permissions`
-- `tags`
-- `use_cases`
+- `publisher`
+- `modality`
+- `access_level`
+- `tags`（可选）
 
 处理方式：
 
@@ -112,7 +106,7 @@
 - 删除报错里指出的字段
 - 只保留 accepted 规范中的核心字段
 
-### 5. `tags` 或 `use_cases` 不是数组格式
+### 5. `tags` 不是合法数组格式
 
 常见现象：
 
@@ -120,16 +114,21 @@
 
 处理方式：
 
-- 改成单行数组格式
+- 改成单行数组格式，例如 `tags: [敦煌, 壁画]`
+- 不要写成逗号分隔纯文本，也不要写成长句
 
-例如：
+### 6. `modality` 或 `access_level` 取值不合法
 
-```yaml
-tags: [敦煌, 壁画]
-use_cases: [研究分析, AI训练]
-```
+常见现象：
 
-### 6. `canonical_url` 非法
+- `staging_accepted_invalid_enum`
+
+处理方式：
+
+- 改成 accepted 规范里定义的枚举值
+- 不要自造近义词或中文值
+
+### 7. `canonical_url` 非法
 
 常见现象：
 
@@ -145,7 +144,7 @@ use_cases: [研究分析, AI训练]
 - 改成完整链接
 - 用户输入可以是原始 URL；系统会在校验和入库时自动规范化
 
-### 7. accepted 候选与现有正式记录冲突
+### 8. accepted 候选与现有正式记录冲突
 
 常见现象：
 
@@ -163,7 +162,7 @@ use_cases: [研究分析, AI训练]
 - 如果是重复提交，删除导入文件
 - 如果结论需要调整，先让维护者处理正式区，再重新提交
 
-### 8. 同一个 PR 里 accepted 候选重复
+### 9. 同一个 PR 里 accepted 候选重复
 
 常见现象：
 

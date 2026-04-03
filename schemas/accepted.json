@@ -11,10 +11,10 @@
       "example": "标题"
     },
     {
-      "name": "subtitle",
+      "name": "summary",
       "type": "string",
       "required": true,
-      "example": "一句话说明核心价值"
+      "example": "一句话客观描述这个来源是什么"
     },
     {
       "name": "canonical_url",
@@ -23,64 +23,30 @@
       "example": "https://example.com/dataset"
     },
     {
-      "name": "domain",
+      "name": "publisher",
       "type": "string",
       "required": true,
-      "example": "领域"
+      "example": "发布或维护该来源的主体"
     },
     {
-      "name": "content_type",
+      "name": "modality",
       "type": "string",
       "required": true,
-      "example": "内容类型"
+      "example": "text",
+      "choices": ["text", "image", "audio", "video", "tabular", "geospatial", "multimodal", "other"]
     },
     {
-      "name": "data_form",
+      "name": "access_level",
       "type": "string",
       "required": true,
-      "example": "数据形态"
-    },
-    {
-      "name": "data_type",
-      "type": "string",
-      "required": true,
-      "example": "数据类型"
-    },
-    {
-      "name": "region",
-      "type": "string",
-      "required": true,
-      "example": "不明/待确认"
-    },
-    {
-      "name": "source_type",
-      "type": "string",
-      "required": true,
-      "example": "来源类型"
-    },
-    {
-      "name": "source_org",
-      "type": "string",
-      "required": true,
-      "example": "来源机构"
-    },
-    {
-      "name": "permissions",
-      "type": "string",
-      "required": true,
-      "example": "不明"
+      "example": "open",
+      "choices": ["open", "request", "restricted", "unknown"]
     },
     {
       "name": "tags",
       "type": "inline_array",
-      "required": true,
+      "required": false,
       "example": "[标签1, 标签2]"
-    },
-    {
-      "name": "use_cases",
-      "type": "inline_array",
-      "required": true,
-      "example": "[用途1, 用途2]"
     }
   ]
 }

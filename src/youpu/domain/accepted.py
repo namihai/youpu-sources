@@ -103,6 +103,7 @@ class AcceptedField:
     field_type: str
     required: bool
     example: str
+    choices: tuple[str, ...] | None = None
 
     @property
     def is_array(self) -> bool:

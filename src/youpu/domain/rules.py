@@ -54,6 +54,21 @@ def validate_accepted_document(
                 )
             )
 
+    for key, choices in rules.accepted_enum_fields.items():
+        value = doc.yaml_fields.get(key, "").strip()
+        if not value:
+            continue
+        if value not in choices:
+            diagnostics.append(
+                Diagnostic(
+                    level="error",
+                    message=f"field `{key}` must be one of: {', '.join(choices)}",
+                    path=rel_path,
+                    code=f"{code_prefix}_invalid_enum",
+                    details={"field": key, "allowed": list(choices)},
+                )
+            )
+
     canonical_url = doc.yaml_fields.get("canonical_url", "").strip()
     if canonical_url:
         try:

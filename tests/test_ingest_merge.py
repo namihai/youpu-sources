@@ -20,18 +20,11 @@ class IngestMergeTests(unittest.TestCase):
             accepted_path.write_text(
                 """---
 title: "Sample Title"
-subtitle: "Subtitle: value"
+summary: "A sample text dataset source."
 canonical_url: "https://example.com/dataset?utm_source=x&id=1"
-domain: "领域"
-content_type: "内容类型"
-data_form: "文本"
-data_type: "元数据"
-region: "CN"
-source_type: "机构"
-source_org: "Example Org"
-permissions: "internal: review"
-tags: [tag-a, tag-b]
-use_cases: [case-a]
+publisher: "Example Org"
+modality: "text"
+access_level: "request"
 ---
 
 ## Notes
@@ -62,7 +55,8 @@ Body text.
             rejected_csv = parse_rejected_csv(repo_root / "data" / "rejected.csv")
 
         self.assertEqual(accepted_doc.yaml_fields["canonical_url"], "https://example.com/dataset?id=1")
-        self.assertEqual(accepted_doc.yaml_fields["subtitle"], "Subtitle: value")
+        self.assertEqual(accepted_doc.yaml_fields["summary"], "A sample text dataset source.")
+        self.assertEqual(accepted_doc.yaml_fields["publisher"], "Example Org")
         self.assertEqual(rejected_csv.rows[0].url, "https://example.com/rejected")
 
     def test_merge_ingest_keeps_sources_when_write_fails(self) -> None:
@@ -72,18 +66,11 @@ Body text.
             accepted_path.write_text(
                 """---
 title: "Sample Title"
-subtitle: "Subtitle"
+summary: "A sample text dataset source."
 canonical_url: "https://example.com/dataset"
-domain: "领域"
-content_type: "内容类型"
-data_form: "文本"
-data_type: "元数据"
-region: "CN"
-source_type: "机构"
-source_org: "Example Org"
-permissions: "公开"
-tags: [tag-a, tag-b]
-use_cases: [case-a]
+publisher: "Example Org"
+modality: "text"
+access_level: "open"
 ---
 """,
                 encoding="utf-8",

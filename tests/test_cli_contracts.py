@@ -39,18 +39,11 @@ class CliContractsTests(unittest.TestCase):
             staging_doc.write_text(
                 """---
 title: "Sample"
-subtitle: "Subtitle"
+summary: "Sample text dataset source."
 canonical_url: "https://example.com/path"
-domain: "领域"
-content_type: "内容类型"
-data_form: "文本"
-data_type: "元数据"
-region: "CN"
-source_type: "机构"
-source_org: "Org"
-permissions: "公开"
-tags: [tag-a]
-use_cases: [case-a]
+publisher: "Org"
+modality: "text"
+access_level: "open"
 ---
 """,
                 encoding="utf-8",

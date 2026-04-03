@@ -14,16 +14,16 @@ class AcceptedYamlIoTests(unittest.TestCase):
     def test_parse_simple_yaml_block_supports_quoted_scalars(self) -> None:
         text = """---
 title: "Title: Example"
-subtitle: "Quoted \\\"value\\\""
-tags: [tag-a, tag-b]
+summary: "Quoted \\\"value\\\""
+publisher: "Org: Example"
 ---
 """
 
         fields = parse_simple_yaml_block(text)
 
         self.assertEqual(fields["title"], "Title: Example")
-        self.assertEqual(fields["subtitle"], 'Quoted "value"')
-        self.assertEqual(fields["tags"], "[tag-a, tag-b]")
+        self.assertEqual(fields["summary"], 'Quoted "value"')
+        self.assertEqual(fields["publisher"], "Org: Example")
 
     def test_parse_simple_yaml_block_rejects_invalid_lines(self) -> None:
         text = """---
@@ -42,18 +42,12 @@ title = invalid
             slug=None,
             yaml_fields={
                 "title": "Title: Example",
-                "subtitle": 'Quoted "value"',
+                "summary": 'Quoted "value"',
                 "canonical_url": "https://EXAMPLE.com/path?utm_source=x&id=1",
-                "domain": "文化:艺术",
-                "content_type": "目录",
-                "data_form": "文本",
-                "data_type": "元数据",
-                "region": "CN",
-                "source_type": "机构",
-                "source_org": "Org",
-                "permissions": "restricted: review",
+                "publisher": "Org: Example",
+                "modality": "multimodal",
+                "access_level": "request",
                 "tags": "[tag-a, tag-b]",
-                "use_cases": "[case-a]",
             },
             body="## Notes\n\nBody text.\n",
         )
@@ -65,9 +59,11 @@ title = invalid
             path.write_text(rendered, encoding="utf-8")
             parsed = parse_accepted_document(path)
 
-        self.assertEqual(parsed.yaml_fields["subtitle"], 'Quoted "value"')
-        self.assertEqual(parsed.yaml_fields["domain"], "文化:艺术")
-        self.assertEqual(parsed.yaml_fields["permissions"], "restricted: review")
+        self.assertEqual(parsed.yaml_fields["summary"], 'Quoted "value"')
+        self.assertEqual(parsed.yaml_fields["publisher"], "Org: Example")
+        self.assertEqual(parsed.yaml_fields["modality"], "multimodal")
+        self.assertEqual(parsed.yaml_fields["access_level"], "request")
+        self.assertEqual(parsed.yaml_fields["tags"], "[tag-a, tag-b]")
         self.assertEqual(parsed.yaml_fields["canonical_url"], "https://example.com/path?id=1")
         self.assertEqual(parsed.body, "## Notes\n\nBody text.\n")
 

@@ -14,9 +14,13 @@ from youpu.domain.urls import normalize_url
 class ContentRulesTests(unittest.TestCase):
     def setUp(self) -> None:
         self.rules = SchemaRules(
-            accepted_required_fields=["title", "canonical_url", "tags"],
-            accepted_allowed_fields={"title", "canonical_url", "tags"},
+            accepted_required_fields=["title", "summary", "canonical_url", "publisher", "modality", "access_level"],
+            accepted_allowed_fields={"title", "summary", "canonical_url", "publisher", "modality", "access_level", "tags"},
             accepted_array_fields=["tags"],
+            accepted_enum_fields={
+                "modality": ("text", "image", "audio", "video", "tabular", "geospatial", "multimodal", "other"),
+                "access_level": ("open", "request", "restricted", "unknown"),
+            },
             rejected_column_names=["url", "title", "reason"],
         )
 
@@ -27,8 +31,11 @@ class ContentRulesTests(unittest.TestCase):
             slug="example",
             yaml_fields={
                 "title": "Example",
+                "summary": "",
                 "canonical_url": "not-a-url",
-                "tags": "tag-a, tag-b",
+                "publisher": "Example Org",
+                "modality": "spreadsheet",
+                "access_level": "free",
                 "extra": "value",
             },
             body="body",
@@ -45,8 +52,10 @@ class ContentRulesTests(unittest.TestCase):
         self.assertEqual(
             [item.code for item in diagnostics],
             [
+                "accepted_missing_field",
                 "accepted_unknown_field",
-                "accepted_invalid_array",
+                "accepted_invalid_enum",
+                "accepted_invalid_enum",
                 "accepted_invalid_canonical_url",
             ],
         )
@@ -58,8 +67,11 @@ class ContentRulesTests(unittest.TestCase):
             slug="example",
             yaml_fields={
                 "title": "Example",
+                "summary": "A sample text dataset source.",
                 "canonical_url": "https://EXAMPLE.com/path?utm_source=x&id=1",
-                "tags": "[tag-a]",
+                "publisher": "Example Org",
+                "modality": "text",
+                "access_level": "open",
             },
             body="body",
         )
@@ -93,15 +105,45 @@ class ContentRulesTests(unittest.TestCase):
             ],
         )
 
-    def test_validate_accepted_document_rejects_malformed_inline_array(self) -> None:
+    def test_validate_accepted_document_rejects_invalid_enum_value(self) -> None:
         doc = AcceptedDocument(
             path=Path("example.md"),
             index=1,
             slug="example",
             yaml_fields={
                 "title": "Example",
+                "summary": "Example source.",
                 "canonical_url": "https://example.com/path",
-                "tags": "[tag-a,,tag-b]",
+                "publisher": "Example Org",
+                "modality": "spreadsheet",
+                "access_level": "open",
+            },
+            body="body",
+        )
+
+        diagnostics, normalized_url = validate_accepted_document(
+            doc,
+            rel_path="staging/accepted/example.md",
+            rules=self.rules,
+            code_prefix="staging_accepted",
+        )
+
+        self.assertEqual(normalized_url, "https://example.com/path")
+        self.assertEqual([item.code for item in diagnostics], ["staging_accepted_invalid_enum"])
+
+    def test_validate_accepted_document_rejects_malformed_optional_tags_array(self) -> None:
+        doc = AcceptedDocument(
+            path=Path("example.md"),
+            index=1,
+            slug="example",
+            yaml_fields={
+                "title": "Example",
+                "summary": "Example source.",
+                "canonical_url": "https://example.com/path",
+                "publisher": "Example Org",
+                "modality": "text",
+                "access_level": "open",
+                "tags": "tag-a, tag-b",
             },
             body="body",
         )

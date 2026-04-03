@@ -1,45 +1,19 @@
 ---
 title: 标题
-subtitle: 一句话说明核心价值
+summary: 一句话客观描述这个来源是什么
 canonical_url: https://example.com/dataset
-domain: 领域
-content_type: 内容类型
-data_form: 数据形态
-data_type: 数据类型
-region: 不明/待确认
-source_type: 来源类型
-source_org: 来源机构
-permissions: 不明
+publisher: 发布或维护该来源的主体
+modality: text
+access_level: open
 tags: [标签1, 标签2]
-use_cases: [用途1, 用途2]
 ---
 
-## 数据集概览
+## 来源概述
 
-- **来源名称**：
-- **一句话价值**：
-- **覆盖内容**：
-- **核心价值**：
-- **适用场景**：
+## 收录内容与边界
 
-## 数据内容说明
+## 获取方式
 
-1. 
-2. 
+## 使用与访问限制
 
-## 数据获取方式
-
-- **链接**：
-- **说明**：
-
-## 使用限制与合规说明
-
-- **使用许可**：
-- **敏感性**：
-
-## 数据质量与已知问题
-
-- **可用性**：
-- **结构化程度**：
-
-## 备注
+## 质量与风险

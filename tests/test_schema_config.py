@@ -25,11 +25,11 @@ class SchemaConfigTests(unittest.TestCase):
             path.write_text(json.dumps({"fields": [{"name": "title"}]}), encoding="utf-8")
             first = load_schema_document(path)
 
-            path.write_text(json.dumps({"fields": [{"name": "subtitle"}]}), encoding="utf-8")
+            path.write_text(json.dumps({"fields": [{"name": "summary"}]}), encoding="utf-8")
             second = load_schema_document(path)
 
         self.assertEqual(first, {"fields": [{"name": "title"}]})
-        self.assertEqual(second, {"fields": [{"name": "subtitle"}]})
+        self.assertEqual(second, {"fields": [{"name": "summary"}]})
 
     def test_load_schema_document_reports_json_errors(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -47,7 +47,7 @@ class SchemaConfigTests(unittest.TestCase):
         repo_root = Path(__file__).resolve().parents[1]
         field_order = get_accepted_field_order(repo_root)
         self.assertEqual(field_order[0], "title")
-        self.assertEqual(field_order[-1], "use_cases")
+        self.assertEqual(field_order[-1], "tags")
 
 
 if __name__ == "__main__":

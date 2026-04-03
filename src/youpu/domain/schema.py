@@ -55,6 +55,7 @@ def _parse_accepted_schema(repo_root: Path, raw: object) -> AcceptedSchemaConfig
         field_type = item.get("type")
         required = item.get("required")
         example = item.get("example")
+        choices_raw = item.get("choices")
 
         if not isinstance(name, str) or not name:
             raise _schema_error(repo_root, "accepted", f"accepted schema field #{index} is missing a valid `name`", "accepted_schema_invalid")
@@ -68,9 +69,21 @@ def _parse_accepted_schema(repo_root: Path, raw: object) -> AcceptedSchemaConfig
             raise _schema_error(repo_root, "accepted", f"accepted schema field `{name}` must define boolean `required`", "accepted_schema_invalid")
         if not isinstance(example, str) or not example:
             raise _schema_error(repo_root, "accepted", f"accepted schema field `{name}` must define non-empty `example`", "accepted_schema_invalid")
+        if choices_raw is not None:
+            if field_type != "string":
+                raise _schema_error(repo_root, "accepted", f"accepted schema field `{name}` can only use `choices` with type `string`", "accepted_schema_invalid")
+            if not isinstance(choices_raw, list) or not choices_raw:
+                raise _schema_error(repo_root, "accepted", f"accepted schema field `{name}` must define a non-empty `choices` list", "accepted_schema_invalid")
+            if not all(isinstance(choice, str) and choice for choice in choices_raw):
+                raise _schema_error(repo_root, "accepted", f"accepted schema field `{name}` choices must be non-empty strings", "accepted_schema_invalid")
+            if len(set(choices_raw)) != len(choices_raw):
+                raise _schema_error(repo_root, "accepted", f"accepted schema field `{name}` choices must not contain duplicates", "accepted_schema_invalid")
+            choices: tuple[str, ...] | None = tuple(choices_raw)
+        else:
+            choices = None
 
         seen_names.add(name)
-        parsed.append(AcceptedField(name=name, field_type=field_type, required=required, example=example))
+        parsed.append(AcceptedField(name=name, field_type=field_type, required=required, example=example, choices=choices))
 
     template = raw.get("template")
     if not isinstance(template, dict):
@@ -170,6 +183,7 @@ class SchemaRules:
     accepted_required_fields: list[str]
     accepted_allowed_fields: set[str]
     accepted_array_fields: list[str]
+    accepted_enum_fields: dict[str, tuple[str, ...]]
     rejected_column_names: list[str]
 
 
@@ -179,6 +193,7 @@ def load_schema_rules(repo_root: Path) -> SchemaRules:
         accepted_required_fields=[field.name for field in config.accepted.fields if field.required],
         accepted_allowed_fields={field.name for field in config.accepted.fields},
         accepted_array_fields=[field.name for field in config.accepted.fields if field.is_array],
+        accepted_enum_fields={field.name: field.choices for field in config.accepted.fields if field.choices is not None},
         rejected_column_names=[column.name for column in config.rejected.columns],
     )
 
