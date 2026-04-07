@@ -150,7 +150,7 @@ CLI 识别的导入区边界为：
 - 调用 `validate-repo`
 - 调用 `validate-imports`
 - 允许 `staging/` 中存在待处理文件
-- 如果 `staging/` 中没有任何候选内容，返回 `staging_empty`
+- 如果 `staging/` 中没有任何候选内容，仍然返回成功
 
 ### `check-merge`
 

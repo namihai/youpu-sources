@@ -21,10 +21,10 @@ class CliContractsTests(unittest.TestCase):
             with redirect_stdout(stdout), redirect_stderr(stderr):
                 exit_code = main(["--format", "json", "--root", str(repo_root), "check-pr"])
 
-        self.assertEqual(exit_code, 1)
-        self.assertEqual(stdout.getvalue(), "")
-        payload = json.loads(stderr.getvalue())
-        self.assertEqual(payload["ok"], False)
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(stderr.getvalue(), "")
+        payload = json.loads(stdout.getvalue())
+        self.assertEqual(payload["ok"], True)
         self.assertEqual(payload["command"], "check-pr")
         self.assertIn("diagnostics", payload)
         self.assertIn("data", payload)

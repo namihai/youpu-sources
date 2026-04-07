@@ -352,8 +352,6 @@ def run_imports_check(repo_root: Path) -> ImportsCheck:
     analysis = build_staging_analysis(repo_root)
     has_candidates = bool(analysis.accepted_docs or analysis.rejected_rows)
     diagnostics = list(analysis.diagnostics)
-    if not diagnostics and not has_candidates:
-        diagnostics.append(Diagnostic(level="error", message="no staging candidates found", code="staging_empty"))
     return ImportsCheck(
         diagnostics=diagnostics,
         accepted_ready=len(analysis.accepted_ready),

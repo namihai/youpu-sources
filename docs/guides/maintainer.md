@@ -33,7 +33,7 @@
 - 候选内容本身是否合理
 - `check-pr` 是否通过
 - PR diff 是否只包含本次候选输入
-- 如果是 staging PR，`staging/` 里必须真的有候选内容；空 staging PR 会以 `staging_empty` 失败
+- 如果是 staging PR，最好确认 `staging/` 里确实有候选内容；空 staging 不会阻塞 `check-pr`，但也没有可导入内容
 
 如果是修改或删除正式记录，维护者应确认：
 
