@@ -16,13 +16,38 @@
 
 ## 快速开始
 
-先区分三种操作：
+如果你只是来提交新的来源记录，不需要修改项目代码，也不要直接 push 到 `main`。
 
-- 新增：使用 `staging/`
-- 修改：直接改 `data/`
-- 删除：直接改 `data/`
+按下面的步骤操作即可：
 
-新增 accepted / rejected 时，把候选内容放到默认导入目录：
+1. 从 `main` 新建一个工作分支，不要直接在 `main` 上提交
+2. 给分支起一个简单名字
+3. 把你的内容放进 `staging/`
+4. 提交分支并创建 PR
+5. 在 PR 描述里说明你这次新增了什么，以及需要更新哪些记录
+6. 等待仓库检查通过，再由维护者继续处理
+
+PR 描述可以直接按下面的格式填写：
+
+```text
+本次新增：
+- 来源名称：<名称>
+- 网址：<URL>
+- 更新内容：<这次补充了哪些 accepted / rejected 记录>
+- 说明：<为什么要新增这些记录>
+```
+
+推荐分支命名：
+
+- 新增来源：`add/source-来源简名`
+
+命名尽量使用简短英文、小写、连字符，例如：
+
+- `add/source-openalex`
+- `add/source-huggingface-dataset`
+- `add/source-example-dataset`
+
+内容请放到下面的默认导入目录：
 
 ```text
 staging/
@@ -37,7 +62,13 @@ staging/
 
 `staging/` 只接收两类输入：`staging/accepted/` 下的候选 accepted Markdown，以及固定文件名 `staging/rejected/rows.csv`。
 
-如果你要修改或删除已有正式记录，不要使用 `staging/`，而是直接在分支中修改 `data/` 后提交 PR。
+放置方式：
+
+- 新增来源时，按需要在 `staging/accepted/` 新建 Markdown 文件
+- 新增来源时，按需要把记录追加到 `staging/rejected/rows.csv`
+- 如果一次提交同时涉及两边，就在同一个分支里一起更新
+
+如果你要修改或删除已有正式记录，不要使用 `staging/`，而是直接在分支中修改 `data/` 后提交 PR。详细规则见操作手册。
 
 ## 进一步阅读
 
