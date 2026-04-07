@@ -27,7 +27,7 @@ class CliMainTests(unittest.TestCase):
         self.assertIn("Repository summary", stdout.getvalue())
         self.assertEqual(stderr.getvalue(), "")
 
-    def test_check_pr_without_candidates_fails_on_stderr(self) -> None:
+    def test_check_pr_without_candidates_succeeds(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo_root = create_repo_skeleton(Path(tmp))
             stdout = io.StringIO()
@@ -35,9 +35,9 @@ class CliMainTests(unittest.TestCase):
             with redirect_stdout(stdout), redirect_stderr(stderr):
                 exit_code = main(["--root", str(repo_root), "check-pr"])
 
-        self.assertEqual(exit_code, 1)
-        self.assertEqual(stdout.getvalue(), "")
-        self.assertIn("staging_empty", stderr.getvalue())
+        self.assertEqual(exit_code, 0)
+        self.assertIn("PR check passed", stdout.getvalue())
+        self.assertEqual(stderr.getvalue(), "")
 
     def test_module_entrypoint_matches_script_behavior(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

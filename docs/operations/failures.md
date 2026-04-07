@@ -356,7 +356,8 @@ url,title,reason
 
 常见现象：
 
-- `staging_empty`
+- `check-pr` 通过，但没有可导入内容
+- 运行 `/ingest` 时返回 `staging_empty`
 
 含义：
 
