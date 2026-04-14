@@ -291,6 +291,7 @@ def _validate_cross(repo_root: Path, rules: SchemaRules) -> list[Diagnostic]:
 
 def _validate_accepted_duplicates(repo_root: Path, rules: SchemaRules) -> list[Diagnostic]:
     diagnostics: list[Diagnostic] = []
+    by_index: dict[int, list[str]] = defaultdict(list)
     by_canonical_url: dict[str, list[str]] = defaultdict(list)
     by_title: dict[str, list[str]] = defaultdict(list)
     for path in sorted(get_accepted_dir(repo_root).glob("*.md")):
@@ -303,12 +304,17 @@ def _validate_accepted_duplicates(repo_root: Path, rules: SchemaRules) -> list[D
         if doc_diagnostics:
             diagnostics.append(Diagnostic(level="warning", message="duplicate checks skipped for invalid accepted file", path=str(path.relative_to(repo_root)), code="accepted_duplicates_partial"))
             continue
+        if doc.index is not None:
+            by_index[doc.index].append(str(path.relative_to(repo_root)))
         title = doc.yaml_fields.get("title", "").strip()
         if title:
             by_title[title].append(str(path.relative_to(repo_root)))
         if not normalized:
             continue
         by_canonical_url[normalized].append(str(path.relative_to(repo_root)))
+    for index, paths in sorted(by_index.items()):
+        if len(paths) >= 2:
+            diagnostics.append(Diagnostic(level="error", message=f"duplicate accepted index: SRC-{index:04d}", path=", ".join(paths), code="accepted_duplicate_index", details={"index": index, "paths": paths}))
     for canonical_url, paths in sorted(by_canonical_url.items()):
         if len(paths) >= 2:
             diagnostics.append(Diagnostic(level="error", message=f"duplicate canonical_url: {canonical_url}", path=", ".join(paths), code="accepted_duplicate_canonical_url", details={"canonical_url": canonical_url, "paths": paths}))

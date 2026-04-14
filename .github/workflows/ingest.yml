@@ -63,6 +63,11 @@ jobs:
           repository: ${{ steps.pr.outputs.head_repo }}
           ref: ${{ steps.pr.outputs.head_ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Fetch default branch for accepted numbering
+        if: ${{ steps.pr.outputs.is_fork != 'true' }}
+        run: git fetch origin ${{ github.event.repository.default_branch }} --depth=1
 
       - name: Set up Python
         if: ${{ steps.pr.outputs.is_fork != 'true' }}
@@ -76,6 +81,8 @@ jobs:
 
       - name: Run ingest
         if: ${{ steps.pr.outputs.is_fork != 'true' }}
+        env:
+          YOUPU_ACCEPTED_BASE_REF: origin/${{ github.event.repository.default_branch }}
         run: ./scripts/youpu ingest
 
       - name: Commit ingest result

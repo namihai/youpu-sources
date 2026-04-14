@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+import os
 from unittest.mock import patch
 from pathlib import Path
 
@@ -103,6 +104,66 @@ access_level: "open"
             self.assertTrue(accepted_path.exists())
             self.assertTrue(rejected_path.exists())
             self.assertEqual(temp_files, [])
+
+    def test_merge_ingest_uses_base_ref_for_next_index(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = create_repo_skeleton(Path(tmp))
+
+            from subprocess import run
+
+            run(["git", "init", "-b", "main"], cwd=repo_root, check=True)
+            run(["git", "config", "user.name", "Test User"], cwd=repo_root, check=True)
+            run(["git", "config", "user.email", "test@example.com"], cwd=repo_root, check=True)
+            run(["git", "add", "."], cwd=repo_root, check=True)
+            run(["git", "commit", "-m", "initial"], cwd=repo_root, check=True)
+            run(["git", "branch", "feature"], cwd=repo_root, check=True)
+
+            (repo_root / "data" / "accepted" / "SRC-0007-existing.md").write_text(
+                """---
+title: "Existing"
+summary: "Existing sample text dataset source."
+canonical_url: "https://example.com/existing"
+publisher: "Org"
+modality: "text"
+access_level: "open"
+---
+""",
+                encoding="utf-8",
+            )
+            run(["git", "add", "."], cwd=repo_root, check=True)
+            run(["git", "commit", "-m", "main accepted"], cwd=repo_root, check=True)
+            run(["git", "checkout", "feature"], cwd=repo_root, check=True)
+
+            accepted_path = repo_root / "staging" / "accepted" / "sample.md"
+            accepted_path.write_text(
+                """---
+title: "Sample Title"
+summary: "A sample text dataset source."
+canonical_url: "https://example.com/dataset"
+publisher: "Example Org"
+modality: "text"
+access_level: "open"
+---
+""",
+                encoding="utf-8",
+            )
+
+            analysis = build_analysis(repo_root)
+            self.assertEqual(analysis.diagnostics, [])
+
+            original_env = os.environ.get("YOUPU_ACCEPTED_BASE_REF")
+            os.environ["YOUPU_ACCEPTED_BASE_REF"] = "main"
+            try:
+                merge_ingest(repo_root, analysis)
+            finally:
+                if original_env is None:
+                    os.environ.pop("YOUPU_ACCEPTED_BASE_REF", None)
+                else:
+                    os.environ["YOUPU_ACCEPTED_BASE_REF"] = original_env
+
+            accepted_files = sorted(path.name for path in (repo_root / "data" / "accepted").glob("*.md"))
+
+        self.assertEqual(accepted_files, ["SRC-0008-sample.md"])
 
 
 if __name__ == "__main__":

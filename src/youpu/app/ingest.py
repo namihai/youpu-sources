@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import os
 import re
+import subprocess
 from collections import defaultdict
 from pathlib import Path
 from uuid import uuid4
@@ -43,7 +45,7 @@ def serialize_accepted(doc: AcceptedDocument, repo_root: Path) -> str:
 def merge_ingest(repo_root: Path, analysis: StagingAnalysis) -> dict[str, int | str]:
     accepted_dir = get_accepted_dir(repo_root)
     accepted_dir.mkdir(parents=True, exist_ok=True)
-    next_index = next_accepted_index(accepted_dir)
+    next_index = next_accepted_index(repo_root, accepted_dir)
     imported_accepted = 0
     imported_rejected = 0
     temp_paths: list[Path] = []
@@ -146,13 +148,36 @@ def slugify(text: str) -> str:
     return slug or "imported"
 
 
-def next_accepted_index(accepted_dir: Path) -> int:
+def next_accepted_index(repo_root: Path, accepted_dir: Path) -> int:
     max_index = 0
     for path in accepted_dir.glob("*.md"):
         match = ACCEPTED_FILENAME_RE.match(path.name)
         if match:
             max_index = max(max_index, int(match.group(1)))
+    base_ref = os.environ.get("YOUPU_ACCEPTED_BASE_REF", "").strip()
+    if base_ref:
+        max_index = max(max_index, max_accepted_index_at_ref(repo_root, base_ref))
     return max_index + 1
+
+
+def max_accepted_index_at_ref(repo_root: Path, ref: str) -> int:
+    try:
+        result = subprocess.run(
+            ["git", "ls-tree", "-r", "--name-only", ref, "data/accepted"],
+            cwd=repo_root,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise OSError(f"failed to inspect accepted data at git ref `{ref}`") from exc
+
+    max_index = 0
+    for raw_path in result.stdout.splitlines():
+        match = ACCEPTED_FILENAME_RE.match(Path(raw_path).name)
+        if match:
+            max_index = max(max_index, int(match.group(1)))
+    return max_index
 
 
 def target_accepted_path(repo_root: Path, doc: AcceptedDocument, index: int) -> Path:

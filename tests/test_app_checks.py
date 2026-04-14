@@ -59,6 +59,39 @@ access_level: "open"
         self.assertTrue(report.pending_staging)
         self.assertTrue(any(item.code == "merge_pending_staging" for item in report.diagnostics))
 
+    def test_run_merge_check_flags_duplicate_accepted_index(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = create_repo_skeleton(Path(tmp))
+            (repo_root / "data" / "accepted" / "SRC-0001-first.md").write_text(
+                """---
+title: "Sample One"
+summary: "First sample text dataset source."
+canonical_url: "https://example.com/one"
+publisher: "Org"
+modality: "text"
+access_level: "open"
+---
+""",
+                encoding="utf-8",
+            )
+            (repo_root / "data" / "accepted" / "SRC-0001-second.md").write_text(
+                """---
+title: "Sample Two"
+summary: "Second sample text dataset source."
+canonical_url: "https://example.com/two"
+publisher: "Org"
+modality: "text"
+access_level: "open"
+---
+""",
+                encoding="utf-8",
+            )
+
+            report = run_merge_check(repo_root)
+
+        self.assertFalse(report.ok)
+        self.assertTrue(any(item.code == "accepted_duplicate_index" for item in report.diagnostics))
+
 
 if __name__ == "__main__":
     unittest.main()
