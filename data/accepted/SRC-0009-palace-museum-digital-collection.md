@@ -1,10 +1,10 @@
 ---
-title: 故宫博物院数字文物库
-summary: 186万+藏品目录与10万+精细影像的权威文物数据库，支持在线检索与研究引用
-canonical_url: https://www.dpm.org.cn
-publisher: 故宫博物院
-modality: multimodal
-access_level: restricted
+title: "故宫博物院数字文物库"
+summary: "186万+藏品目录与10万+精细影像的权威文物数据库，支持在线检索与研究引用"
+canonical_url: "https://www.dpm.org.cn"
+publisher: "故宫博物院"
+modality: "multimodal"
+access_level: "restricted"
 tags: [博物馆, 文物, 藏品目录, 图像资源, 文化遗产]
 ---
 

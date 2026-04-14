@@ -1,10 +1,10 @@
 ---
-title: 敦煌壁画图像数据集与基准（Dunhuang Grottoes Painting Dataset）
-summary: 面向敦煌壁画修复与视觉任务的图像数据集，支持损伤分割、图像补全与超分辨率研究
-canonical_url: https://github.com/dunhuang-dataset
-publisher: 学术机构
-modality: image
-access_level: open
+title: "敦煌壁画图像数据集与基准（Dunhuang Grottoes Painting Dataset）"
+summary: "面向敦煌壁画修复与视觉任务的图像数据集，支持损伤分割、图像补全与超分辨率研究"
+canonical_url: "https://github.com/dunhuang-dataset"
+publisher: "学术机构"
+modality: "image"
+access_level: "open"
 tags: [敦煌, 壁画, 文化遗产, 图像修复, 超分辨率, 计算机视觉]
 ---
 

@@ -1,10 +1,10 @@
 ---
-title: 传统文献语料
-summary: GitHub 分发的开源传统汉文文献语料库，CC BY-SA 4.0 许可，适合学术研究与自然语言处理训练
-canonical_url: https://github.com/kanripo
-publisher: Kanripo community
-modality: text
-access_level: open
+title: "传统文献语料"
+summary: "GitHub 分发的开源传统汉文文献语料库，CC BY-SA 4.0 许可，适合学术研究与自然语言处理训练"
+canonical_url: "https://github.com/kanripo"
+publisher: "Kanripo community"
+modality: "text"
+access_level: "open"
 tags: [古籍, 语料库, 开源, 中文NLP]
 ---
 

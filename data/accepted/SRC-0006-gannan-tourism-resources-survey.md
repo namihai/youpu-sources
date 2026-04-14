@@ -1,10 +1,10 @@
 ---
-title: 甘南旅游资源考察数据集
-summary: 五年实地调研形成的音视频与图片证据链，涵盖甘南-川西等线路旅游资源分布与评估
-canonical_url: https://www.tpdc.ac.cn
-publisher: 国家青藏高原科学数据中心
-modality: multimodal
-access_level: open
+title: "甘南旅游资源考察数据集"
+summary: "五年实地调研形成的音视频与图片证据链，涵盖甘南-川西等线路旅游资源分布与评估"
+canonical_url: "https://www.tpdc.ac.cn"
+publisher: "国家青藏高原科学数据中心"
+modality: "multimodal"
+access_level: "open"
 tags: [旅游资源, 青藏高原, 人文活动, 文化遗产, GIS, 文旅]
 ---
 

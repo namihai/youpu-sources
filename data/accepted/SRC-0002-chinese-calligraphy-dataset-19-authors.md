@@ -1,10 +1,10 @@
 ---
-title: 中国书法字符图像数据集（19位书法家，13.8万字形）
-summary: 19位书法家共13.8万字形图像的开源数据集，适合书法字符识别和作者/风格分类研究
-canonical_url: https://github.com/zhuojg/chinese-calligraphy-dataset
-publisher: Zheng Yu
-modality: image
-access_level: open
+title: "中国书法字符图像数据集（19位书法家，13.8万字形）"
+summary: "19位书法家共13.8万字形图像的开源数据集，适合书法字符识别和作者/风格分类研究"
+canonical_url: "https://github.com/zhuojg/chinese-calligraphy-dataset"
+publisher: "Zheng Yu"
+modality: "image"
+access_level: "open"
 tags: [书法, 字符识别, 作者识别, 风格分类]
 ---
 

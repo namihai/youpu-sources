@@ -1,10 +1,10 @@
 ---
-title: 敦煌壁画数字修复图像数据集（MuralDH）
-summary: 5000+敦煌壁画图像（512×512）的修复数据集，含损伤标注与超分子集，DOI 发布于 Dryad
-canonical_url: https://doi.org/10.5061/dryad.bnzs7h4jd
-publisher: Dryad Digital Repository
-modality: image
-access_level: open
+title: "敦煌壁画数字修复图像数据集（MuralDH）"
+summary: "5000+敦煌壁画图像（512×512）的修复数据集，含损伤标注与超分子集，DOI 发布于 Dryad"
+canonical_url: "https://doi.org/10.5061/dryad.bnzs7h4jd"
+publisher: "Dryad Digital Repository"
+modality: "image"
+access_level: "open"
 tags: [敦煌, 壁画, 图像修复, inpainting, 损伤分割, 超分辨率]
 ---
 

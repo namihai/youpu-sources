@@ -1,10 +1,10 @@
 ---
-title: 中国非遗命名实体识别数据集（ICH-NER）
-summary: 非遗领域中文NER标注语料库，8类实体、7779样本、21244实体，含train/dev与代码
-canonical_url: https://github.com/evahan-nlpeer/ich-ner
-publisher: 学术机构
-modality: text
-access_level: open
+title: "中国非遗命名实体识别数据集（ICH-NER）"
+summary: "非遗领域中文NER标注语料库，8类实体、7779样本、21244实体，含train/dev与代码"
+canonical_url: "https://github.com/evahan-nlpeer/ich-ner"
+publisher: "学术机构"
+modality: "text"
+access_level: "open"
 tags: [非遗, NER, 信息抽取, 语料库, 中文NLP, 知识图谱]
 ---
 

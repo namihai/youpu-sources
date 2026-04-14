@@ -1,10 +1,10 @@
 ---
-title: 中国古汉语OCR共享任务数据集
-summary: 面向古汉语OCR识别的共享任务数据集，包含训练集与测试集，三类文本样本配套评测基准
-canonical_url: https://evahan.nlpeer.com
-publisher: EvaHan共享任务组织方
-modality: image
-access_level: request
+title: "中国古汉语OCR共享任务数据集"
+summary: "面向古汉语OCR识别的共享任务数据集，包含训练集与测试集，三类文本样本配套评测基准"
+canonical_url: "https://evahan.nlpeer.com"
+publisher: "EvaHan共享任务组织方"
+modality: "image"
+access_level: "request"
 tags: [古籍, OCR, 图文对, 基准测试, 多模态, NLP]
 ---
 

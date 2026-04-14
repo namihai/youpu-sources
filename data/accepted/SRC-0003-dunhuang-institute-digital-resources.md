@@ -1,10 +1,10 @@
 ---
-title: 敦煌研究院数字资源体系（Digital Dunhuang / 开放素材库）
-summary: 权威敦煌数字资源体系，开放素材库提供6500+可下载资产，权限分级且需授权
-canonical_url: https://www.dha.ac.cn
-publisher: 敦煌研究院
-modality: multimodal
-access_level: restricted
+title: "敦煌研究院数字资源体系（Digital Dunhuang / 开放素材库）"
+summary: "权威敦煌数字资源体系，开放素材库提供6500+可下载资产，权限分级且需授权"
+canonical_url: "https://www.dha.ac.cn"
+publisher: "敦煌研究院"
+modality: "multimodal"
+access_level: "restricted"
 tags: [敦煌, 莫高窟, 壁画, 文化遗产, 授权, 素材库]
 ---
 

@@ -1,10 +1,10 @@
 ---
-title: 法藏敦煌遗书数字资源
-summary: 5300+项敦煌遗书与3.1万+图像的检索与在线浏览入口，权威学术资源
-canonical_url: https://www.nlc.cn
-publisher: 国家图书馆等（合作发布）
-modality: multimodal
-access_level: request
+title: "法藏敦煌遗书数字资源"
+summary: "5300+项敦煌遗书与3.1万+图像的检索与在线浏览入口，权威学术资源"
+canonical_url: "https://www.nlc.cn"
+publisher: "国家图书馆等（合作发布）"
+modality: "multimodal"
+access_level: "request"
 tags: [敦煌, 遗书, 古文档, 图像, 检索, 文献]
 ---
 

@@ -1,10 +1,10 @@
 ---
-title: 传统服饰图案数据集
-summary: 约6740张传统服饰纹样图像数据集，涵盖多地域文化纹饰，适合图像分类与文化元素分析
-canonical_url: https://www.kaggle.com/datasets/colabsss
-publisher: Kaggle (colabsss)
-modality: image
-access_level: request
+title: "传统服饰图案数据集"
+summary: "约6740张传统服饰纹样图像数据集，涵盖多地域文化纹饰，适合图像分类与文化元素分析"
+canonical_url: "https://www.kaggle.com/datasets/colabsss"
+publisher: "Kaggle (colabsss)"
+modality: "image"
+access_level: "request"
 tags: [服饰纹样, 传统手工艺, 文化遗产, 图像分类, 计算机视觉]
 ---
 
