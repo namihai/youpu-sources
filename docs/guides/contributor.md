@@ -29,7 +29,7 @@
 2. 按 accepted 规范填写内容
 3. 提交 PR
 4. 等待 `check-pr`
-5. 检查通过后，由维护者执行 `/ingest`
+5. 检查通过后，由维护者执行 `/finalize`
 
 注意：
 
@@ -48,7 +48,7 @@
 1. 在 `staging/rejected/rows.csv` 中追加记录
 2. 提交 PR
 3. 等待 `check-pr`
-4. 检查通过后，由维护者执行 `/ingest`
+4. 检查通过后，由维护者执行 `/finalize`
 
 注意：
 
@@ -118,14 +118,28 @@
 对新增流程：
 
 - `check-pr` 会检查正式区与 staging
-- `/ingest` 会把合法的 staging 输入写入正式区
-- `/ingest` 成功后会清空已处理的 staging 输入
+- `check-merge` 也会自动运行；只要 `staging/` 里还有待处理内容，它会失败并提示 `merge_pending_staging`
+- `/finalize` 会在需要时执行 ingest，把合法的 staging 输入写入正式区
+- `/finalize` 成功后会清空已处理的 staging 输入，并再次确认当前分支可合并
 
 对修改和删除流程：
 
-- 不需要 `/ingest`
+- 不需要 ingest
 - `check-pr` 会检查正式区是否合法
 - `check-merge` 会确认当前分支可合并
+
+## 维护者入口
+
+维护者统一使用下面的评论命令：
+
+```text
+/finalize
+```
+
+行为说明：
+
+- 如果 `staging/` 为空，系统不会执行 ingest，只会验证当前分支是否可合并
+- 如果 `staging/` 不为空，系统会先校验，再执行 ingest，再验证最终是否可合并
 
 ## 什么时候不要用 staging
 

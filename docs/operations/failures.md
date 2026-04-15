@@ -8,7 +8,7 @@
 2. 提交 PR
 3. `check-pr` 自动运行
 4. 根据反馈修正内容
-5. `check-pr` 通过后，由维护者触发 `/ingest`
+5. `check-pr` 通过后，由维护者触发 `/finalize`
 
 只要 `staging/` 中还存在任何 `error`，`check-pr` 就会失败，`./scripts/youpu ingest` 也不会执行正式写入。
 
@@ -344,9 +344,9 @@ url,title,reason
 - 如果确实是不同来源但标题相同，可以先保留
 - 如果是重复记录，维护者应合并或删除其一
 
-## `/ingest` 常见失败
+## `/finalize` 常见失败
 
-### 20. `/ingest` 没反应
+### 20. `/finalize` 没反应
 
 常见原因：
 
@@ -357,13 +357,13 @@ url,title,reason
 常见现象：
 
 - `check-pr` 通过，但没有可导入内容
-- 运行 `/ingest` 时返回 `staging_empty`
+- 运行 `/finalize` 时不会执行 ingest，而是直接做 merge 检查
 
 含义：
 
 - 当前 `staging/` 中没有任何 accepted 候选
 - 也没有任何 rejected 候选
-- 仓库本身仍然可以是合法的，但这不是一个可 ingest 的新增候选 PR
+- 这时 `/finalize` 不会执行 ingest，会直接检查当前分支是否可合并
 
 处理方式：
 
@@ -396,10 +396,10 @@ url,title,reason
 - 确认 workflow 已经在默认分支生效
 
 ```text
-/ingest
+/finalize
 ```
 
-### 23. `/ingest` 被触发但失败
+### 23. `/finalize` 被触发但失败
 
 常见原因：
 
@@ -411,9 +411,9 @@ url,title,reason
 
 - 先修完 `check-pr` 报错
 - 确认评论者有 `write`、`maintain` 或 `admin`
-- 再重新评论 `/ingest`
+- 再重新评论 `/finalize`
 
-### 24. `/ingest` 后没有正式结果
+### 24. `/finalize` 后没有正式结果
 
 只要存在任何 `error`，`./scripts/youpu ingest` 就不会做部分导入。
 
@@ -425,7 +425,7 @@ url,title,reason
 处理方式：
 
 - 先把所有 `error` 修完
-- 等 `check-pr` 全绿后再 `/ingest`
+- 等 `check-pr` 全绿后再 `/finalize`
 
 ## `check-merge` 常见失败
 
@@ -441,8 +441,8 @@ url,title,reason
 
 处理方式：
 
-- 对内容 PR，先让维护者执行 `/ingest`
-- `/ingest` 成功后，这些输入会被清掉
+- 对内容 PR，先让维护者执行 `/finalize`
+- `/finalize` 成功后，这些输入会被清掉
 
 ## 一般处理顺序
 
@@ -452,7 +452,7 @@ url,title,reason
 2. 按 `path` 找到对应文件或 CSV 行
 3. 修完后重新 push
 4. 等 `check-pr` 重新运行
-5. 全绿后再让维护者执行 `/ingest`
+5. 全绿后再让维护者执行 `/finalize`
 
 ## 相关文档
 

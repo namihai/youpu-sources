@@ -1,11 +1,11 @@
-name: Ingest PR
+name: Finalize PR
 
 on:
   issue_comment:
     types: [created]
 
 concurrency:
-  group: ingest-${{ github.event.issue.number }}
+  group: finalize-${{ github.event.issue.number }}
   cancel-in-progress: true
 
 permissions:
@@ -13,8 +13,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  ingest:
-    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/ingest') }}
+  finalize:
+    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/finalize') }}
     runs-on: ubuntu-latest
     steps:
       - name: Validate commenter permission
@@ -30,7 +30,7 @@ jobs:
             const allowed = new Set(["admin", "maintain", "write"]);
             core.setOutput("allowed", allowed.has(permission.data.permission) ? "true" : "false");
             if (!allowed.has(permission.data.permission)) {
-              core.setFailed(`User ${context.payload.comment.user.login} does not have permission to run /ingest.`);
+              core.setFailed(`User ${context.payload.comment.user.login} does not have permission to run /finalize.`);
             }
 
       - name: Load PR metadata
@@ -53,7 +53,7 @@ jobs:
         with:
           script: |
             core.setFailed(
-              "Fork PRs do not support automatic /ingest write-back. Please move the candidate files to an internal branch and run /ingest there."
+              "Fork PRs do not support automatic /finalize write-back. Please move the changes to an internal branch and run /finalize there."
             );
 
       - name: Checkout PR branch
@@ -79,14 +79,29 @@ jobs:
         if: ${{ steps.pr.outputs.is_fork != 'true' }}
         run: ./scripts/youpu check-pr
 
-      - name: Run ingest
+      - name: Detect pending staging
         if: ${{ steps.pr.outputs.is_fork != 'true' }}
+        id: staging
+        run: |
+          has_staging=false
+          if [ -d staging/accepted ]; then
+            if find staging/accepted -type f -name '*.md' ! -name '.gitkeep' | grep -q .; then
+              has_staging=true
+            fi
+          fi
+          if [ -f staging/rejected/rows.csv ]; then
+            has_staging=true
+          fi
+          echo "has_staging=${has_staging}" >> "$GITHUB_OUTPUT"
+
+      - name: Run ingest when staging is present
+        if: ${{ steps.pr.outputs.is_fork != 'true' && steps.staging.outputs.has_staging == 'true' }}
         env:
           YOUPU_ACCEPTED_BASE_REF: origin/${{ github.event.repository.default_branch }}
         run: ./scripts/youpu ingest
 
-      - name: Commit ingest result
-        if: ${{ steps.pr.outputs.is_fork != 'true' }}
+      - name: Commit finalize result
+        if: ${{ steps.pr.outputs.is_fork != 'true' && steps.staging.outputs.has_staging == 'true' }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -95,7 +110,7 @@ jobs:
             echo "No changes to commit."
             exit 0
           fi
-          git commit -m "Run ingest for PR"
+          git commit -m "Finalize PR"
           git push origin HEAD:${{ steps.pr.outputs.head_ref }}
 
       - name: Run merge checks
