@@ -1,4 +1,5 @@
 .DS_Store
+tests/flow/generated/
 __pycache__/
 *.pyc
 *.pyo
@@ -28,4 +29,3 @@ env/
 
 # OS / local temp files
 Thumbs.db
-
