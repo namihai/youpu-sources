@@ -1,10 +1,10 @@
 ---
-title: 中国传统乐器识别音频数据集（ChMusic）
-summary: 该来源提供覆盖 11 种中国传统乐器的 55 段单乐器 WAV 音频及配套识别基线代码。
-canonical_url: https://github.com/HaoranWeiUTD/ChMusic
-publisher: HaoranWeiUTD / GitHub
-modality: audio
-access_level: open
+title: "中国传统乐器识别音频数据集（ChMusic）"
+summary: "该来源提供覆盖 11 种中国传统乐器的 55 段单乐器 WAV 音频及配套识别基线代码。"
+canonical_url: "https://github.com/HaoranWeiUTD/ChMusic"
+publisher: "HaoranWeiUTD / GitHub"
+modality: "audio"
+access_level: "open"
 tags: [传统乐器, 音频分类, 乐器识别, ChMusic, 基线]
 ---
 

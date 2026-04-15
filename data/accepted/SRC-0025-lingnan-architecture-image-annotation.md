@@ -1,10 +1,10 @@
 ---
-title: 岭南建筑图像标注数据集
-summary: 该来源提供岭南建筑外观图像及细粒度标注，可用于建筑风格识别和视觉分析任务。
-canonical_url: https://huggingface.co/datasets/noncegeek/lingnan-architecture-image-annotation
-publisher: noncegeek
-modality: image
-access_level: request
+title: "岭南建筑图像标注数据集"
+summary: "该来源提供岭南建筑外观图像及细粒度标注，可用于建筑风格识别和视觉分析任务。"
+canonical_url: "https://huggingface.co/datasets/noncegeek/lingnan-architecture-image-annotation"
+publisher: "noncegeek"
+modality: "image"
+access_level: "request"
 tags: [岭南建筑, 图像标注, 建筑风格, 文化遗产, HuggingFace]
 ---
 

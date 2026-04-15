@@ -1,10 +1,10 @@
 ---
-title: 唐卡文化图像数据集
-summary: 该来源提供约 6200 张带注释的唐卡图像，可用于文化遗产图像识别与分类研究。
-canonical_url: https://www.scidb.cn/en/detail?dataSetId=0a67cf3a3fc943f7b42ac9f42ac84371&version=V2
-publisher: 李卓
-modality: image
-access_level: request
+title: "唐卡文化图像数据集"
+summary: "该来源提供约 6200 张带注释的唐卡图像，可用于文化遗产图像识别与分类研究。"
+canonical_url: "https://www.scidb.cn/en/detail?dataSetId=0a67cf3a3fc943f7b42ac9f42ac84371&version=V2"
+publisher: "李卓"
+modality: "image"
+access_level: "request"
 tags: [唐卡, 藏传佛教, 图像标注, 文化遗产, 计算机视觉]
 ---
 

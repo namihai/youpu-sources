@@ -1,10 +1,10 @@
 ---
-title: 文化视觉问答数据集
-summary: 该来源提供覆盖 11 个国家文化图像的开放式视觉问答数据，用于评估视觉语言模型的跨文化理解能力。
-canonical_url: https://culturalvqa.org/
-publisher: Mila Quebec AI Institute / Universite de Montreal / McGill University / Google Research / Google DeepMind
-modality: multimodal
-access_level: open
+title: "文化视觉问答数据集"
+summary: "该来源提供覆盖 11 个国家文化图像的开放式视觉问答数据，用于评估视觉语言模型的跨文化理解能力。"
+canonical_url: "https://culturalvqa.org/"
+publisher: "Mila Quebec AI Institute / Universite de Montreal / McGill University / Google Research / Google DeepMind"
+modality: "multimodal"
+access_level: "open"
 tags: [CulturalVQA, 跨文化, 视觉问答, 基准测试, 多模态]
 ---
 
