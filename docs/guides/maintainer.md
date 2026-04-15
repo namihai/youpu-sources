@@ -79,6 +79,7 @@
 - 如果这次 PR 包含 staging 输入，确认 `staging/accepted/*.md` 和 `staging/rejected/rows.csv` 已被清空
 - `data/accepted/` 或 `data/rejected.csv` 的正式结果符合预期
 - PR checks 最终为绿色
+- 如果命令失败，优先看 PR 评论区里 GitHub Actions 自动回贴的失败摘要；需要更细节时再点进失败 step 日志
 
 ### 4. 合并 PR
 

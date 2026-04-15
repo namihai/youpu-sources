@@ -5,6 +5,8 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
+  issues: write
 
 jobs:
   check-pr:
@@ -19,4 +21,102 @@ jobs:
           python-version: "3.14.4"
 
       - name: Run PR checks
-        run: uv run python ./scripts/youpu check-pr
+        id: check_pr
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          log_path="$RUNNER_TEMP/check-pr.log"
+          echo "log_path=$log_path" >> "$GITHUB_OUTPUT"
+          uv run python ./scripts/youpu check-pr 2>&1 | tee "$log_path"
+
+      - name: Post PR check failure summary
+        if: ${{ steps.check_pr.outcome == 'failure' }}
+        uses: actions/github-script@v8
+        env:
+          LOG_PATH: ${{ steps.check_pr.outputs.log_path }}
+        with:
+          script: |
+            const fs = require("fs");
+            const logPath = process.env.LOG_PATH;
+            const marker = "<!-- youpu:pr-check-failure-summary -->";
+            const log = logPath && fs.existsSync(logPath) ? fs.readFileSync(logPath, "utf8") : "";
+            const lines = log
+              .split("\n")
+              .map((line) => line.trimEnd())
+              .filter((line) => line.trim().length > 0);
+            const important = lines.filter((line) =>
+              line.startsWith("PR check failed") ||
+              line.startsWith("ERROR:") ||
+              line.startsWith("WARNING:")
+            );
+            const snippet = (important.length ? important : lines.slice(-20)).slice(0, 20).join("\n");
+            const body = [
+              marker,
+              "**PR Check failed**",
+              "",
+              "`youpu check-pr` returned a validation failure.",
+              "",
+              "```text",
+              snippet || "No log output captured.",
+              "```",
+              "",
+              "Full details are available in the failed `Run PR checks` step log.",
+            ].join("\n");
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find((comment) =>
+              comment.user.login === "github-actions[bot]" && comment.body.includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+            }
+
+      - name: Clear PR check failure summary on success
+        if: ${{ steps.check_pr.outcome == 'success' }}
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const marker = "<!-- youpu:pr-check-failure-summary -->";
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find((comment) =>
+              comment.user.login === "github-actions[bot]" && comment.body.includes(marker)
+            );
+            if (existing) {
+              await github.rest.issues.deleteComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+              });
+            }
+
+      - name: Fail workflow on PR check failure
+        if: ${{ steps.check_pr.outcome == 'failure' }}
+        run: exit 1
