@@ -1,10 +1,10 @@
 ---
-title: 明清妇女著作数字档案（MQWW）
-summary: 该来源提供明清女性著作的扫描影像及作家作品数据库，是面向文献研究的专题数字档案。
-canonical_url: https://mhdb.mh.sinica.edu.tw/mingqing/mqww/
-publisher: Academia Sinica
-modality: multimodal
-access_level: open
+title: "明清妇女著作数字档案（MQWW）"
+summary: "该来源提供明清女性著作的扫描影像及作家作品数据库，是面向文献研究的专题数字档案。"
+canonical_url: "https://mhdb.mh.sinica.edu.tw/mingqing/mqww/"
+publisher: "Academia Sinica"
+modality: "multimodal"
+access_level: "open"
 tags: [明清, 女性文学, 古籍数字化, 扫描影像, 目录]
 ---
 

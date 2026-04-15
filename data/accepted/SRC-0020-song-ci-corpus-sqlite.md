@@ -1,10 +1,10 @@
 ---
-title: 宋词语料库（整理版SQLite）
-summary: 该来源以 SQLite 数据库形式发布 2 万余首宋词及相关元数据，适合检索、统计与复现实验。
-canonical_url: https://doi.org/10.5281/zenodo.17798065
-publisher: Yao SONG
-modality: text
-access_level: open
+title: "宋词语料库（整理版SQLite）"
+summary: "该来源以 SQLite 数据库形式发布 2 万余首宋词及相关元数据，适合检索、统计与复现实验。"
+canonical_url: "https://doi.org/10.5281/zenodo.17798065"
+publisher: "Yao SONG"
+modality: "text"
+access_level: "open"
 tags: [宋词, 语料库, SQLite, 数字人文]
 ---
 

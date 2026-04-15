@@ -1,10 +1,10 @@
 ---
-title: 数字敦煌
-summary: 数字敦煌由敦煌研究院维护，提供敦煌石窟相关图像、文献和数字化展示资源的在线入口。
-canonical_url: https://www.e-dunhuang.com/
-publisher: 敦煌研究院
-modality: multimodal
-access_level: restricted
+title: "数字敦煌"
+summary: "数字敦煌由敦煌研究院维护，提供敦煌石窟相关图像、文献和数字化展示资源的在线入口。"
+canonical_url: "https://www.e-dunhuang.com/"
+publisher: "敦煌研究院"
+modality: "multimodal"
+access_level: "restricted"
 tags: [敦煌, 莫高窟, 壁画, 数字馆藏, 文献]
 ---
 

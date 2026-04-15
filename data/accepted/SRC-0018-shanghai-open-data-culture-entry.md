@@ -1,10 +1,10 @@
 ---
-title: 上海市公共数据开放平台（文化相关数据集入口）
-summary: 上海市公共数据开放平台可用于检索文化场馆、旅游和公共文化服务相关数据集与数据接口。
-canonical_url: https://data.sh.gov.cn/
-publisher: 上海市公共数据开放平台
-modality: tabular
-access_level: open
+title: "上海市公共数据开放平台（文化相关数据集入口）"
+summary: "上海市公共数据开放平台可用于检索文化场馆、旅游和公共文化服务相关数据集与数据接口。"
+canonical_url: "https://data.sh.gov.cn/"
+publisher: "上海市公共数据开放平台"
+modality: "tabular"
+access_level: "open"
 tags: [上海, 开放数据, 公共文化, 文旅, API]
 ---
 

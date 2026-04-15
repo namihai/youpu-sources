@@ -1,10 +1,10 @@
 ---
-title: 数字村庄（CCVG｜当代中国村志结构化变量数据）
-summary: 该来源从当代中国村志中抽取人口、经济等结构化变量，并通过项目网站提供查询或下载入口。
-canonical_url: https://www.chinesevillagedata.library.pitt.edu/
-publisher: University of Pittsburgh
-modality: tabular
-access_level: open
+title: "数字村庄（CCVG｜当代中国村志结构化变量数据）"
+summary: "该来源从当代中国村志中抽取人口、经济等结构化变量，并通过项目网站提供查询或下载入口。"
+canonical_url: "https://www.chinesevillagedata.library.pitt.edu/"
+publisher: "University of Pittsburgh"
+modality: "tabular"
+access_level: "open"
 tags: [村志, 地方志, 结构化变量, 历史地理, 乡村研究]
 ---
 

@@ -1,10 +1,10 @@
 ---
-title: 欧洲文化遗产数字平台（Europeana）
-summary: Europeana 聚合欧洲多家文化机构的数字文化遗产元数据与对象链接，支持跨馆藏检索与复用发现。
-canonical_url: https://www.europeana.eu/en
-publisher: Europeana
-modality: multimodal
-access_level: open
+title: "欧洲文化遗产数字平台（Europeana）"
+summary: "Europeana 聚合欧洲多家文化机构的数字文化遗产元数据与对象链接，支持跨馆藏检索与复用发现。"
+canonical_url: "https://www.europeana.eu/en"
+publisher: "Europeana"
+modality: "multimodal"
+access_level: "open"
 tags: [Europeana, 文化遗产, 元数据, API, 数字馆藏]
 ---
 

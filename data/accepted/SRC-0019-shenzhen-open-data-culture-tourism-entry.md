@@ -1,10 +1,10 @@
 ---
-title: 深圳市政府数据开放平台（文化旅游类接口目录入口）
-summary: 深圳市政府数据开放平台可用于筛选文化和旅游相关开放接口与结构化数据资源。
-canonical_url: https://opendata.sz.gov.cn/data/api/toApi
-publisher: 深圳市政府数据开放平台
-modality: tabular
-access_level: open
+title: "深圳市政府数据开放平台（文化旅游类接口目录入口）"
+summary: "深圳市政府数据开放平台可用于筛选文化和旅游相关开放接口与结构化数据资源。"
+canonical_url: "https://opendata.sz.gov.cn/data/api/toApi"
+publisher: "深圳市政府数据开放平台"
+modality: "tabular"
+access_level: "open"
 tags: [深圳, 开放数据, API, 文旅, 城市数据]
 ---
 
