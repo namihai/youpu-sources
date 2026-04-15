@@ -146,3 +146,23 @@ GitHub 联调目前还未自动化，后续将单独实现：
 - 评论 `/finalize`
 - 拉取 workflow 结果
 - 汇总到 issue
+
+当前已落地 GitHub 联调的前置脚手架：
+
+- `tests/flow/run_github_flow_tests.py`
+
+当前支持：
+
+- 列出 GitHub 联调用例
+- 输出 GitHub 联调计划
+- 检查当前 `gh` 登录状态
+- 生成 issue 模板
+
+命令：
+
+```bash
+uv run python tests/flow/run_github_flow_tests.py --list
+uv run python tests/flow/run_github_flow_tests.py --plan
+uv run python tests/flow/run_github_flow_tests.py --check-auth
+uv run python tests/flow/run_github_flow_tests.py --issue-template
+```

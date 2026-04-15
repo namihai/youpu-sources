@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Validate commenter permission
         id: permission
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const permission = await github.rest.repos.getCollaboratorPermissionLevel({
@@ -35,7 +35,7 @@ jobs:
 
       - name: Load PR metadata
         id: pr
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const pr = await github.rest.pulls.get({
@@ -49,7 +49,7 @@ jobs:
 
       - name: Stop on fork PR
         if: ${{ steps.pr.outputs.is_fork == 'true' }}
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             core.setFailed(
@@ -58,7 +58,7 @@ jobs:
 
       - name: Checkout PR branch
         if: ${{ steps.pr.outputs.is_fork != 'true' }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ steps.pr.outputs.head_repo }}
           ref: ${{ steps.pr.outputs.head_ref }}
@@ -71,7 +71,7 @@ jobs:
 
       - name: Set up uv
         if: ${{ steps.pr.outputs.is_fork != 'true' }}
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
         with:
           python-version: "3.14.4"
 
