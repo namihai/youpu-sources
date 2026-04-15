@@ -23,7 +23,7 @@
 如果组织层面对 Actions 做了限制，需要确保以下 action 可用：
 
 - `actions/checkout`
-- `actions/setup-python`
+- `astral-sh/setup-uv`
 - `actions/github-script`
 
 ### 2. 收缩默认分支写权限
@@ -69,10 +69,10 @@
 
 workflow 会：
 
-1. 再跑一次 `./scripts/youpu check-pr`
-2. 若 `staging/` 不为空，则执行 `./scripts/youpu ingest`
+1. 再跑一次 `uv run python ./scripts/youpu check-pr`
+2. 若 `staging/` 不为空，则执行 `uv run python ./scripts/youpu ingest`
 3. 若本次发生写回，则自动提交结果回原分支
-4. 执行 `./scripts/youpu check-merge`
+4. 执行 `uv run python ./scripts/youpu check-merge`
 
 ### fork PR
 

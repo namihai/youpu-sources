@@ -13,10 +13,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: "3.13"
+          python-version: "3.14.4"
 
       - name: Run merge checks
-        run: ./scripts/youpu check-merge
+        run: uv run python ./scripts/youpu check-merge

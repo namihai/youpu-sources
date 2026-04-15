@@ -25,8 +25,8 @@
 本地流程测试入口：
 
 ```bash
-python3 tests/flow/run_flow_tests.py --list
-python3 tests/flow/run_flow_tests.py --run
+uv run python tests/flow/run_flow_tests.py --list
+uv run python tests/flow/run_flow_tests.py --run
 ```
 
 ## 维护建议

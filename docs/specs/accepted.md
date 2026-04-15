@@ -49,8 +49,8 @@ SRC-0003-figshare-dunhuang-restoration.md
 维护者如果要在本地调试 accepted 导入流程，可以按下面方式验证：
 
 1. 用户先把候选 Markdown 放进 `staging/accepted/`
-2. 运行 `./scripts/youpu validate-imports`
-3. 修正问题后运行 `./scripts/youpu ingest`
+2. 运行 `uv run python ./scripts/youpu validate-imports`
+3. 修正问题后运行 `uv run python ./scripts/youpu ingest`
 
 `ingest` 会在正式合并时：
 

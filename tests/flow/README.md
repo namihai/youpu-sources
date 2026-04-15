@@ -10,7 +10,7 @@
 
 ## 当前流程规则
 
-- `pr-check` 运行的是 `./scripts/youpu check-pr`
+- `pr-check` 运行的是 `uv run python ./scripts/youpu check-pr`
 - `check-pr` 会校验正式区 `data/` 和候选区 `staging/`
 - `staging/` 非空不会导致 `check-pr` 失败
 - `staging/` 非空会导致 `check-merge` 失败，错误码为 `merge_pending_staging`
@@ -77,22 +77,22 @@
 常用命令：
 
 ```bash
-python3 tests/flow/run_flow_tests.py --list
-python3 tests/flow/run_flow_tests.py --plan
-python3 tests/flow/run_flow_tests.py --run
+uv run python tests/flow/run_flow_tests.py --list
+uv run python tests/flow/run_flow_tests.py --plan
+uv run python tests/flow/run_flow_tests.py --run
 ```
 
 高价值子集：
 
 ```bash
-python3 tests/flow/run_flow_tests.py --plan --high-value-only
-python3 tests/flow/run_flow_tests.py --run --high-value-only
+uv run python tests/flow/run_flow_tests.py --plan --high-value-only
+uv run python tests/flow/run_flow_tests.py --run --high-value-only
 ```
 
 指定用例：
 
 ```bash
-python3 tests/flow/run_flow_tests.py --run --case T01 --case T03
+uv run python tests/flow/run_flow_tests.py --run --case T01 --case T03
 ```
 
 运行后会在 `tests/flow/generated/` 下生成：

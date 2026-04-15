@@ -16,6 +16,13 @@
 
 ## 快速开始
 
+推荐先使用 `uv` 创建并管理本地环境：
+
+```bash
+uv venv --python 3.14.4
+uv run python ./scripts/youpu report
+```
+
 如果你只是来提交新的来源记录，不需要修改项目代码，也不要直接 push 到 `main`。
 
 按下面的步骤操作即可：

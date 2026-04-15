@@ -112,8 +112,8 @@ PYTHONPATH=src python3 -m unittest discover -s tests
 维护者或自动化流程推荐方式：
 
 ```bash
-./scripts/youpu report
-./scripts/youpu validate-schema
+uv run python ./scripts/youpu report
+uv run python ./scripts/youpu validate-schema
 PYTHONPATH=src python3 -m unittest discover -s tests
 ```
 

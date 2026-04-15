@@ -58,7 +58,7 @@ schema 使用 JSON 文件。
 1. 修改 `schemas/accepted.json` 或 `schemas/rejected.json`
 2. 同步修改对应 template
 3. 同步更新相关规范文档
-4. 运行 `./scripts/youpu validate-schema`
+4. 运行 `uv run python ./scripts/youpu validate-schema`
 5. 再运行相关数据检查命令
 
 不建议的做法：
@@ -69,7 +69,7 @@ schema 使用 JSON 文件。
 
 ## `validate-schema` 的职责
 
-`./scripts/youpu validate-schema` 主要检查：
+`uv run python ./scripts/youpu validate-schema` 主要检查：
 
 - schema 文件存在且结构合法
 - `templates/accepted.md` 中 YAML 字段顺序与 accepted schema 一致

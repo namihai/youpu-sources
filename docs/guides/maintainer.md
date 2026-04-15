@@ -64,15 +64,15 @@
 
 ### 3. 检查 `/finalize` 结果
 
-`/finalize` 会先跑 `./scripts/youpu check-pr`，然后分两种情况：
+`/finalize` 会先跑 `uv run python ./scripts/youpu check-pr`，然后分两种情况：
 
 - 如果 `staging/` 为空：
   1. 不执行 ingest
-  2. 直接执行 `./scripts/youpu check-merge`
+  2. 直接执行 `uv run python ./scripts/youpu check-merge`
 - 如果 `staging/` 不为空：
-  1. 执行 `./scripts/youpu ingest`
+  1. 执行 `uv run python ./scripts/youpu ingest`
   2. 自动提交结果回原分支
-  3. 执行 `./scripts/youpu check-merge`
+  3. 执行 `uv run python ./scripts/youpu check-merge`
 
 维护者需要确认：
 
@@ -112,33 +112,33 @@ fork PR 只支持检查，不支持自动回写 finalize 结果。
 如果需要在本地复现或排查，维护者可以使用：
 
 ```bash
-./scripts/youpu validate-schema
-./scripts/youpu validate-repo
-./scripts/youpu validate-imports
-./scripts/youpu check-pr
-./scripts/youpu ingest
-./scripts/youpu check-merge
-./scripts/youpu report
+uv run python ./scripts/youpu validate-schema
+uv run python ./scripts/youpu validate-repo
+uv run python ./scripts/youpu validate-imports
+uv run python ./scripts/youpu check-pr
+uv run python ./scripts/youpu ingest
+uv run python ./scripts/youpu check-merge
+uv run python ./scripts/youpu report
 ```
 
 常见用途：
 
-- `./scripts/youpu validate-repo`
+- `uv run python ./scripts/youpu validate-repo`
   检查正式区
-- `./scripts/youpu validate-imports`
+- `uv run python ./scripts/youpu validate-imports`
   检查当前 `staging/`
-- `./scripts/youpu validate-schema`
+- `uv run python ./scripts/youpu validate-schema`
   检查 `schemas/` 与 `templates/` 是否一致
-- `./scripts/youpu check-pr`
+- `uv run python ./scripts/youpu check-pr`
   复现 PR 检查
-- `./scripts/youpu ingest`
+- `uv run python ./scripts/youpu ingest`
   本地执行确定性入库
-- `./scripts/youpu check-merge`
+- `uv run python ./scripts/youpu check-merge`
   确认当前状态是否可合并
-- `./scripts/youpu report`
+- `uv run python ./scripts/youpu report`
   快速查看仓库摘要
 
-如果本次 PR 涉及字段调整、模板调整或 CLI schema 逻辑调整，建议先单独跑一次 `./scripts/youpu validate-schema`，再看 `./scripts/youpu check-pr` 和 `./scripts/youpu check-merge`。
+如果本次 PR 涉及字段调整、模板调整或 CLI schema 逻辑调整，建议先单独跑一次 `uv run python ./scripts/youpu validate-schema`，再看 `uv run python ./scripts/youpu check-pr` 和 `uv run python ./scripts/youpu check-merge`。
 
 如果需要继续修改 CLI 实现本身，源码当前位于 `src/youpu/`，并按 `cli / app / domain / infra` 分层；具体见 [源码结构](../architecture/source-layout.md)。
 

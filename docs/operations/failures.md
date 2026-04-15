@@ -10,7 +10,7 @@
 4. 根据反馈修正内容
 5. `check-pr` 通过后，由维护者触发 `/finalize`
 
-只要 `staging/` 中还存在任何 `error`，`check-pr` 就会失败，`./scripts/youpu ingest` 也不会执行正式写入。
+只要 `staging/` 中还存在任何 `error`，`check-pr` 就会失败，`uv run python ./scripts/youpu ingest` 也不会执行正式写入。
 
 ## 看哪里
 
@@ -386,7 +386,7 @@ url,title,reason
 
 处理方式：
 
-- 先运行 `./scripts/youpu validate-schema`
+- 先运行 `uv run python ./scripts/youpu validate-schema`
 - 先修 schema，再修 template
 - 不要只改模板而忘记同步 schema
 
@@ -415,7 +415,7 @@ url,title,reason
 
 ### 24. `/finalize` 后没有正式结果
 
-只要存在任何 `error`，`./scripts/youpu ingest` 就不会做部分导入。
+只要存在任何 `error`，`uv run python ./scripts/youpu ingest` 就不会做部分导入。
 
 这意味着：
 

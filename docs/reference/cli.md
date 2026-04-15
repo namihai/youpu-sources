@@ -2,10 +2,10 @@
 
 这份文档定义 `youpu` 的命令接口、返回码和行为边界。
 
-这里的 `youpu` 表示逻辑接口名。仓库内实际执行入口是 `./scripts/youpu`，例如：
+这里的 `youpu` 表示逻辑接口名。仓库内推荐执行入口是 `uv run python ./scripts/youpu`，例如：
 
 ```bash
-./scripts/youpu check-pr
+uv run python ./scripts/youpu check-pr
 ```
 
 ## 目标

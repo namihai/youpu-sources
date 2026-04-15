@@ -69,15 +69,15 @@ jobs:
         if: ${{ steps.pr.outputs.is_fork != 'true' }}
         run: git fetch origin ${{ github.event.repository.default_branch }} --depth=1
 
-      - name: Set up Python
+      - name: Set up uv
         if: ${{ steps.pr.outputs.is_fork != 'true' }}
-        uses: actions/setup-python@v5
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: "3.13"
+          python-version: "3.14.4"
 
       - name: Run PR checks
         if: ${{ steps.pr.outputs.is_fork != 'true' }}
-        run: ./scripts/youpu check-pr
+        run: uv run python ./scripts/youpu check-pr
 
       - name: Detect pending staging
         if: ${{ steps.pr.outputs.is_fork != 'true' }}
@@ -98,7 +98,7 @@ jobs:
         if: ${{ steps.pr.outputs.is_fork != 'true' && steps.staging.outputs.has_staging == 'true' }}
         env:
           YOUPU_ACCEPTED_BASE_REF: origin/${{ github.event.repository.default_branch }}
-        run: ./scripts/youpu ingest
+        run: uv run python ./scripts/youpu ingest
 
       - name: Commit finalize result
         if: ${{ steps.pr.outputs.is_fork != 'true' && steps.staging.outputs.has_staging == 'true' }}
@@ -115,4 +115,4 @@ jobs:
 
       - name: Run merge checks
         if: ${{ steps.pr.outputs.is_fork != 'true' }}
-        run: ./scripts/youpu check-merge
+        run: uv run python ./scripts/youpu check-merge
