@@ -1,10 +1,10 @@
 ---
-title: 甘南旅游资源考察数据集
-summary: 国家青藏高原科学数据中心发布的甘南及川西线路旅游资源实地考察多模态数据来源，包含影像、音频与轨迹资料。
-canonical_url: https://doi.org/10.11888/HumanNat.tpdc.302318
-publisher: 国家青藏高原科学数据中心
-modality: multimodal
-access_level: request
+title: "甘南旅游资源考察数据集"
+summary: "国家青藏高原科学数据中心发布的甘南及川西线路旅游资源实地考察多模态数据来源，包含影像、音频与轨迹资料。"
+canonical_url: "https://doi.org/10.11888/HumanNat.tpdc.302318"
+publisher: "国家青藏高原科学数据中心"
+modality: "multimodal"
+access_level: "request"
 tags: [甘南, 旅游资源, 青藏高原, 文旅, 时空轨迹, 文化遗产]
 ---
 
