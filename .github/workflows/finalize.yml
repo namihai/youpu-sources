@@ -1,0 +1,355 @@
+name: Finalize PR
+
+on:
+  issue_comment:
+    types: [created]
+
+concurrency:
+  group: finalize-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  finalize:
+    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/finalize') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate commenter permission
+        id: permission
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const permission = await github.rest.repos.getCollaboratorPermissionLevel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              username: context.payload.comment.user.login,
+            });
+            const allowed = new Set(["admin", "maintain", "write"]);
+            core.setOutput("allowed", allowed.has(permission.data.permission) ? "true" : "false");
+            if (!allowed.has(permission.data.permission)) {
+              core.setFailed(`User ${context.payload.comment.user.login} does not have permission to run /finalize.`);
+            }
+
+      - name: Load PR metadata
+        id: pr
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            core.setOutput("head_ref", pr.data.head.ref);
+            core.setOutput("head_repo", pr.data.head.repo.full_name);
+            core.setOutput("is_fork", pr.data.head.repo.full_name !== `${context.repo.owner}/${context.repo.repo}` ? "true" : "false");
+
+      - name: Stop on fork PR
+        if: ${{ steps.pr.outputs.is_fork == 'true' }}
+        uses: actions/github-script@v8
+        with:
+          script: |
+            core.setFailed(
+              "Fork PRs do not support automatic /finalize write-back. Please move the changes to an internal branch and run /finalize there."
+            );
+
+      - name: Checkout PR branch
+        if: ${{ steps.pr.outputs.is_fork != 'true' }}
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ steps.pr.outputs.head_repo }}
+          ref: ${{ steps.pr.outputs.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Fetch default branch for accepted numbering
+        if: ${{ steps.pr.outputs.is_fork != 'true' }}
+        run: git fetch origin ${{ github.event.repository.default_branch }} --depth=1
+
+      - name: Set up uv
+        if: ${{ steps.pr.outputs.is_fork != 'true' }}
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.14.4"
+
+      - name: Run PR checks
+        id: check_pr
+        if: ${{ steps.pr.outputs.is_fork != 'true' }}
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          log_path="$RUNNER_TEMP/finalize-check-pr.log"
+          echo "log_path=$log_path" >> "$GITHUB_OUTPUT"
+          uv run python ./scripts/youpu check-pr 2>&1 | tee "$log_path"
+
+      - name: Post finalize PR check failure summary
+        if: ${{ steps.pr.outputs.is_fork != 'true' && steps.check_pr.outcome == 'failure' }}
+        uses: actions/github-script@v8
+        env:
+          LOG_PATH: ${{ steps.check_pr.outputs.log_path }}
+        with:
+          script: |
+            const fs = require("fs");
+            const logPath = process.env.LOG_PATH;
+            const marker = "<!-- youpu:finalize-failure-summary -->";
+            const log = logPath && fs.existsSync(logPath) ? fs.readFileSync(logPath, "utf8") : "";
+            const lines = log
+              .split("\n")
+              .map((line) => line.trimEnd())
+              .filter((line) => line.trim().length > 0);
+            const important = lines.filter((line) =>
+              line.startsWith("PR check failed") ||
+              line.startsWith("ERROR:") ||
+              line.startsWith("WARNING:")
+            );
+            const snippet = (important.length ? important : lines.slice(-20)).slice(0, 20).join("\n");
+            const body = [
+              marker,
+              "**/finalize failed during PR checks**",
+              "",
+              "`youpu check-pr` failed, so finalize stopped before ingest.",
+              "",
+              "```text",
+              snippet || "No log output captured.",
+              "```",
+              "",
+              "Full details are available in the failed `Run PR checks` step log.",
+            ].join("\n");
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find((comment) =>
+              comment.user.login === "github-actions[bot]" && comment.body.includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+            }
+
+      - name: Detect pending staging
+        if: ${{ steps.pr.outputs.is_fork != 'true' && steps.check_pr.outcome == 'success' }}
+        id: staging
+        run: |
+          has_staging=false
+          if [ -d staging/accepted ]; then
+            if find staging/accepted -type f -name '*.md' ! -name '.gitkeep' | grep -q .; then
+              has_staging=true
+            fi
+          fi
+          if [ -f staging/rejected/rows.csv ]; then
+            has_staging=true
+          fi
+          echo "has_staging=${has_staging}" >> "$GITHUB_OUTPUT"
+
+      - name: Run ingest when staging is present
+        id: ingest
+        if: ${{ steps.pr.outputs.is_fork != 'true' && steps.check_pr.outcome == 'success' && steps.staging.outputs.has_staging == 'true' }}
+        continue-on-error: true
+        shell: bash
+        env:
+          YOUPU_ACCEPTED_BASE_REF: origin/${{ github.event.repository.default_branch }}
+        run: |
+          set -o pipefail
+          log_path="$RUNNER_TEMP/finalize-ingest.log"
+          echo "log_path=$log_path" >> "$GITHUB_OUTPUT"
+          uv run python ./scripts/youpu ingest 2>&1 | tee "$log_path"
+
+      - name: Post finalize ingest failure summary
+        if: ${{ steps.pr.outputs.is_fork != 'true' && steps.ingest.outcome == 'failure' }}
+        uses: actions/github-script@v8
+        env:
+          LOG_PATH: ${{ steps.ingest.outputs.log_path }}
+        with:
+          script: |
+            const fs = require("fs");
+            const logPath = process.env.LOG_PATH;
+            const marker = "<!-- youpu:finalize-failure-summary -->";
+            const log = logPath && fs.existsSync(logPath) ? fs.readFileSync(logPath, "utf8") : "";
+            const lines = log
+              .split("\n")
+              .map((line) => line.trimEnd())
+              .filter((line) => line.trim().length > 0);
+            const important = lines.filter((line) =>
+              line.startsWith("Ingest operation failed") ||
+              line.startsWith("ERROR:") ||
+              line.startsWith("WARNING:")
+            );
+            const snippet = (important.length ? important : lines.slice(-20)).slice(0, 20).join("\n");
+            const body = [
+              marker,
+              "**/finalize failed during ingest**",
+              "",
+              "`youpu ingest` failed, so finalize stopped before write-back completed.",
+              "",
+              "```text",
+              snippet || "No log output captured.",
+              "```",
+              "",
+              "Full details are available in the failed `Run ingest when staging is present` step log.",
+            ].join("\n");
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find((comment) =>
+              comment.user.login === "github-actions[bot]" && comment.body.includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+            }
+
+      - name: Commit finalize result
+        if: ${{ steps.pr.outputs.is_fork != 'true' && steps.check_pr.outcome == 'success' && steps.staging.outputs.has_staging == 'true' && steps.ingest.outcome == 'success' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "Finalize PR"
+          git push origin HEAD:${{ steps.pr.outputs.head_ref }}
+
+      - name: Run merge checks
+        id: check_merge
+        if: ${{ steps.pr.outputs.is_fork != 'true' && steps.check_pr.outcome == 'success' && (steps.staging.outputs.has_staging != 'true' || steps.ingest.outcome == 'success') }}
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          log_path="$RUNNER_TEMP/finalize-check-merge.log"
+          echo "log_path=$log_path" >> "$GITHUB_OUTPUT"
+          uv run python ./scripts/youpu check-merge 2>&1 | tee "$log_path"
+
+      - name: Post finalize merge check failure summary
+        if: ${{ steps.pr.outputs.is_fork != 'true' && steps.check_merge.outcome == 'failure' }}
+        uses: actions/github-script@v8
+        env:
+          LOG_PATH: ${{ steps.check_merge.outputs.log_path }}
+        with:
+          script: |
+            const fs = require("fs");
+            const logPath = process.env.LOG_PATH;
+            const marker = "<!-- youpu:finalize-failure-summary -->";
+            const log = logPath && fs.existsSync(logPath) ? fs.readFileSync(logPath, "utf8") : "";
+            const lines = log
+              .split("\n")
+              .map((line) => line.trimEnd())
+              .filter((line) => line.trim().length > 0);
+            const important = lines.filter((line) =>
+              line.startsWith("Merge check failed") ||
+              line.startsWith("ERROR:") ||
+              line.startsWith("WARNING:")
+            );
+            const snippet = (important.length ? important : lines.slice(-20)).slice(0, 20).join("\n");
+            const body = [
+              marker,
+              "**/finalize failed during merge checks**",
+              "",
+              "`youpu check-merge` failed after finalize processing.",
+              "",
+              "```text",
+              snippet || "No log output captured.",
+              "```",
+              "",
+              "Full details are available in the failed `Run merge checks` step log.",
+            ].join("\n");
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find((comment) =>
+              comment.user.login === "github-actions[bot]" && comment.body.includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+            }
+
+      - name: Clear finalize failure summary on success
+        if: ${{ always() && steps.pr.outputs.is_fork != 'true' && steps.check_pr.outcome == 'success' && (steps.staging.outputs.has_staging != 'true' || steps.ingest.outcome == 'success') && steps.check_merge.outcome == 'success' }}
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const marker = "<!-- youpu:finalize-failure-summary -->";
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find((comment) =>
+              comment.user.login === "github-actions[bot]" && comment.body.includes(marker)
+            );
+            if (existing) {
+              await github.rest.issues.deleteComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+              });
+            }
+
+      - name: Fail workflow on finalize command failure
+        if: ${{ always() && (steps.check_pr.outcome == 'failure' || steps.ingest.outcome == 'failure' || steps.check_merge.outcome == 'failure') }}
+        run: exit 1

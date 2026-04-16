@@ -1,0 +1,25 @@
+area/data:
+  - changed-files:
+      - any-glob-to-any-file:
+          - data/**
+
+area/staging:
+  - changed-files:
+      - any-glob-to-any-file:
+          - staging/**
+
+area/docs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - README.md
+          - docs/**
+
+area/infra:
+  - changed-files:
+      - any-glob-to-any-file:
+          - .github/**
+          - pyproject.toml
+          - schemas/**
+          - scripts/**
+          - src/**
+          - uv.lock
