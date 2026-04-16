@@ -30,6 +30,6 @@ env/
 # OS / local temp files
 Thumbs.db
 
-# Ignore all files in the temp directory, except for .gitkeep
-temp/*
-!temp/.gitkeep
+# Ignore all files in the incoming directory, except for .gitkeep
+incoming/*
+!incoming/.gitkeep

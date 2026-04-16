@@ -54,6 +54,11 @@ PR 描述可以直接按下面的格式填写：
 - `add/source-huggingface-dataset`
 - `add/source-example-dataset`
 
+如果你手上还是未标准化的原始文档，可以先放在 `incoming/`：
+
+- `incoming/` 只用于本地暂存未标准化材料，不参与校验、导入或追踪
+- 整理完成后，再把内容移动到 `staging/`
+
 内容请放到下面的默认导入目录：
 
 ```text
