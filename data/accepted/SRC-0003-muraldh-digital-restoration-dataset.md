@@ -1,10 +1,10 @@
 ---
-title: 敦煌壁画数字修复图像数据集（MuralDH）
-summary: Dryad 发布的敦煌壁画数字修复图像数据来源，包含修复、损伤分割和超分辨率研究所需的高分辨率图像与部分标注样本。
-canonical_url: https://datadryad.org/dataset/doi:10.5061/dryad.bnzs7h4jd
-publisher: Dryad
-modality: image
-access_level: open
+title: "敦煌壁画数字修复图像数据集（MuralDH）"
+summary: "Dryad 发布的敦煌壁画数字修复图像数据来源，包含修复、损伤分割和超分辨率研究所需的高分辨率图像与部分标注样本。"
+canonical_url: "https://datadryad.org/dataset/doi:10.5061/dryad.bnzs7h4jd"
+publisher: "Dryad"
+modality: "image"
+access_level: "open"
 tags: [敦煌, 壁画, 图像修复, 损伤分割, 超分辨率, 文化遗产]
 ---
 

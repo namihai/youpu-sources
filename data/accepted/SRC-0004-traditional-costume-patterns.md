@@ -1,10 +1,10 @@
 ---
-title: 传统服饰图案数据集
-summary: Kaggle 上发布的传统服饰纹样图像来源，包含多地域文化服饰图案图像，可用于分类、检索与视觉分析。
-canonical_url: https://www.kaggle.com/datasets/colabsss/cultural-clothing-patterns-dataset
-publisher: Kaggle
-modality: image
-access_level: request
+title: "传统服饰图案数据集"
+summary: "Kaggle 上发布的传统服饰纹样图像来源，包含多地域文化服饰图案图像，可用于分类、检索与视觉分析。"
+canonical_url: "https://www.kaggle.com/datasets/colabsss/cultural-clothing-patterns-dataset"
+publisher: "Kaggle"
+modality: "image"
+access_level: "request"
 tags: [传统服饰, 服饰纹样, 图像分类, 图案检索, 文化遗产]
 ---
 

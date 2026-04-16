@@ -1,10 +1,10 @@
 ---
-title: 传统文献语料
-summary: Kanripo 社区通过 GitHub 组织分发的传统汉文文献文本来源，可用于语料整理、检索与数字人文研究。
-canonical_url: https://github.com/kanripo
-publisher: Kanripo community
-modality: text
-access_level: open
+title: "传统文献语料"
+summary: "Kanripo 社区通过 GitHub 组织分发的传统汉文文献文本来源，可用于语料整理、检索与数字人文研究。"
+canonical_url: "https://github.com/kanripo"
+publisher: "Kanripo community"
+modality: "text"
+access_level: "open"
 tags: [传统文献, 古籍数字化, 语料库, 开源, 数字人文]
 ---
 
