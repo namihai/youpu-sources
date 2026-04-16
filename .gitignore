@@ -29,3 +29,7 @@ env/
 
 # OS / local temp files
 Thumbs.db
+
+# Ignore all files in the temp directory, except for .gitkeep
+temp/*
+!temp/.gitkeep
