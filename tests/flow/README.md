@@ -49,7 +49,7 @@
 | T10 | staging 非法输入 | staging accepted 内部重复 | 失败 | 失败 | 跳过 | 跳过 |
 | T11 | staging 非法输入 | staging rejected 内部重复 | 失败 | 失败 | 跳过 | 跳过 |
 | T12 | staging 非法输入 | staging 中有不支持的文件 | 失败 | 失败 | 跳过 | 跳过 |
-| T13 | staging 非法输入 | staging accepted 文件名非法 | 失败 | 失败 | 跳过 | 跳过 |
+| T13 | staging 非法输入 | staging accepted 文件名非法，包括中文文件名 | 失败 | 失败 | 跳过 | 跳过 |
 | T14 | staging 非法输入 | staging accepted 内容结构非法 | 失败 | 失败 | 跳过 | 跳过 |
 | T15 | staging 非法输入 | staging rejected 表头或行结构非法 | 失败 | 失败 | 跳过 | 跳过 |
 | T16 | data 非法输入 | 正式区 `data/accepted/` 非法 | 失败 | 失败 | 跳过 | 跳过 |
@@ -72,7 +72,13 @@
 
 - accepted 正向样例：直接复用 `tests/source-examples/*.md`
 - rejected 正向样例：由脚本自动构造合法 `rows.csv`
-- accepted / rejected 异常样例：由脚本自动变异生成
+- accepted / rejected 异常样例：由脚本自动变异生成，包括 accepted 中文文件名
+
+命名相关规则：
+
+- `staging/accepted/*.md` 的文件名必须是用户提供的合法英文 slug
+- ingest 只负责给 accepted 正式文件名补 `SRC-####` 编号前缀
+- ingest 不负责生成、翻译、改写或规范化 slug
 
 常用命令：
 

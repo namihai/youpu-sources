@@ -37,6 +37,28 @@ access_level: "open"
         self.assertEqual(report.rejected_ready, 1)
         self.assertTrue(report.has_candidates)
 
+    def test_run_imports_check_rejects_chinese_staging_accepted_filename(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = create_repo_skeleton(Path(tmp))
+            (repo_root / "staging" / "accepted" / "敦煌壁画数据集.md").write_text(
+                """---
+title: "Sample"
+summary: "Sample text dataset source."
+canonical_url: "https://example.com/path"
+publisher: "Org"
+modality: "text"
+access_level: "open"
+---
+""",
+                encoding="utf-8",
+            )
+
+            report = run_imports_check(repo_root)
+
+        self.assertFalse(report.ok)
+        self.assertEqual(report.accepted_ready, 0)
+        self.assertTrue(any(item.code == "staging_accepted_invalid_filename" for item in report.diagnostics))
+
     def test_run_merge_check_flags_pending_staging(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo_root = create_repo_skeleton(Path(tmp))

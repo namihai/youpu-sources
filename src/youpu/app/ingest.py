@@ -22,7 +22,6 @@ from youpu.app.staging import StagingAnalysis
 from youpu.app.staging import build_staging_analysis
 from youpu.app.staging import has_staging_candidates
 
-SLUG_CLEAN_RE = re.compile(r"[^a-z0-9]+")
 ACCEPTED_FILENAME_RE = re.compile(r"^SRC-(\d{4})-[a-z0-9-]+\.md$")
 
 
@@ -142,12 +141,6 @@ def build_summary(analysis: StagingAnalysis, repo_root: Path) -> str:
         f"accepted candidates ready: {len(analysis.accepted_ready)}",
         f"rejected candidates ready: {len(analysis.rejected_ready)}",
     ])
-def slugify(text: str) -> str:
-    lowered = text.strip().lower()
-    slug = SLUG_CLEAN_RE.sub("-", lowered).strip("-")
-    return slug or "imported"
-
-
 def next_accepted_index(repo_root: Path, accepted_dir: Path) -> int:
     max_index = 0
     for path in accepted_dir.glob("*.md"):
@@ -181,7 +174,7 @@ def max_accepted_index_at_ref(repo_root: Path, ref: str) -> int:
 
 
 def target_accepted_path(repo_root: Path, doc: AcceptedDocument, index: int) -> Path:
-    source_slug = slugify(doc.path.stem)
+    source_slug = doc.path.stem
     return get_accepted_dir(repo_root) / f"SRC-{index:04d}-{source_slug}.md"
 
 

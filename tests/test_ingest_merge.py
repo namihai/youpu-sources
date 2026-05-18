@@ -60,6 +60,33 @@ Body text.
         self.assertEqual(accepted_doc.yaml_fields["publisher"], "Example Org")
         self.assertEqual(rejected_csv.rows[0].url, "https://example.com/rejected")
 
+    def test_invalid_staging_filename_is_not_slugified_or_imported(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = create_repo_skeleton(Path(tmp))
+            accepted_path = repo_root / "staging" / "accepted" / "Sample Dataset.md"
+            accepted_path.write_text(
+                """---
+title: "Sample Title"
+summary: "A sample text dataset source."
+canonical_url: "https://example.com/dataset"
+publisher: "Example Org"
+modality: "text"
+access_level: "open"
+---
+""",
+                encoding="utf-8",
+            )
+
+            analysis = build_analysis(repo_root)
+            result = merge_ingest(repo_root, analysis)
+
+            accepted_files = list((repo_root / "data" / "accepted").glob("*.md"))
+            self.assertTrue(any(item.code == "staging_accepted_invalid_filename" for item in analysis.diagnostics))
+            self.assertEqual(analysis.accepted_ready, [])
+            self.assertEqual(result["imported_accepted"], 0)
+            self.assertEqual(accepted_files, [])
+            self.assertTrue(accepted_path.exists())
+
     def test_merge_ingest_keeps_sources_when_write_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo_root = create_repo_skeleton(Path(tmp))
