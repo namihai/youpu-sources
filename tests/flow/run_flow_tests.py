@@ -268,7 +268,7 @@ def setup_case(case: FlowCase, repo_root: Path) -> None:
     if case.case_id == "T13":
         write_staging_accepted(
             repo_root,
-            "SRC-0001-invalid-name.md",
+            "敦煌壁画数据集.md",
             accepted_fixture(example_a),
         )
         return

@@ -130,6 +130,7 @@ CLI 识别的导入区边界为：
 
 - `staging/accepted/*.md`
 - `staging/rejected/rows.csv`
+- accepted 候选文件名是否为用户提供的合法英文 slug
 - 与正式区的冲突
 - `staging/` 内部重复
 
@@ -237,13 +238,15 @@ accepted / rejected 的结构定义应集中放在 `schemas/*.json` 中，由 CL
 
 - URL 规范化
 - accepted 编号分配
-- 文件名 slug 规范化
 
 不允许自动修正：
 
+- 文件名 slug 生成、翻译、改写或规范化
 - 缺失事实字段补全
 - accepted / rejected 分类猜测
 - 主观判断型冲突处理
+
+accepted 入库时，CLI 只自动分配正式文件名中的 `SRC-####` 编号前缀。`slug` 必须来自 `staging/accepted/*.md` 的用户文件名，并且必须已经符合英文命名规范。
 
 ## 相关文档
 

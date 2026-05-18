@@ -51,5 +51,5 @@ def validate_staging_accepted_filename(path: str | Path) -> str | None:
     if name.startswith("SRC-"):
         return "staging markdown must not use the final `SRC-####-slug.md` naming"
     if not STAGING_ACCEPTED_NAME_RE.match(name):
-        return "staging markdown filename must use lowercase letters, digits, and hyphens"
+        return "staging markdown filename must be an English slug using lowercase ASCII letters, digits, and hyphens"
     return None
