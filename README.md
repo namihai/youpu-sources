@@ -19,7 +19,7 @@
 推荐先使用 `uv` 创建并管理本地环境：
 
 ```bash
-uv venv --python 3.14.4
+uv venv --python 3.14
 uv run python ./scripts/youpu report
 ```
 
