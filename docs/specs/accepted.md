@@ -2,14 +2,14 @@
 
 ## 定义
 
-`data/accepted/` 中的记录表示：某个数据集来源已经过核验，确认真实存在，并值得在仓库中保留。
+`data/` 中的记录表示：某个数据集来源已经过核验，确认真实存在，并值得在仓库中保留。
 
 这里记录的是“来源”，不是数据集文件本身。
 
 ## 文件形式
 
 - 每条记录对应一个 Markdown 文件
-- 文件放在 `data/accepted/` 目录下
+- 文件放在 `data/` 目录下
 - 文件名遵循统一命名规则
 - accepted 的字段定义以 [`../../schemas/accepted.json`](../../schemas/accepted.json) 为准
 - [`../../templates/accepted.md`](../../templates/accepted.md) 是面向贡献者的填写模板，结构需要与 schema 保持一致
@@ -17,7 +17,7 @@
 
 ## 文件命名
 
-`data/accepted/` 下的文件名统一使用以下格式：
+`data/` 下的文件名统一使用以下格式：
 
 ```text
 SRC-####-slug.md
@@ -47,11 +47,11 @@ SRC-0003-figshare-dunhuang-restoration.md
 - 不建议包含随机 hash
 - 不建议直接使用超长中文标题
 
-正式入库时，系统只负责自动分配 `SRC-####` 编号前缀；`slug` 必须由用户在 `staging/accepted/` 的文件名中提供。系统不会替用户生成、翻译、改写或规范化 `slug`。
+正式入库时，系统只负责自动分配 `SRC-####` 编号前缀；`slug` 必须由用户在 `staging/` 的文件名中提供。系统不会替用户生成、翻译、改写或规范化 `slug`。
 
 维护者如果要在本地调试 accepted 导入流程，可以按下面方式验证：
 
-1. 用户先把候选 Markdown 放进 `staging/accepted/`
+1. 用户先把候选 Markdown 放进 `staging/`
 2. 运行 `uv run python ./scripts/youpu validate-imports`
 3. 修正问题后运行 `uv run python ./scripts/youpu ingest`
 

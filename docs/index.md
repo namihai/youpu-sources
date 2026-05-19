@@ -32,10 +32,9 @@
 ## 规范
 
 - accepted 规范：[specs/accepted.md](specs/accepted.md)
-- rejected 规范：[specs/rejected.md](specs/rejected.md)
 - schema 规范：[specs/schema.md](specs/schema.md)
 - URL 规范：[specs/url.md](specs/url.md)
-- Schema 配置：[../schemas/accepted.json](../schemas/accepted.json) / [../schemas/rejected.json](../schemas/rejected.json)
+- Schema 配置：[../schemas/accepted.json](../schemas/accepted.json)
 
 ## 说明
 

@@ -154,13 +154,10 @@ jobs:
         id: staging
         run: |
           has_staging=false
-          if [ -d staging/accepted ]; then
-            if find staging/accepted -type f -name '*.md' ! -name '.gitkeep' | grep -q .; then
+          if [ -d staging ]; then
+            if find staging -maxdepth 1 -type f -name '*.md' ! -name '.gitkeep' | grep -q .; then
               has_staging=true
             fi
-          fi
-          if [ -f staging/rejected/rows.csv ]; then
-            has_staging=true
           fi
           echo "has_staging=${has_staging}" >> "$GITHUB_OUTPUT"
 

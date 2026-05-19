@@ -1,13 +1,12 @@
 # URL 规范
 
-这份文档定义本仓库中 `canonical_url` 与 `data/rejected.csv:url` 的统一规范。
+这份文档定义本仓库中 `canonical_url` 的统一规范。
 
 适用范围：
 
-- `data/accepted/*.md` 中的 `canonical_url`
-- `data/rejected.csv` 中的 `url`
+- `data/*.md` 中的 `canonical_url`
 - `uv run python ./scripts/youpu ingest`
-- 任何做去重或交叉冲突检查的逻辑
+- 任何做去重检查的逻辑
 
 ## 目标
 
@@ -106,5 +105,4 @@ https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi%3A10.7910%2FDVN%2F7
 ## 相关文档
 
 - accepted 规范：[accepted.md](accepted.md)
-- rejected 规范：[rejected.md](rejected.md)
 - CLI 接口说明：[../reference/cli.md](../reference/cli.md)

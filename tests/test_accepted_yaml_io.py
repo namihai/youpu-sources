@@ -37,7 +37,7 @@ title = invalid
     def test_serialize_accepted_round_trips_special_characters(self) -> None:
         repo_root = Path(__file__).resolve().parents[1]
         doc = AcceptedDocument(
-            path=repo_root / "staging/accepted/example.md",
+            path=repo_root / "staging/example.md",
             index=None,
             slug=None,
             yaml_fields={

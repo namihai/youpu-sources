@@ -3,21 +3,15 @@ from __future__ import annotations
 import os
 import re
 import subprocess
-from collections import defaultdict
 from pathlib import Path
 from uuid import uuid4
 
 from youpu.domain.accepted import AcceptedDocument
 from youpu.domain.schema import get_accepted_field_order
-from youpu.domain.schema import load_schema_rules
 from youpu.domain.urls import normalize_url
 from youpu.infra.accepted_store import serialize_simple_yaml_mapping
-from youpu.infra.rejected_store import parse_rejected_csv
-from youpu.infra.rejected_store import write_rejected_csv
 from youpu.infra.repo_layout import get_accepted_dir
-from youpu.infra.repo_layout import get_rejected_csv_path
 from youpu.infra.repo_layout import get_staging_layout
-from youpu.app.staging import RejectedImportRow
 from youpu.app.staging import StagingAnalysis
 from youpu.app.staging import build_staging_analysis
 from youpu.app.staging import has_staging_candidates
@@ -46,7 +40,6 @@ def merge_ingest(repo_root: Path, analysis: StagingAnalysis) -> dict[str, int | 
     accepted_dir.mkdir(parents=True, exist_ok=True)
     next_index = next_accepted_index(repo_root, accepted_dir)
     imported_accepted = 0
-    imported_rejected = 0
     temp_paths: list[Path] = []
     replace_pairs: list[tuple[Path, Path]] = []
     delete_targets: list[Path] = []
@@ -59,22 +52,6 @@ def merge_ingest(repo_root: Path, analysis: StagingAnalysis) -> dict[str, int | 
         next_index += 1
         ready_accepted_targets.append((doc, target))
 
-    rejected_csv = get_rejected_csv_path(repo_root)
-    rejected_csv.parent.mkdir(parents=True, exist_ok=True)
-    existing_rows: list[tuple[str, str, str]] = []
-    if rejected_csv.exists():
-        parsed = parse_rejected_csv(rejected_csv)
-        existing_rows = [(row.url, row.title, row.reason) for row in parsed.rows]
-
-    ready_row_keys = {(row.source_path, row.row_number) for row in analysis.rejected_ready}
-    rows_by_file: dict[Path, list[RejectedImportRow]] = defaultdict(list)
-    for row in analysis.rejected_rows:
-        rows_by_file[row.source_path].append(row)
-    for row in analysis.rejected_ready:
-        existing_rows.append((normalize_url(row.url), row.title.strip(), row.reason.strip()))
-        imported_rejected += 1
-
-    columns = load_schema_rules(repo_root).rejected_column_names
     try:
         for doc, target in ready_accepted_targets:
             temp_path = _temp_path_for(target)
@@ -83,22 +60,6 @@ def merge_ingest(repo_root: Path, analysis: StagingAnalysis) -> dict[str, int | 
             replace_pairs.append((temp_path, target))
             delete_targets.append(doc.path)
             imported_accepted += 1
-
-        if analysis.rejected_ready:
-            temp_path = _temp_path_for(rejected_csv)
-            write_rejected_csv(temp_path, columns, existing_rows)
-            temp_paths.append(temp_path)
-            replace_pairs.append((temp_path, rejected_csv))
-
-        for source_path, rows in rows_by_file.items():
-            remaining = [row for row in rows if (row.source_path, row.row_number) not in ready_row_keys]
-            if not remaining:
-                delete_targets.append(source_path)
-                continue
-            temp_path = _temp_path_for(source_path)
-            write_rejected_csv(temp_path, columns, [(row.url, row.title, row.reason) for row in remaining])
-            temp_paths.append(temp_path)
-            replace_pairs.append((temp_path, source_path))
 
         for temp_path, target_path in replace_pairs:
             backup_path = _backup_path_for(target_path)
@@ -130,7 +91,7 @@ def merge_ingest(repo_root: Path, analysis: StagingAnalysis) -> dict[str, int | 
                 if backup_path.exists():
                     backup_path.unlink()
 
-    return {"imported_accepted": imported_accepted, "imported_rejected": imported_rejected, "staging_root": "staging"}
+    return {"imported_accepted": imported_accepted, "staging_root": "staging"}
 
 
 def build_summary(analysis: StagingAnalysis, repo_root: Path) -> str:
@@ -139,7 +100,6 @@ def build_summary(analysis: StagingAnalysis, repo_root: Path) -> str:
         "Ingest completed",
         f"staging root: {layout.root.relative_to(repo_root)}",
         f"accepted candidates ready: {len(analysis.accepted_ready)}",
-        f"rejected candidates ready: {len(analysis.rejected_ready)}",
     ])
 def next_accepted_index(repo_root: Path, accepted_dir: Path) -> int:
     max_index = 0
@@ -156,7 +116,7 @@ def next_accepted_index(repo_root: Path, accepted_dir: Path) -> int:
 def max_accepted_index_at_ref(repo_root: Path, ref: str) -> int:
     try:
         result = subprocess.run(
-            ["git", "ls-tree", "-r", "--name-only", ref, "data/accepted"],
+            ["git", "ls-tree", "-r", "--name-only", ref, "data"],
             cwd=repo_root,
             check=True,
             capture_output=True,

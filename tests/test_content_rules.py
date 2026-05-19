@@ -6,7 +6,6 @@ from pathlib import Path
 from youpu.domain.accepted import AcceptedDocument
 from youpu.domain.accepted import parse_inline_array
 from youpu.domain.rules import validate_accepted_document
-from youpu.domain.rules import validate_rejected_values
 from youpu.domain.schema import SchemaRules
 from youpu.domain.urls import normalize_url
 
@@ -21,7 +20,6 @@ class ContentRulesTests(unittest.TestCase):
                 "modality": ("text", "image", "audio", "video", "tabular", "geospatial", "multimodal", "other"),
                 "access_level": ("open", "request", "restricted", "unknown"),
             },
-            rejected_column_names=["url", "title", "reason"],
         )
 
     def test_validate_accepted_document_reports_schema_errors(self) -> None:
@@ -43,7 +41,7 @@ class ContentRulesTests(unittest.TestCase):
 
         diagnostics, normalized_url = validate_accepted_document(
             doc,
-            rel_path="data/accepted/example.md",
+            rel_path="data/example.md",
             rules=self.rules,
             code_prefix="accepted",
         )
@@ -78,32 +76,13 @@ class ContentRulesTests(unittest.TestCase):
 
         diagnostics, normalized_url = validate_accepted_document(
             doc,
-            rel_path="staging/accepted/example.md",
+            rel_path="staging/example.md",
             rules=self.rules,
             code_prefix="staging_accepted",
         )
 
         self.assertEqual(diagnostics, [])
         self.assertEqual(normalized_url, "https://example.com/path?id=1")
-
-    def test_validate_rejected_values_reports_missing_and_invalid_fields(self) -> None:
-        diagnostics, normalized_url = validate_rejected_values(
-            url="bad-url",
-            title="",
-            reason="",
-            path="data/rejected.csv:2",
-            code_prefix="rejected",
-        )
-
-        self.assertIsNone(normalized_url)
-        self.assertEqual(
-            [item.code for item in diagnostics],
-            [
-                "rejected_invalid_url",
-                "rejected_missing_title",
-                "rejected_missing_reason",
-            ],
-        )
 
     def test_validate_accepted_document_rejects_invalid_enum_value(self) -> None:
         doc = AcceptedDocument(
@@ -123,7 +102,7 @@ class ContentRulesTests(unittest.TestCase):
 
         diagnostics, normalized_url = validate_accepted_document(
             doc,
-            rel_path="staging/accepted/example.md",
+            rel_path="staging/example.md",
             rules=self.rules,
             code_prefix="staging_accepted",
         )
@@ -150,7 +129,7 @@ class ContentRulesTests(unittest.TestCase):
 
         diagnostics, normalized_url = validate_accepted_document(
             doc,
-            rel_path="staging/accepted/example.md",
+            rel_path="staging/example.md",
             rules=self.rules,
             code_prefix="staging_accepted",
         )

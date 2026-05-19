@@ -21,7 +21,7 @@ class RepoRootTests(unittest.TestCase):
     def test_find_repo_root_walks_up_from_nested_path(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo_root = create_repo_skeleton(Path(tmp))
-            nested = repo_root / "staging" / "accepted"
+            nested = repo_root / "staging" / "nested"
             nested.mkdir(parents=True, exist_ok=True)
 
             detected = find_repo_root(nested)

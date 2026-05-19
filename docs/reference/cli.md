@@ -2,7 +2,7 @@
 
 这份文档定义 `youpu` 的命令接口、返回码和行为边界。
 
-这里的 `youpu` 表示逻辑接口名。仓库内推荐执行入口是 `uv run python ./scripts/youpu`，例如：
+仓库内推荐执行入口是 `uv run python ./scripts/youpu`，例如：
 
 ```bash
 uv run python ./scripts/youpu check-pr
@@ -25,14 +25,12 @@ uv run python ./scripts/youpu check-pr
 - Git 提交或推送
 - 外部来源发现
 - 自动补全事实字段
-- 接受或拒绝结论的主观判断
+- accepted 结论的主观判断
 - PR 权限控制
 
 这些职责应分别由 GitHub、维护者和仓库外围流程承担。
 
 ## 命令入口
-
-逻辑入口：
 
 ```bash
 youpu [--format text|json] [--root <path>] <command> [command_args]
@@ -75,8 +73,9 @@ youpu [--format text|json] [--root <path>] <command> [command_args]
 
 CLI 识别的导入区边界为：
 
-- `staging/accepted/*.md`：accepted 候选输入
-- `staging/rejected/rows.csv`：rejected 候选输入
+- `staging/*.md`：accepted 候选输入
+
+`staging/` 中出现其他目录或文件时，检查会失败。
 
 ## 命令规格
 
@@ -89,9 +88,7 @@ CLI 识别的导入区边界为：
 检查范围：
 
 - `schemas/accepted.json`
-- `schemas/rejected.json`
 - `templates/accepted.md`
-- `templates/rejected.rows.csv`
 
 约束：
 
@@ -106,14 +103,9 @@ CLI 识别的导入区边界为：
 
 检查范围：
 
-- `data/accepted/`
-- `data/rejected.csv`
+- `data/`
 - 正式区重复
-- accepted / rejected 冲突
-
-补充：
-
-- 缺失 `data/rejected.csv` 时，按“正式 rejected 为空表”处理，不单独报错
+- `data/` 根目录中的非规范文件或目录
 
 约束：
 
@@ -128,11 +120,11 @@ CLI 识别的导入区边界为：
 
 检查范围：
 
-- `staging/accepted/*.md`
-- `staging/rejected/rows.csv`
+- `staging/*.md`
 - accepted 候选文件名是否为用户提供的合法英文 slug
 - 与正式区的冲突
 - `staging/` 内部重复
+- `staging/` 根目录中的非规范文件或目录
 
 约束：
 
@@ -163,8 +155,7 @@ CLI 识别的导入区边界为：
 
 - 调用 `validate-schema`
 - 调用 `validate-repo`
-- 要求 `staging/accepted/` 没有待处理 Markdown
-- 要求 `staging/rejected/rows.csv` 不存在
+- 要求 `staging/` 没有待处理 Markdown
 - 要求当前分支没有遗留导入问题
 
 ### `ingest`
@@ -175,17 +166,11 @@ CLI 识别的导入区边界为：
 
 行为：
 
-- 读取 `staging/`
+- 读取 `staging/*.md`
 - 校验候选内容
 - 进行确定性修正
-- 写入 `data/accepted/` / `data/rejected.csv`
+- 写入 `data/`
 - 删除已处理输入
-- 如果正式 `data/rejected.csv` 不存在且本次有合法 rejected 候选，会自动创建该文件
-
-输入约束：
-
-- `staging/accepted/*.md` 作为 accepted 候选输入
-- `staging/rejected/rows.csv` 作为 rejected 候选输入
 
 约束：
 
@@ -221,10 +206,6 @@ JSON 输出固定包含：
 - `code`
 - `details`
 
-`data` 的具体字段按命令不同而不同，但命名应与仓库结构保持一致：
-
-- staging 相关字段使用 `staging_*`
-
 文本输出不承诺与 JSON 同构。文本输出保证：
 
 - 第一行输出摘要 `summary`
@@ -232,7 +213,7 @@ JSON 输出固定包含：
 
 ## 自动修正边界
 
-accepted / rejected 的结构定义应集中放在 `schemas/*.json` 中，由 CLI 的校验与序列化逻辑共享；新增或删除字段时，应优先修改 schema 定义，而不是在多个命令中分别维护字段列表。模板保持手写，但必须通过 `validate-schema` 与 schema 保持一致。schema 的维护关系与修改顺序见 [`../specs/schema.md`](../specs/schema.md)。
+accepted 的结构定义应集中放在 `schemas/accepted.json` 中，由 CLI 的校验与序列化逻辑共享；新增或删除字段时，应优先修改 schema 定义，而不是在多个命令中分别维护字段列表。模板保持手写，但必须通过 `validate-schema` 与 schema 保持一致。schema 的维护关系与修改顺序见 [`../specs/schema.md`](../specs/schema.md)。
 
 允许自动修正：
 
@@ -243,10 +224,10 @@ accepted / rejected 的结构定义应集中放在 `schemas/*.json` 中，由 CL
 
 - 文件名 slug 生成、翻译、改写或规范化
 - 缺失事实字段补全
-- accepted / rejected 分类猜测
+- accepted 分类猜测
 - 主观判断型冲突处理
 
-accepted 入库时，CLI 只自动分配正式文件名中的 `SRC-####` 编号前缀。`slug` 必须来自 `staging/accepted/*.md` 的用户文件名，并且必须已经符合英文命名规范。
+accepted 入库时，CLI 只自动分配正式文件名中的 `SRC-####` 编号前缀。`slug` 必须来自 `staging/*.md` 的用户文件名，并且必须已经符合英文命名规范。
 
 ## 相关文档
 

@@ -16,7 +16,8 @@
 - `staging/` 非空会导致 `check-merge` 失败，错误码为 `merge_pending_staging`
 - `/finalize` 是唯一维护者入口
 - 如果 `staging/` 为空，`/finalize` 不执行 ingest，只验证当前分支是否可合并
-- 如果 `staging/` 不为空，`/finalize` 会执行 ingest，再验证当前分支是否可合并
+- 如果 `staging/` 有候选，`/finalize` 会执行 ingest，再验证当前分支是否可合并
+- `data/` 和 `staging/` 根目录中的非规范文件或目录应导致检查失败
 - 只要存在任何 `error`，`check-pr` 失败，`/finalize` 也不会执行部分导入
 
 ## 维护者极简原则
@@ -39,28 +40,22 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | T01 | data 基线 | `data` 空，`staging` 空 | 通过 | 通过 | 跳过 | 跳过 |
 | T02 | data 基线 | `data` 非空，`staging` 空 | 通过 | 通过 | 跳过 | 跳过 |
-| T03 | staging 主路径 | `data` 空，`staging/accepted` 合法 | 通过 | 失败 | 通过 | 通过 |
-| T04 | staging 主路径 | `data` 空，`staging/rejected` 合法 | 通过 | 失败 | 通过 | 通过 |
-| T05 | staging 主路径 | `data` 非空，`staging` 同时有 accepted 和 rejected | 通过 | 失败 | 通过 | 通过 |
-| T06 | staging 冲突 | staging accepted 与 `data/accepted/` 重复 | 失败 | 失败 | 跳过 | 跳过 |
-| T07 | staging 冲突 | staging accepted 与 `data/rejected.csv` 冲突 | 失败 | 失败 | 跳过 | 跳过 |
-| T08 | staging 冲突 | staging rejected 与 `data/rejected.csv` 重复 | 失败 | 失败 | 跳过 | 跳过 |
-| T09 | staging 冲突 | staging rejected 与 `data/accepted/` 冲突 | 失败 | 失败 | 跳过 | 跳过 |
-| T10 | staging 非法输入 | staging accepted 内部重复 | 失败 | 失败 | 跳过 | 跳过 |
-| T11 | staging 非法输入 | staging rejected 内部重复 | 失败 | 失败 | 跳过 | 跳过 |
-| T12 | staging 非法输入 | staging 中有不支持的文件 | 失败 | 失败 | 跳过 | 跳过 |
-| T13 | staging 非法输入 | staging accepted 文件名非法，包括中文文件名 | 失败 | 失败 | 跳过 | 跳过 |
-| T14 | staging 非法输入 | staging accepted 内容结构非法 | 失败 | 失败 | 跳过 | 跳过 |
-| T15 | staging 非法输入 | staging rejected 表头或行结构非法 | 失败 | 失败 | 跳过 | 跳过 |
-| T16 | data 非法输入 | 正式区 `data/accepted/` 非法 | 失败 | 失败 | 跳过 | 跳过 |
-| T17 | data 非法输入 | 正式区 `data/rejected.csv` 非法 | 失败 | 失败 | 跳过 | 跳过 |
-| T18 | data 非法输入 | 正式区 accepted / rejected 交叉冲突 | 失败 | 失败 | 跳过 | 跳过 |
-| T19 | 边界验证 | pending staging 时 `pr-check` 过、`check-merge` 失败 | 通过 | 失败 | 通过 | 通过 |
-| T20 | 闭环验证 | ingest 成功后再次 `check-merge` | 通过 | 失败 | 通过 | 通过 |
+| T03 | staging 主路径 | `data` 空，`staging` 合法 | 通过 | 失败 | 通过 | 通过 |
+| T04 | staging 主路径 | `data` 非空，`staging` 合法 | 通过 | 失败 | 通过 | 通过 |
+| T05 | staging 冲突 | staging accepted 与 `data/` 重复 | 失败 | 失败 | 跳过 | 跳过 |
+| T06 | staging 非法输入 | staging accepted 内部 canonical_url 重复 | 失败 | 失败 | 跳过 | 跳过 |
+| T07 | staging 非法输入 | staging 中有不支持的文件 | 失败 | 失败 | 跳过 | 跳过 |
+| T08 | staging 非法输入 | staging accepted 文件名非法，包括中文文件名 | 失败 | 失败 | 跳过 | 跳过 |
+| T09 | staging 非法输入 | staging accepted 内容结构非法 | 失败 | 失败 | 跳过 | 跳过 |
+| T10 | data 非法输入 | 正式区 `data/` 非法 | 失败 | 失败 | 跳过 | 跳过 |
+| T11 | data 非法输入 | 正式区存在 `data/` 之外的文件 | 失败 | 失败 | 跳过 | 跳过 |
+| T12 | staging 非法输入 | staging 中存在 `staging/` 之外的目录 | 失败 | 失败 | 跳过 | 跳过 |
+| T13 | 边界验证 | pending staging 时 `pr-check` 过、`check-merge` 失败 | 通过 | 失败 | 通过 | 通过 |
+| T14 | 闭环验证 | ingest 成功后再次 `check-merge` | 通过 | 失败 | 通过 | 通过 |
 
 ## 本地自动化
 
-当前本地 runner 已覆盖 `T01-T20` 全部流程用例。
+当前本地 runner 已覆盖 `T01-T14` 全部流程用例。
 
 目录：
 
@@ -71,12 +66,12 @@
 输入素材：
 
 - accepted 正向样例：直接复用 `tests/source-examples/*.md`
-- rejected 正向样例：由脚本自动构造合法 `rows.csv`
-- accepted / rejected 异常样例：由脚本自动变异生成，包括 accepted 中文文件名
+- accepted 异常样例：由脚本自动变异生成，包括 accepted 中文文件名
+- 非规范路径样例：由脚本构造，用于确认检查会失败
 
 命名相关规则：
 
-- `staging/accepted/*.md` 的文件名必须是用户提供的合法英文 slug
+- `staging/*.md` 的文件名必须是用户提供的合法英文 slug
 - ingest 只负责给 accepted 正式文件名补 `SRC-####` 编号前缀
 - ingest 不负责生成、翻译、改写或规范化 slug
 
@@ -112,23 +107,21 @@ uv run python tests/flow/run_flow_tests.py --run --case T01 --case T03
 accepted：
 
 - 正向：直接复用 `tests/source-examples/*.md`
-- 冲突：把相同来源同时写入 `data/accepted/` 和 `staging/accepted/`
-- 重复：在 `staging/accepted/` 中制造相同规范化 `canonical_url`
+- 冲突：把相同来源同时写入 `data/` 和 `staging/`
+- 重复：在 `staging/` 中制造相同规范化 `canonical_url`
 - 非法：删除必填字段、改坏 URL、改坏文件名
 
-rejected：
+非规范路径：
 
-- 正向：脚本构造合法 `rows.csv`
-- 冲突：把相同 URL 同时写到正式区和 staging
-- 重复：在同一个 `rows.csv` 中制造相同规范化 URL
-- 非法：改坏表头、改坏 URL、改坏字段数
+- `data/rows.csv`：构造正式区根目录文件，期望 `data_unexpected_file`
+- `staging/extra/`：构造 staging 根目录额外目录，期望 `staging_unexpected_file`
 
 ## 推荐执行顺序
 
 1. 先跑 data 基线：T01-T02
-2. 再跑 staging 主路径：T03-T05
-3. 再跑高风险失败路径：T06-T18
-4. 最后跑边界与闭环：T19-T20
+2. 再跑 staging 主路径：T03-T04
+3. 再跑高风险失败路径：T05-T12
+4. 最后跑边界与闭环：T13-T14
 
 ## 高价值回归子集
 
@@ -137,11 +130,11 @@ rejected：
 - T01
 - T02
 - T03
+- T04
 - T05
 - T06
-- T08
-- T10
-- T19
+- T07
+- T12
 
 ## 下一阶段
 

@@ -33,7 +33,7 @@
 - 候选内容本身是否合理
 - `check-pr` 是否通过
 - PR diff 是否只包含本次候选输入
-- 如果是 staging PR，最好确认 `staging/` 里确实有候选内容；空 staging 不会阻塞 `check-pr`，但也没有可导入内容
+- 如果是 staging PR，最好确认 `staging/` 里确实有 `*.md` 候选；没有候选 Markdown 不会阻塞 `check-pr`，但也没有可导入内容
 
 如果是修改或删除正式记录，维护者应确认：
 
@@ -66,18 +66,18 @@
 
 `/finalize` 会先跑 `uv run python ./scripts/youpu check-pr`，然后分两种情况：
 
-- 如果 `staging/` 为空：
+- 如果没有 `staging/*.md` 候选：
   1. 不执行 ingest
   2. 直接执行 `uv run python ./scripts/youpu check-merge`
-- 如果 `staging/` 不为空：
+- 如果存在 `staging/*.md` 候选：
   1. 执行 `uv run python ./scripts/youpu ingest`
   2. 自动提交结果回原分支
   3. 执行 `uv run python ./scripts/youpu check-merge`
 
 维护者需要确认：
 
-- 如果这次 PR 包含 staging 输入，确认 `staging/accepted/*.md` 和 `staging/rejected/rows.csv` 已被清空
-- `data/accepted/` 或 `data/rejected.csv` 的正式结果符合预期
+- 如果这次 PR 包含 staging 输入，确认 `staging/*.md` 已被清空
+- `data/` 的正式结果符合预期
 - PR checks 最终为绿色
 - 如果命令失败，优先看 PR 评论区里 GitHub Actions 自动回贴的失败摘要；需要更细节时再点进失败 step 日志
 

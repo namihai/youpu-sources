@@ -70,7 +70,7 @@
 workflow 会：
 
 1. 再跑一次 `uv run python ./scripts/youpu check-pr`
-2. 若 `staging/` 不为空，则执行 `uv run python ./scripts/youpu ingest`
+2. 若存在 `staging/*.md` 候选，则执行 `uv run python ./scripts/youpu ingest`
 3. 若本次发生写回，则自动提交结果回原分支
 4. 执行 `uv run python ./scripts/youpu check-merge`
 

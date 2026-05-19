@@ -20,7 +20,6 @@ def build_summary(report: ImportsCheck, layout: StagingLayout, repo_root: Path, 
             header,
             f"staging root: {layout.root.relative_to(repo_root)}",
             f"accepted candidates ready: {report.accepted_ready}",
-            f"rejected candidates ready: {report.rejected_ready}",
             f"issues: {len(report.diagnostics)}",
         ]
     )
@@ -42,7 +41,6 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             data={
                 "staging_root": str(layout.root.relative_to(repo_root)),
                 "accepted_ready": report.accepted_ready,
-                "rejected_ready": report.rejected_ready,
             },
         ),
         EXIT_OK if ok else EXIT_VALIDATION_FAILED,

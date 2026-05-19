@@ -84,8 +84,8 @@ PYTHONPATH=src python3 -m unittest discover -s tests
 
 - 仓库目录布局
 - schema 文件读取
-- accepted / rejected 文件读写
-- 与 `Path`、`csv`、磁盘文件等基础设施打交道
+- accepted 文件读写
+- 与 `Path`、Markdown、JSON、磁盘文件等基础设施打交道
 
 如果代码直接依赖文件路径、目录结构、文件格式或磁盘操作，它更适合放在 `infra`。
 
@@ -96,7 +96,7 @@ PYTHONPATH=src python3 -m unittest discover -s tests
 - 新增一个对外命令：放 `src/youpu/cli/commands/`
 - 新增一个完整检查流程或 ingest 流程：放 `src/youpu/app/`
 - 新增一个字段规则、重复判断、URL 处理：放 `src/youpu/domain/`
-- 新增一个 markdown/csv/json 文件解析器或 repo 布局函数：放 `src/youpu/infra/`
+- 新增一个 Markdown/JSON 文件解析器或 repo 布局函数：放 `src/youpu/infra/`
 
 ## 不推荐的做法
 

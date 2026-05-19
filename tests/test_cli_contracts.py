@@ -35,7 +35,7 @@ class CliContractsTests(unittest.TestCase):
     def test_check_merge_reports_pending_staging_in_json(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo_root = create_repo_skeleton(Path(tmp))
-            staging_doc = repo_root / "staging" / "accepted" / "sample.md"
+            staging_doc = repo_root / "staging" / "sample.md"
             staging_doc.write_text(
                 """---
 title: "Sample"
