@@ -31,7 +31,6 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
                 data={
                     "staging_root": str(layout.root.relative_to(repo_root)),
                     "accepted_ready": len(analysis.accepted_ready),
-                    "rejected_ready": len(analysis.rejected_ready),
                 },
             ),
             EXIT_VALIDATION_FAILED,
@@ -47,7 +46,6 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
                 data={
                     "staging_root": str(layout.root.relative_to(repo_root)),
                     "accepted_ready": len(analysis.accepted_ready),
-                    "rejected_ready": len(analysis.rejected_ready),
                 },
             ),
             EXIT_VALIDATION_FAILED,
@@ -65,7 +63,6 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
                 data={
                     "staging_root": str(layout.root.relative_to(repo_root)),
                     "accepted_ready": len(analysis.accepted_ready),
-                    "rejected_ready": len(analysis.rejected_ready),
                 },
             ),
             EXIT_VALIDATION_FAILED,
@@ -79,7 +76,6 @@ def run(command_args: list[str], repo_root: Path) -> tuple[CommandResult, int]:
             data={
                 **merge_data,
                 "accepted_ready": len(analysis.accepted_ready),
-                "rejected_ready": len(analysis.rejected_ready),
             },
         ),
         EXIT_OK,

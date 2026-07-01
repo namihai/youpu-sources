@@ -119,22 +119,17 @@ def write_text(path: Path, content: str) -> None:
 
 
 def write_data_accepted(repo_root: Path, filename: str, content: str) -> None:
-    write_text(repo_root / "data" / "accepted" / filename, content)
+    write_text(repo_root / "data" / filename, content)
 
 
 def write_staging_accepted(repo_root: Path, filename: str, content: str) -> None:
-    write_text(repo_root / "staging" / "accepted" / filename, content)
+    write_text(repo_root / "staging" / filename, content)
 
 
-def write_rejected_csv(repo_root: Path, *, rows: list[tuple[str, str, str]], staging: bool) -> None:
-    target = (
-        repo_root / "staging" / "rejected" / "rows.csv"
-        if staging
-        else repo_root / "data" / "rejected.csv"
-    )
+def write_unexpected_csv(path: Path) -> None:
     body = ["url,title,reason"]
-    body.extend(",".join(row) for row in rows)
-    write_text(target, "\n".join(body) + "\n")
+    body.append("https://example.com/unexpected,Unexpected,invalid location")
+    write_text(path, "\n".join(body) + "\n")
 
 
 def command_payload(repo_root: Path, command: str) -> tuple[int, dict[str, object]]:
@@ -183,14 +178,6 @@ def setup_case(case: FlowCase, repo_root: Path) -> None:
         return
 
     if case.case_id == "T04":
-        write_rejected_csv(
-            repo_root,
-            staging=True,
-            rows=[("https://example.com/rejected-one", "Rejected One", "not fit")],
-        )
-        return
-
-    if case.case_id == "T05":
         write_data_accepted(
             repo_root,
             "SRC-0001-ocr-shared-task.md",
@@ -201,71 +188,26 @@ def setup_case(case: FlowCase, repo_root: Path) -> None:
             "chinese-calligraphy-dataset-19-authors.md",
             accepted_fixture(example_b),
         )
-        write_rejected_csv(
-            repo_root,
-            staging=True,
-            rows=[("https://example.com/rejected-two", "Rejected Two", "out of scope")],
-        )
         return
 
-    if case.case_id == "T06":
+    if case.case_id == "T05":
         content = accepted_fixture(example_a)
         write_data_accepted(repo_root, "SRC-0001-ocr-shared-task.md", content)
         write_staging_accepted(repo_root, "ancient-chinese-ocr-shared-task.md", content)
         return
 
-    if case.case_id == "T07":
-        staging_content = accepted_fixture(example_a)
-        write_staging_accepted(repo_root, "ancient-chinese-ocr-shared-task.md", staging_content)
-        write_rejected_csv(
-            repo_root,
-            staging=False,
-            rows=[("https://evahan.nlpeer.com", "Rejected OCR", "already rejected")],
-        )
-        return
-
-    if case.case_id == "T08":
-        row = ("https://example.com/rejected-dupe", "Rejected Dupe", "duplicate")
-        write_rejected_csv(repo_root, staging=False, rows=[row])
-        write_rejected_csv(repo_root, staging=True, rows=[row])
-        return
-
-    if case.case_id == "T09":
-        write_data_accepted(
-            repo_root,
-            "SRC-0001-ocr-shared-task.md",
-            accepted_fixture(example_a),
-        )
-        write_rejected_csv(
-            repo_root,
-            staging=True,
-            rows=[("https://evahan.nlpeer.com", "Rejected OCR", "conflict with accepted")],
-        )
-        return
-
-    if case.case_id == "T10":
+    if case.case_id == "T06":
         first = accepted_fixture(example_a)
         second = accepted_fixture(example_b, canonical_url="https://evahan.nlpeer.com")
         write_staging_accepted(repo_root, "ancient-chinese-ocr-shared-task.md", first)
         write_staging_accepted(repo_root, "duplicate-url.md", second)
         return
 
-    if case.case_id == "T11":
-        write_rejected_csv(
-            repo_root,
-            staging=True,
-            rows=[
-                ("https://example.com/rejected-dup", "Rejected Dup A", "duplicate"),
-                ("https://example.com/rejected-dup", "Rejected Dup B", "duplicate"),
-            ],
-        )
-        return
-
-    if case.case_id == "T12":
+    if case.case_id == "T07":
         write_text(repo_root / "staging" / "tmp.txt", "unexpected\n")
         return
 
-    if case.case_id == "T13":
+    if case.case_id == "T08":
         write_staging_accepted(
             repo_root,
             "敦煌壁画数据集.md",
@@ -273,45 +215,25 @@ def setup_case(case: FlowCase, repo_root: Path) -> None:
         )
         return
 
-    if case.case_id == "T14":
+    if case.case_id == "T09":
         invalid = accepted_fixture(example_a, canonical_url="not-a-url")
         write_staging_accepted(repo_root, "ancient-chinese-ocr-shared-task.md", invalid)
         return
 
-    if case.case_id == "T15":
-        write_text(
-            repo_root / "staging" / "rejected" / "rows.csv",
-            "bad,header\nhttps://example.com/rejected-three,Rejected Three\n",
-        )
-        return
-
-    if case.case_id == "T16":
+    if case.case_id == "T10":
         invalid = remove_yaml_field(accepted_fixture(example_a), "summary")
         write_data_accepted(repo_root, "SRC-0001-invalid.md", invalid)
         return
 
-    if case.case_id == "T17":
-        write_rejected_csv(
-            repo_root,
-            staging=False,
-            rows=[
-                ("https://example.com/rejected-dupe", "Rejected A", "duplicate"),
-                ("https://example.com/rejected-dupe", "Rejected B", "duplicate"),
-            ],
-        )
+    if case.case_id == "T11":
+        write_unexpected_csv(repo_root / "data" / "rows.csv")
         return
 
-    if case.case_id == "T18":
-        accepted = accepted_fixture(example_a)
-        write_data_accepted(repo_root, "SRC-0001-ocr-shared-task.md", accepted)
-        write_rejected_csv(
-            repo_root,
-            staging=False,
-            rows=[("https://evahan.nlpeer.com", "Same URL", "conflict")],
-        )
+    if case.case_id == "T12":
+        write_unexpected_csv(repo_root / "staging" / "extra" / "rows.csv")
         return
 
-    if case.case_id == "T19":
+    if case.case_id == "T13":
         write_staging_accepted(
             repo_root,
             "dunhuang-institute-digital-resources.md",
@@ -319,16 +241,11 @@ def setup_case(case: FlowCase, repo_root: Path) -> None:
         )
         return
 
-    if case.case_id == "T20":
+    if case.case_id == "T14":
         write_staging_accepted(
             repo_root,
             "dunhuang-institute-digital-resources.md",
             accepted_fixture(example_c),
-        )
-        write_rejected_csv(
-            repo_root,
-            staging=True,
-            rows=[("https://example.com/rejected-finalize", "Rejected Finalize", "not fit")],
         )
         return
 

@@ -13,7 +13,7 @@ class AppChecksTests(unittest.TestCase):
     def test_run_imports_check_counts_ready_candidates(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo_root = create_repo_skeleton(Path(tmp))
-            (repo_root / "staging" / "accepted" / "sample.md").write_text(
+            (repo_root / "staging" / "sample.md").write_text(
                 """---
 title: "Sample"
 summary: "Sample text dataset source."
@@ -25,22 +25,32 @@ access_level: "open"
 """,
                 encoding="utf-8",
             )
-            (repo_root / "staging" / "rejected" / "rows.csv").write_text(
-                "url,title,reason\nhttps://example.com/rejected,Rejected,not fit\n",
-                encoding="utf-8",
-            )
 
             report = run_imports_check(repo_root)
 
         self.assertTrue(report.ok)
         self.assertEqual(report.accepted_ready, 1)
-        self.assertEqual(report.rejected_ready, 1)
         self.assertTrue(report.has_candidates)
+
+    def test_run_imports_check_rejects_unexpected_staging_dir(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = create_repo_skeleton(Path(tmp))
+            extra_dir = repo_root / "staging" / "extra"
+            extra_dir.mkdir()
+            (extra_dir / "rows.csv").write_text(
+                "url,title,reason\nhttps://example.com/extra,Extra,invalid location\n",
+                encoding="utf-8",
+            )
+
+            report = run_imports_check(repo_root)
+
+        self.assertFalse(report.ok)
+        self.assertTrue(any(item.code == "staging_unexpected_file" for item in report.diagnostics))
 
     def test_run_imports_check_rejects_chinese_staging_accepted_filename(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo_root = create_repo_skeleton(Path(tmp))
-            (repo_root / "staging" / "accepted" / "敦煌壁画数据集.md").write_text(
+            (repo_root / "staging" / "敦煌壁画数据集.md").write_text(
                 """---
 title: "Sample"
 summary: "Sample text dataset source."
@@ -62,7 +72,7 @@ access_level: "open"
     def test_run_merge_check_flags_pending_staging(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo_root = create_repo_skeleton(Path(tmp))
-            (repo_root / "staging" / "accepted" / "sample.md").write_text(
+            (repo_root / "staging" / "sample.md").write_text(
                 """---
 title: "Sample"
 summary: "Sample text dataset source."
@@ -84,7 +94,7 @@ access_level: "open"
     def test_run_merge_check_flags_duplicate_accepted_index(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo_root = create_repo_skeleton(Path(tmp))
-            (repo_root / "data" / "accepted" / "SRC-0001-first.md").write_text(
+            (repo_root / "data" / "SRC-0001-first.md").write_text(
                 """---
 title: "Sample One"
 summary: "First sample text dataset source."
@@ -96,7 +106,7 @@ access_level: "open"
 """,
                 encoding="utf-8",
             )
-            (repo_root / "data" / "accepted" / "SRC-0001-second.md").write_text(
+            (repo_root / "data" / "SRC-0001-second.md").write_text(
                 """---
 title: "Sample Two"
 summary: "Second sample text dataset source."

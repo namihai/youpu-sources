@@ -77,30 +77,3 @@ def validate_accepted_document(
             diagnostics.append(Diagnostic(level="error", message=str(exc), path=rel_path, code=f"{code_prefix}_invalid_canonical_url"))
 
     return diagnostics, normalized_url
-
-
-def validate_rejected_values(
-    *,
-    url: str,
-    title: str,
-    reason: str,
-    path: str,
-    code_prefix: str,
-) -> tuple[list[Diagnostic], str | None]:
-    diagnostics: list[Diagnostic] = []
-    normalized_url: str | None = None
-
-    if not url:
-        diagnostics.append(Diagnostic(level="error", message="missing `url`", path=path, code=f"{code_prefix}_missing_url"))
-    else:
-        try:
-            normalized_url = normalize_url(url)
-        except ValueError as exc:
-            diagnostics.append(Diagnostic(level="error", message=str(exc), path=path, code=f"{code_prefix}_invalid_url"))
-
-    if not title:
-        diagnostics.append(Diagnostic(level="error", message="missing `title`", path=path, code=f"{code_prefix}_missing_title"))
-    if not reason:
-        diagnostics.append(Diagnostic(level="error", message="missing `reason`", path=path, code=f"{code_prefix}_missing_reason"))
-
-    return diagnostics, normalized_url

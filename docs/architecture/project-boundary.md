@@ -6,7 +6,7 @@
 
 本项目的核心目标只有一个：
 
-- 保证 `data/accepted/` 与 `data/rejected.csv` 中的结论可靠、可维护、可持续校验
+- 保证 `data/` 中的结论可靠、可维护、可持续校验
 
 围绕这个目标，仓库只承担“守门”职责，不承担“发现”职责。
 
@@ -14,11 +14,10 @@
 
 本项目负责以下内容：
 
-- 保存最终的 `accepted` 结论
-- 保存最终的 `rejected` 结论
+- 保存最终的 accepted 结论
 - 维护 schema 真源与人工 template 的一致性
-- 维护 `accepted`、`rejected`、命名和 URL 规范
-- 校验仓库结构、字段、去重和交叉冲突
+- 维护 accepted、命名和 URL 规范
+- 校验仓库结构、字段和去重
 - 对候选导入内容做安全合并
 - 在提交前做全仓检查，阻止非法状态进入版本库
 
@@ -30,7 +29,7 @@
 - 网页抓取与页面理解
 - 自动从项目页、GitHub、Hugging Face 等链接中推断数据源
 - 自动补全事实字段
-- 自动判断一个原始网页是否应该 `accepted` 或 `rejected`
+- 自动判断一个原始网页是否应该 accepted
 - 个人采集流程和中间工作流管理
 - 通用草稿箱、研究笔记或临时过程文件管理
 
@@ -40,16 +39,17 @@
 
 输入边界：
 
-- 用户通过 `staging/accepted/*.md` 提供候选 `accepted` 文档
-- 用户通过 `staging/rejected/rows.csv` 提供候选 `rejected` 记录
+- 用户通过 `staging/*.md` 提供候选 accepted 文档
 - 用户通过直接修改 `data/` 来修订或删除正式记录
 
 输出边界：
 
-- 合法内容被安全合并到正式 `data/accepted/` 和 `data/rejected.csv`
+- 合法内容被安全合并到正式 `data/`
 - 不合法或无法处理的内容进入问题清单，由用户手动处理
 
 系统不应替用户补事实，也不应为了完成导入而做高风险猜测。
+
+`staging/` 和 `data/` 根目录中的非规范文件或目录会导致检查失败。
 
 ## 守门原则
 
@@ -59,7 +59,6 @@
 - 只自动处理确定性的格式问题，不自动处理事实判断
 - 不能确定的内容一律不入库
 - 冲突项一律显式报出，不能静默覆盖
-- `accepted` 与 `rejected` 不允许交叉冲突
 - 只有通过全仓检查的状态才允许提交
 
 ## 实现原则
@@ -72,8 +71,7 @@
 
 当前导入目录约束为：
 
-- `staging/accepted/*.md`：accepted 候选输入
-- `staging/rejected/rows.csv`：rejected 候选输入
+- `staging/*.md`：accepted 候选输入
 
 正式区修订约束为：
 
@@ -82,8 +80,8 @@
 
 结构规则约束为：
 
-- `schemas/*.json` 是 accepted / rejected 结构的真源
-- `templates/*` 只作为面向人的展示模板
+- `schemas/accepted.json` 是 accepted 结构的真源
+- `templates/accepted.md` 只作为面向人的展示模板
 - CLI 应从 schema 读取结构定义，不应把字段列表散落硬编码在多个命令中
 
 CLI 的具体边界和命令收敛方向见 [`../reference/cli.md`](../reference/cli.md)。

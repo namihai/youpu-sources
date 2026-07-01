@@ -7,9 +7,8 @@ FIXTURE_ROOT = Path(__file__).resolve().parents[1]
 
 
 def create_repo_skeleton(repo_root: Path) -> Path:
-    (repo_root / "data" / "accepted").mkdir(parents=True)
-    (repo_root / "staging" / "accepted").mkdir(parents=True)
-    (repo_root / "staging" / "rejected").mkdir(parents=True)
+    (repo_root / "data").mkdir(parents=True)
+    (repo_root / "staging").mkdir(parents=True)
     (repo_root / "schemas").mkdir(parents=True)
     (repo_root / "docs").mkdir(parents=True)
     (repo_root / "src").mkdir(parents=True)
@@ -18,9 +17,7 @@ def create_repo_skeleton(repo_root: Path) -> Path:
 
     for rel_path in (
         "schemas/accepted.json",
-        "schemas/rejected.json",
         "templates/accepted.md",
-        "templates/rejected.rows.csv",
     ):
         source = FIXTURE_ROOT / rel_path
         target = repo_root / rel_path
