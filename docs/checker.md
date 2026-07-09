@@ -65,6 +65,7 @@ body_too_short           data/example.md
 - `duplicate_source`：多个文件的 `canonical_url` 规范化后相同。
 - `duplicate_unique_field`：其他唯一字段重复。
 - `duplicate_title`：标题重复；当前作为 warning。
+- `badge_count_mismatch`：README 中的 sources badge 数量与 `data/*.md` 数量不一致；当前作为 warning。
 - `body_too_short`：正文非空白字符数低于配置值。
 
 ## 不检查内容

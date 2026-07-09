@@ -19,6 +19,7 @@ FIELD_NAME_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
 DATA_FILENAME_RE = re.compile(r"^[a-z0-9][a-z0-9-]*\.md$")
 TRACKING_PARAM_PREFIXES = ("utm_",)
 TRACKING_PARAMS = {"fbclid", "gclid", "dclid", "mc_cid", "mc_eid", "igshid"}
+README_BADGE_RE = re.compile(r"https://img\.shields\.io/badge/sources-(\d+)-")
 
 
 @dataclass(frozen=True)
@@ -76,27 +77,39 @@ def main() -> int:
 
     result = check_repo(config)
     errors = [item for item in result.diagnostics if item.level == "error"]
-    print_report(errors, file_count=result.file_count)
+    warnings = [item for item in result.diagnostics if item.level == "warning"]
+    print_report(errors, warnings, file_count=result.file_count)
     if errors:
         return 1
 
     return 0
 
 
-def print_report(errors: list[Diagnostic], *, file_count: int) -> None:
+def print_report(errors: list[Diagnostic], warnings: list[Diagnostic] | None = None, *, file_count: int) -> None:
+    warnings = warnings or []
     if not errors:
         print("Status: PASS")
         print(f"Files checked: {file_count}")
+        if warnings:
+            print(f"Warnings: {len(warnings)}")
+            print()
+            print_diagnostic_table(warnings)
         return
 
     print("Status: FAIL")
     print(f"Files checked: {file_count}")
     print(f"Failures: {len(errors)}")
+    if warnings:
+        print(f"Warnings: {len(warnings)}")
     print()
+    print_diagnostic_table(errors)
+
+
+def print_diagnostic_table(diagnostics: list[Diagnostic]) -> None:
     print(f"{'Code':<24} File")
     print(f"{'-' * 24} {'-' * 40}")
-    for error in errors:
-        print(f"{error.code or 'unknown':<24} {error.path or '-'}")
+    for diagnostic in diagnostics:
+        print(f"{diagnostic.code or 'unknown':<24} {diagnostic.path or '-'}")
 
 
 def load_config(path: Path) -> Config:
@@ -250,7 +263,35 @@ def check_repo(config: Config) -> CheckResult:
         if len(paths) > 1:
             diagnostics.append(Diagnostic(level="warning", message=f"duplicate title: {title}", path=", ".join(paths), code="duplicate_title"))
 
+    diagnostics.extend(check_readme_badge(file_count))
+
     return CheckResult(diagnostics=diagnostics, file_count=file_count)
+
+
+def check_readme_badge(file_count: int) -> list[Diagnostic]:
+    readme_path = REPO_ROOT / "README.md"
+    rel_path = str(readme_path.relative_to(REPO_ROOT))
+    try:
+        text = readme_path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return []
+
+    match = README_BADGE_RE.search(text)
+    if not match:
+        return []
+
+    badge_count = int(match.group(1))
+    if badge_count == file_count:
+        return []
+
+    return [
+        Diagnostic(
+            level="warning",
+            message=f"README sources badge count is {badge_count}; expected {file_count}",
+            path=rel_path,
+            code="badge_count_mismatch",
+        )
+    ]
 
 
 def validate_fields(

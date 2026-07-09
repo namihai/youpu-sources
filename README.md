@@ -1,5 +1,9 @@
 # youpu-sources
 
+![Namihai Studio](https://img.shields.io/badge/Namihai_Studio-youpu--sources-black)
+![Updated](https://img.shields.io/badge/updated-2026--07--09-green)
+![Sources](https://img.shields.io/badge/sources-116-blue)
+
 `youpu-sources` 用来维护一份数据集与数字资源来源清单。
 
 仓库只保存“来源记录”，不保存数据集文件本身，也不自动发现外部来源。
