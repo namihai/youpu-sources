@@ -1,0 +1,58 @@
+{
+  "data_dir": "data",
+  "min_body_chars": 100,
+  "fields": [
+    {
+      "name": "title",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "summary",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "canonical_url",
+      "type": "url",
+      "required": true,
+      "unique": true
+    },
+    {
+      "name": "publisher",
+      "type": "string",
+      "required": true
+    },
+    {
+      "name": "modality",
+      "type": "enum",
+      "required": true,
+      "choices": [
+        "text",
+        "image",
+        "audio",
+        "video",
+        "tabular",
+        "geospatial",
+        "multimodal",
+        "other"
+      ]
+    },
+    {
+      "name": "access_level",
+      "type": "enum",
+      "required": true,
+      "choices": [
+        "open",
+        "request",
+        "restricted",
+        "unknown"
+      ]
+    },
+    {
+      "name": "tags",
+      "type": "inline_array",
+      "required": false
+    }
+  ]
+}

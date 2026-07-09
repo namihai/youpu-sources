@@ -1,1 +1,0 @@
-"""youpu application package."""
