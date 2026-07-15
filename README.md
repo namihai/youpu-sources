@@ -1,7 +1,7 @@
 # youpu-sources
 
 ![Namihai Studio](https://img.shields.io/badge/Namihai_Studio-youpu--sources-black)
-![Updated](https://img.shields.io/badge/updated-2026--07--09-green)
+![Updated](https://img.shields.io/badge/updated-2026--07--15-green)
 ![Sources](https://img.shields.io/badge/sources-117-blue)
 
 ![youpu-sources cover](docs/images/cover.png)
