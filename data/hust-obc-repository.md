@@ -1,24 +1,92 @@
 ---
-title: "HUST-OBC (repo)"
-summary: "HUST-OBC 甲骨文字形数据集的代码与说明仓库，指向 Figshare 数据下载并说明 deciphered、undeciphered 与 OCR 等数据组织方式。"
+title: "华中科技大学VLRLab甲骨文数据集（HUST-OBC）"
+summary: "面向甲骨文字形识别与计算辅助释读的大规模图像数据集，包含已释读、未释读和隔离数据。"
 canonical_url: "https://github.com/Pengjie-W/HUST-OBC"
-publisher: "VLRLab of HUST / Pengjie-W（GitHub）"
+publisher: "华中科技大学 VLRLab"
 modality: "image"
 access_level: "open"
-tags: [OCR, 古文字, 字符识别]
+tags: ["甲骨文", "古文字", "图像识别", "OCR", "文化遗产", "计算机视觉", "HUST-OBC", "CC BY-NC 4.0"]
 ---
 
-## 来源概述
-HUST-OBC 是华中科技大学 VLRLab 收集的甲骨文字形数据相关仓库。仓库说明称已开源 HUST-OBC 数据集及相关模型，覆盖 Chinese OCR、MoCo 和 Validation 等任务，并提供 Figshare 下载入口。
+# 华中科技大学VLRLab甲骨文数据集（HUST-OBC）
+## 要点
+- 包含145053张图像。主要由已解读、未解读与隔离数据组成。
+- 数据的主要来源包括：《新甲骨文编》、《甲骨文六位数字码检索字库》、殷契文渊、国学大师网站、HWOBC 手写甲骨文数据库。
+- 数据大小：580MB
+- 许可协议：CC BY-NC 4.0
+- URL：https://github.com/Pengjie-W/HUST-OBC
+## 数据内容
+本数据集由华中科技大学 VLRLab、安阳师范学院甲骨文专家及其他合作团队构建，正式数据论文于 2024 年发表于 Scientific Data。论文将其定位为面向甲骨文字形识别与计算辅助释读的数据集。
 
-## 收录内容与边界
-数据说明包含 deciphered、undeciphered、GuoXueDaShi_1390 等目录结构，以及 `chinese_to_ID.json`、`ID_to_chinese.json` 等字符映射文件。仓库本身主要承担说明、代码和链接入口作用；若正式入库时只保留一个 canonical 来源，Figshare 数据页通常比 GitHub 仓库更适合作为主数据落地点。
+作者对书页进行扫描、自动裁切和现代汉字标签识别；不同来源的数据随后通过视觉相似度和专家审核进行合并。论文方法部分和GitHub 仓库均提供了数据来源及目录说明。
 
-## 获取方式
-GitHub 仓库公开可访问；实际数据、OCR 数据集和模型文件需按 README 指向的 Figshare 链接下载。
+因此，它实际上包含三种性质不同的内容：
+- 已释读甲骨文字形及其现代汉字对应关系；
+- 尚无可靠现代汉字标签的字形分组；
+- 作者认为标签可靠性不足、单独隔离的网页数据。
 
-## 使用与访问限制
-访问 GitHub 与 Figshare 页面本身无需人工审批；具体数据许可和引用要求需以 Figshare 条目与论文说明为准。
+数据内容核验后发现，共包含 145,072 张图像。其中 140,053 张属于论文主数据，另外 5,019 张属于隔离的不可靠数据。
 
-## 质量与风险
-该条目与 `HUST-OBC` 的 Figshare 条目可能描述同一数据源。正式入库时建议优先选择 Figshare 作为数据 canonical_url，并将 GitHub 作为代码/说明入口写入正文，避免重复收录。
+主数据构成为：
+| 部分 | 图像数 | 类别数 | 标签含义 |
+|---|---:|---:|---|
+| 已释读 `deciphered` | 77,064 | 1,588 | 对应现代汉字或合并后的现代字类别 |
+| 未释读 `undeciphered` | 62,989 | 论文称 9,411；实际目录为 9,408 | 来源内部的待释读字形分组 |
+| 隔离数据 `GuoXueDaShi_1390` | 5,019 | 1,390 | 缺少可靠交叉验证的网页标签 |
+
+## 数据结构
+### 数据包结构
+```HUST-OBC/
+├── deciphered/                 # 已释读甲骨文
+│   ├── 0001/                   # 一个最终字形类别
+│   │   ├── H_0001_xxx.png
+│   │   ├── X_0001_xxx.png
+│   │   └── ...
+│   ├── 0002/
+│   ├── 0678_0679/              # 多个原始类别合并后的类别
+│   ├── ...
+│   ├── chinese_to_ID.json
+│   └── ID_to_chinese.json
+│
+├── undeciphered/               # 未释读甲骨文
+│   ├── L/                      # 六位数字码来源
+│   │   ├── category_1/
+│   │   │   └── L_?_xxx.jpg
+│   │   └── ...
+│   ├── X/                      # 《新甲骨文编》来源
+│   │   ├── category_1/
+│   │   │   ├── X_?_xxx_1.png
+│   │   │   └── X_?_xxx_2.png
+│   │   └── ...
+│   └── Y+H/                    # 殷契文渊与 HWOBC 合并部分
+│       ├── category_1/
+│       │   ├── Y_?_xxx.jpg
+│       │   ├── H_?_xxx_0.png
+│       │   └── ...
+│       └── ...
+│
+├── GuoXueDaShi_1390/           # 可靠性不足、被隔离的数据
+│   ├── 0001/
+│   │   ├── G_0001_xxx.png
+│   │   └── ...
+│   ├── ...
+│   ├── chinese_to_ID.json
+│   └── ID_to_chinese.json
+│
+└── Source.txt                  # 数据来源字母说明
+```
+### 来源字母含义
+本数据集规定了五个来源编码：
+| 编码 | 来源 |
+|---|---|
+| `X` | *New Compilation of Oracle Bone Scripts*，《新甲骨文编》 |
+| `L` | *Oracle Bone Script: Six Digit Numerical Code*，《甲骨文六位数字码检索字库》 |
+| `G` | GuoXueDaShi，国学大师网站 |
+| `Y` | YinQiWenYuan，殷契文渊 |
+| `H` | HWOBC 手写甲骨文数据库 |
+
+来源字母非常重要，因为不同来源的图像形式差异明显：
+- `X`、`L` 多来自书籍扫描和裁切；
+- `G`、`Y` 多来自网页数据库；
+- `H`主要是人工描摹或手写甲骨文字形。
+模型可能学习到来源风格，因此做跨来源评估时应保留这个字段。

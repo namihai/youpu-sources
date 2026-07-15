@@ -1,30 +1,23 @@
 ---
-title: "中国传统乐器识别音频数据集（ChMusic）"
-summary: "ChMusic 中国传统乐器识别数据集：11 种乐器（每类 5 段，共 55 段），单乐器演奏；双声道 44.1kHz WAV，时长约 25–280s；数据约 530MB，可通过百度网盘/Google Drive 下载；仓库为基线代码，MIT 许可。"
-canonical_url: "http://chmusic.py"
-publisher: "GitHub（HaoranWeiUTD/ChMusic）"
+title: "中国传统乐器识别基准数据集"
+summary: "包含11种中国传统乐器的55段单乐器WAV音频，可用于传统乐器识别研究。"
+canonical_url: "https://drive.google.com/file/d/1rfbXpkYEUGw5h_CZJtC7eayYemeFMzij/view?usp=sharing"
+publisher: "未明确"
 modality: "audio"
 access_level: "open"
-tags: [机器学习]
+tags: ["中国传统音乐", "乐器识别", "音频分类", "WAV", "二胡", "琵琶", "古筝", "笛子", "民族音乐"]
 ---
 
-## 来源概述
-ChMusic 中国传统乐器识别数据集：11 种乐器（每类 5 段，共 55 段），单乐器演奏；双声道 44.1kHz WAV，时长约 25–280s；数据约 530MB，可通过百度网盘/Google Drive 下载；仓库为基线代码，MIT 许可。
+# 中国传统乐器识别基准数据集
+## 要点
+- 55首中国传统音乐片段
+- 涵盖11种乐器：二胡、琵琶、三弦琴、笛子、唢呐、追琴、中阮、柳琴、古筝、扬琴和笙。
+- 数据大小：530MB
+- 格式为WAV
+- 采样频率：44100Hz
+- 可以通过百度网盘链接下载：pan.baidu.com/s/13e-6GnVJmC3tcwJtxed3-g   密码xk23
+- 也可以通过谷歌云端硬盘下载：drive.google.com/file/d/1rfbXpkYEUGw5h_CZJtC7eayYemeFMzij/view?usp=sharing
+## 数据内容
+本数据集涵盖11种乐器（每类首段，共55首），单乐器演奏，双声道，44.1kHz WAV，时长约 25–280s；数据约 530MB，可通过百度网盘/Google Drive 下载。
 
-## 收录内容与边界
-1. 数据对象与边界：乐器类别标注的传统音乐片段；每段仅由单一乐器演奏（以仓库说明为准）。
-2. 数据组织方式：音频文件为 .wav；文件命名遵循 `x.y.wav`：`x` 为乐器编号（1–11），`y` 为该乐器的片段编号（1–5）（以仓库说明为准）。
-3. 规模与粒度：11 类 × 每类 5 段，共 55 段；采样率 44.1kHz、双声道；单段时长约 25–280 秒（以仓库说明为准）。
-4. 数据体量：约 530 MB。
-
-## 获取方式
-公开
-
-## 使用与访问限制
-MIT
-
-## 质量与风险
-- **完整性**：样本量小，类别内多样性不足。
-- **一致性**：不同来源音频可能存在采样率/响度差异。
-- **时效性**：一次性数据。
-- **稳定性**：依赖 GitHub 托管。
+音频文件为 .wav；文件命名遵循 `x.y.wav`：`x` 为乐器编号（1–11），`y` 为该乐器的片段编号（1–5）

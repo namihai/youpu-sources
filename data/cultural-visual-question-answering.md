@@ -1,28 +1,57 @@
 ---
 title: "文化视觉问答数据集"
-summary: "涵盖11个国家文化图像的开放式VQA数据集，用于评估视觉语言模型跨文化理解能力。"
-canonical_url: "https://culturalvqa.org/"
-publisher: "Mila Quebec AI Institute/Université de Montréal/McGill University/Google Research/Google DeepMind"
+summary: "用于评估视觉语言模型文化理解能力的视觉问答基准，覆盖多国文化内容。"
+canonical_url: "https://huggingface.co/datasets/mair-lab/CulturalVQA"
+publisher: "MAIR Lab"
 modality: "multimodal"
 access_level: "open"
-tags: [基准测试, 多模态VQA, 数据集评测, 文化偏置, 文化理解, 机器学习, 深度学习, 视觉问答]
+tags: ["视觉问答", "VQA", "文化理解", "视觉语言模型", "Hugging Face", "图像问答", "跨文化", "CC BY-SA 4.0"]
 ---
 
-## 来源概述
-涵盖11个国家文化图像的开放式VQA数据集，用于评估视觉语言模型跨文化理解能力
+# 文化视觉问答数据集
+## 要点
+- 问答基准（Q&A Benchmark）数据集。
+- 2378组图像，每个问题对应1-5个答案，涵盖5大洲11个国家的文化内容。
+- 覆盖服饰、食物、饮品、仪式和传统。
+- 数据大小：1.1GB
+- 许可协议：CC BY-SA 4.0
+- URL：https://huggingface.co/datasets/mair-lab/CulturalVQA
+## 数据介绍
+本数据集旨在评估视觉语言模型队不同地理区域文化的理解能力。
 
-## 收录内容与边界
-1. 数据集由 2378 对图像-问答对组成，包含 2328 张独立图像。
-2. 每个问题有 1–5 个人工标注答案。
-3. 五类文化面向：Traditions、Rituals、Food、Drink、Clothing。
+如需加载并使用，可以使用以下命令：
+```
+from datasets import load_dataset
 
-## 获取方式
-公开
+culturalvqa_dataset = load_dataset('mair-lab/CulturalVQA')
+```
 
-## 使用与访问限制
-CC BY 4.0
-
-## 质量与风险
-- **完整性**：覆盖 11 国与五类文化面向，但类别可能不均衡。
-- **一致性**：开放式问答格式多样，评估标准需一致定义。
-- **稳定性**：依赖 Hugging Face 平台稳定性。
+数据集加载后，每个样本包含以下字段：数据集加载后，每个样本包含以下字段：
+- `u_id`：每组图像—问题对的唯一标识符。
+- `image`：以二进制格式存储的图像数据。
+- `question`：与图像相关的问题。
+- `facet`：该图像—问题对所属的文化维度。
+- `country`：该图像—问题对所属的国家。
+- `all_answers`：参与者针对某一问题提供的全部答案。
+## 引用规则
+> @inproceedings{nayak-etal-2024-benchmarking,
+>     title = "Benchmarking Vision Language Models for Cultural Understanding",
+>     author = "Nayak, Shravan  and
+>       Jain, Kanishk  and
+>       Awal, Rabiul  and
+>       Reddy, Siva  and
+>       Steenkiste, Sjoerd Van  and
+>       Hendricks, Lisa Anne  and
+>       Stanczak, Karolina  and
+>       Agrawal, Aishwarya",
+>     editor = "Al-Onaizan, Yaser  and
+>       Bansal, Mohit  and
+>       Chen, Yun-Nung",
+>     booktitle = "Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing",
+>     month = nov,
+>     year = "2024",
+>     address = "Miami, Florida, USA",
+>     publisher = "Association for Computational Linguistics",
+>     url = "https://aclanthology.org/2024.emnlp-main.329",
+>     pages = "5769--5790"
+> }
