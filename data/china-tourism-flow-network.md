@@ -1,29 +1,29 @@
 ---
 title: "中国旅游流动网络数据集"
-summary: "基于在线游记抽取的中国旅游流动网络：景点为节点、流动为有向加权边；含按季节/同伴等切片变体；数据 CC BY 4.0，代码 MIT。"
+summary: "基于游记行程序列构建的中国旅游POI流动网络数据集，包含POI元数据和有向转移边。"
 canonical_url: "https://doi.org/10.6084/m9.figshare.30184726"
-publisher: "Figshare（DOI 记录）"
-modality: "other"
+publisher: "Figshare"
+modality: "tabular"
 access_level: "open"
-tags: [Figshare, 图神经网络, 开源, 文旅, 旅游流动, 旅游网络, 机器学习, 空间分析]
+tags: ["旅游流动", "POI", "网络数据", "游记", "地理数据", "CSV", "Figshare", "CC BY 4.0"]
 ---
 
-## 来源概述
-基于在线游记抽取的中国旅游流动网络：景点为节点、流动为有向加权边；含按季节/同伴等切片变体；数据 CC BY 4.0，代码 MIT。
-
-## 收录内容与边界
-1. 数据对象与边界：节点为景点或地点实体；边为游记抽取到的“从 A 到 B”的流动关系（具体抽取规则与清洗标准需以论文/说明文档核验）。
-2. 数据组织方式：节点表 + 边表，并可能包含多个切片版本（季节/同伴等）。
-3. 数据量：不明/待确认（建议从 Figshare 记录补齐文件数量与大小）。
-
-## 获取方式
-公开
-
-## 使用与访问限制
-CC BY 4.0
-
-## 质量与风险
-- **完整性**：覆盖范围受游记采样影响，可能低估小众地区与非典型路线。
-- **一致性**：地名/景点名存在同名、别名、拼写差异，需要实体对齐。
-- **时效性**：一次性数据；与当前旅游趋势可能存在滞后。
-- **稳定性**：依赖 Figshare 托管。
+# 中国旅游流动网络数据集
+## 要点
+- 数据大小：25.93MB。
+- 包含POI元数据与游记访问序列。
+- 许可协议：CC BY 4.0
+- URL：https://doi.org/10.6084/m9.figshare.30184726
+## 数据内容
+这是一个基于游记行程序列构建的中国旅游 POI 流动网络数据集。它包含两类基础信息：
+- POI 元数据：景点/地点 ID、中文名、英文名、城市、GCJ-02 坐标、标签。
+- 游记访问序列：匿名游记 ID、抓取日期、出发日期、同行关系、按顺序访问的 POI ID 列表。
+由访问序列进一步派生出网络数据：
+- 节点`Nodes_*`：参与某类网络转移的 POI。
+- 边`Edges_*`：从一个 POI 到下一个 POI 的有向转移。
+- `Weight`：同一有向转移在所有行程中出现的次数。
+## 原始数据规模
+| 文件 | 行数 | 字段 |
+|---|---:|---|
+| `POIs_V2.csv` | 23,736 | `Encrypted_ID`, `Name_ZH`, `Name_EN`, `City_ZH`, `City_EN`, `Latitude_GCJ02`, `Longitude_GCJ02`, `Label_ZH`, `Label_EN` |
+| `Visit_Sequences_V2.csv` | 68,531 | `Anonymized_Blog_ID`, `Retrieval_Date`, `Departure_Date`, `Travel_Partners`, `Visit_Sequence` |
