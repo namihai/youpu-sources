@@ -1,14 +1,14 @@
 ---
-title: "敦煌舞三维动作数据集"
-summary: "DOI：10.57760/sciencedb.16380。"
+title: "敦煌舞三维动作数据集（2024年3月修订版）"
+summary: "包含7个主题、83个基础动作和16个长动作的敦煌舞三维动作数据，对应2024年3月修订的V2，访问需申请。"
 canonical_url: "https://www.scidb.cn/en/detail?dataSetId=efc79612bbf54466aea47a881b3de6ec"
 publisher: "ScienceDB"
 modality: "multimodal"
-access_level: "open"
+access_level: "request"
 tags: [敦煌, 舞蹈, 动作捕捉]
 ---
 
-# 敦煌舞三维动作数据集
+# 敦煌舞三维动作数据集（2024年3月修订版）
 ## 亮点
 - DOI：10.57760/sciencedb.16380。
 - CSTR：31253.11.sciencedb.16380。
