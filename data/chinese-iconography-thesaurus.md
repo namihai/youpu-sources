@@ -1,6 +1,6 @@
 ---
-title: "中国图像学主题词表（CIT，CC0-1.0）"
-summary: "Chinese Iconography Thesaurus（CIT）：面向中国视觉文化的中英双语图像学受控词表/标引标准，并关联图像档案；支持层级、同义组与关联关系，用于主题/母题/符号等标引与检索；CC0-1.0 许可，GitHub 发布。"
+title: "中国图像志主题词表（CIT）"
+summary: "支持中英文双语检索。"
 canonical_url: "https://github.com/iconclass/cit"
 publisher: "**V&A（DCMS** 资助项目；CIT Editorial Team）/ GitHub iconclass/cit"
 modality: "tabular"
@@ -8,22 +8,102 @@ access_level: "open"
 tags: [机器学习]
 ---
 
-## 来源概述
-Chinese Iconography Thesaurus（CIT）：面向中国视觉文化的中英双语图像学受控词表/标引标准，并关联图像档案；支持层级、同义组与关联关系，用于主题/母题/符号等标引与检索；CC0-1.0 许可，GitHub 发布。
+# 中国图像志主题词表（CIT）
+## 要点
+- 支持中英文双语检索。
+- 主题词规模17465条。
+- 目录规模12893条。
+- 可转换为SQLite全文检索数据库。
+- 可导出为SKOS JSON-LD，适合知识图谱和关联数据应用。
+- 提供Docker镜像与本地运行方法。
+- 数据大小：6.7MB
+- 许可协议：CC0 1.0
+- URL：https://github.com/iconclass/cit
+## 数据内容
+数据中主题词覆盖：
+- 自然；
+- 人类；
+- 社会与文化；
+- 宗教；
+- 神话与传说；
+- 历史与地理；
+- 文学作品；
+- 植物、动物、人物、器物、事件；
+- 历史、宗教、神话和文学中的人名与地名；
+- 图案、母题、题材和主题。
 
-## 收录内容与边界
-1. 数据对象与边界：词表术语体系与概念关系，包含通用概念（如植物/动物/人物/器物/事件等）、专名（历史人物/地名/宗教神话文学等）、以及描述母题/题材/主题的术语；并组织层级关系、同义组与关联关系（以仓库说明为准）。
-2. 数据组织方式：以在线数据库/项目仓库形式维护与发布；具体导出文件格式与字段以仓库数据目录与文档为准。
-3. 数据量：仓库说明未给出条目总数，需以仓库数据文件统计为准。
+主题词记录包含：
+```
+SEQ           顺序号
+TYPE          记录类型
+ID            CIT稳定标识
+TERM_ZH       中文主词
+TERM_EN       英文主词
+TERM_PINYIN   拼音
+KW_ZH         中文同义词、异体或检索词
+KW_EN         英文同义词、检索词
+BROADER       直接上位词
+C             子节点
+R             关联词
+P             完整上位路径
+```
+例如一个概念可以同时具有繁体主词、简体异体、英文译名、拼音、上位词和相关概念。这已经具备规范主题词表和轻量本体的基本结构。
 
-## 获取方式
-公开
+藏品与图像目录中，记录主要包含：
+```
+ID              内部记录ID
+COL             收藏机构代码
+TYPE            记录类型，当前主要为image
+LOCATION.INV    收藏机构名称
+DESCRIPTION     对象类型或描述
+TITLE           藏品标题
+URL.IMAGE       图像文件名
+URL.WEBPAGE     原始收藏机构页面
+CIT             关联的CIT主题词ID
+DATE            制作年代
+PERSON.ARTIST   作者或制作者
+PERSON.ROLE     人物角色
+INSTIT.INV      机构藏品号
+ID.INV.ALT      其他编号
+ID.INV.INST     编号类型
+```
+一件藏品可以关联多个 CIT 主题词。例如一方砚台可以同时关联器物类型、材质、动物纹样、历史时期和神话母题。
 
-## 使用与访问限制
-CC0
-
-## 质量与风险
-- **完整性**：覆盖范围取决于词表建设进度，对长尾题材可能不足。
-- **一致性**：受控词表内部一致性强，但标引落地依赖规范与培训。
-- **时效性**：不定期更新。
-- **稳定性**：依赖 GitHub/项目站点托管。
+## 数据结构
+CIT 使用一种名为 `.dmp` 的纯文本记录格式。每条记录由若干“字段名—字段值”组成，多值字段用分号续行，记录之间使用 `$` 分隔。
+示意机构：
+```
+SEQ 4
+TYPE CIT
+ID CIT0284391
+KW_ZH 气
+TERM_PINYIN qi
+TERM_EN qi
+KW_EN effluvium
+; breath
+; vital breath
+BROADER CIT290300
+TERM_ZH 氣
+$
+```
+## 数据处理链路
+```
+V&A馆藏管理系统
+        ↓
+主题词与目录XML导出
+        ↓
+转换脚本
+        ↓
+CIT.dmp + CATALOG.dmp
+        ↓
+SQLite检索库 / SKOS JSON-LD
+        ↓
+FastAPI网站与中英文检索界面
+```
+具体包括：
+- `convert_thesaurus.py`：把主题词 XML 转换为 `CIT.dmp`；
+- `convert_catalog.py`：把收藏机构目录 XML 转换为 `CATALOG.dmp`；
+- `convert_todb.py`：把两个 DMP 文件转换为 `CIT.sqlite`；
+- `SQLite` 使用 `FTS5` 建立全文检索索引；
+- 数据库建立 `terms` 和 `images` 两个视图；
+- `objs_cit` 表保存藏品与主题词之间的关联；

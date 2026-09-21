@@ -1,6 +1,6 @@
 ---
-title: "中国绘画艺术数据集"
-summary: "包含2585张中国水墨画与油画图像，适用于艺术风格识别与AI模型训练。"
+title: "中国绘画艺术数据集（Chinese Art Styles Dataset）"
+summary: "收录 2,585 张稀有中国人物画风格图像，面向少样本分类与深度特征融合研究。"
 canonical_url: "https://www.kaggle.com/datasets/programmer3/chinese-art-styles-dataset"
 publisher: "programmer3"
 modality: "image"
@@ -8,22 +8,28 @@ access_level: "open"
 tags: [中国绘画, 图像分类, 数据清洗, 文化遗产, 文物图像, 机器学习, 水墨画, 油画]
 ---
 
-## 来源概述
-包含2585张中国水墨画与油画图像，适用于艺术风格识别与AI模型训练
+# 中国绘画艺术数据集（Chinese Art Styles Dataset）
 
-## 收录内容与边界
-1. 数据以图片文件形式组织，大体分为水墨画和油画。
-2. 图像总数约为 2585 张，为中等规模图像数据集，可用于分类、聚类和风格学习任务。
-3. 图像质量较高，适合视觉特征提取、风格迁移和深度学习模型训练。但水墨画图片中大部分包含水印。
+## 亮点
 
-## 获取方式
-公开
+- 收录 2,585 张稀有中国人物画风格图像，面向少样本分类与深度特征融合研究。
+- 每张图像对应一种艺术风格，说明强调笔触、色彩、肌理与构图等特征。
+- 由 Kaggle 用户 programmer3 发布，页面副标题为 Few-Shot Figure Painting Set。
+- 当前版本为 Version 1，页面最后修改时间为 2025 年 5 月 19 日。
+- 数据大小：约 120.1 MB（120,114,177 字节，ZIP 下载包）。
+- 许可协议：[CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/)。
+- URL：https://www.kaggle.com/datasets/programmer3/chinese-art-styles-dataset
 
-## 使用与访问限制
-Kaggle 数据集页面公开可访问；下载通常需要登录 Kaggle，并遵守数据集页面标注的 license 与 Kaggle 平台条款。
+## 数据内容
 
-## 质量与风险
-- **完整性**：数据集规模适中，内容较完整。
-- **一致性**：图片质量稳定，但整体清晰度偏低。
-- **时效性**：数据长期有效，最近更新时间为2025年5月。
-- **稳定性**：数据较为稳定，依赖 Kaggle 平台稳定性及账户权限。
+该数据集由 Kaggle 用户 programmer3 发布，副标题为 Few-Shot Figure Painting Set，收录稀有中国人物画风格图像。数据集共 2,585 张图像，每张图像代表一种艺术风格，页面说明将其定位为用于少样本分类和深度特征融合策略研究。
+
+发布说明强调图像在笔触、色彩、肌理和构图上的差异，以呈现传统中国人物画的风格多样性。来源页面未列出具体的作者、采集时间或风格分类目录，因此这里不补充超出页面说明的分类信息。
+
+## 发布与获取
+
+数据通过 Kaggle 发布，下载内容为 ZIP 格式压缩包，大小约 120.1 MB，对应 Version 1。原始页面当前无法直接访问，页面内容可经互联网存档查看；下载和获取条件需以 Kaggle 页面当前状态为准。
+
+## 访问与授权
+
+页面元数据将许可协议标注为 CC0 1.0，对应 Creative Commons Zero 1.0 公共领域声明。发布者 Kaggle 用户名是 programmer3，页面未提供其他联系方式。

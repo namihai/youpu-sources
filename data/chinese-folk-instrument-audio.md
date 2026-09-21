@@ -1,6 +1,6 @@
 ---
 title: "中国传统乐器音频数据集（FolkMusic）"
-summary: "中国传统乐器音频数据集（FolkMusic）：15 种乐器，单乐器 3 秒音频片段，双声道 44.1kHz MP3；用于乐器识别训练与评测；文件大小为5.6GB。"
+summary: "面向中国传统乐器识别模型训练与性能评估的音频数据集，覆盖 15 种传统乐器。"
 canonical_url: "https://zenodo.org/records/8012071"
 publisher: "Zenodo"
 modality: "audio"
@@ -8,22 +8,26 @@ access_level: "open"
 tags: [机器学习，传统音乐]
 ---
 
-## 来源概述
-中国传统乐器音频数据集（FolkMusic）：15 种乐器，单乐器 3 秒音频片段，双声道 44.1kHz MP3；用于乐器识别训练与评测；文件大小为5.6GB。
+# 中国传统乐器音频数据集（FolkMusic）
 
-## 收录内容与边界
-1. 数据对象与边界：传统乐器音频切片；单乐器演奏；每条约 3 秒；MP3，双声道，44.1kHz。
-2. 数据组织方式：Zenodo 提供 [FolkMusic.zip](http://FolkMusic.zip) 压缩包（以记录页 Files 为准）；压缩包内按乐器类别组织的音频文件（以发布包为准）。
-3. 数据量：覆盖 15 种乐器（各类样本数需以压缩包目录与文件数核验）。
+## 亮点
 
-## 获取方式
-公开
+- 面向中国传统乐器识别模型训练与性能评估的音频数据集，覆盖 15 种传统乐器。
+- 音频以 MP3 格式保存，双声道录制，采样率 44100 Hz，每段时长 3 秒，每段由单一乐器演奏。
+- 全部内容打包为单个压缩文件 FolkMusic.zip，约 5.6 GB。
+- 许可协议：CC BY 4.0。
+- URL：https://zenodo.org/records/8012071
 
-## 使用与访问限制
-CC BY 4.0
+## 数据内容与来源
 
-## 质量与风险
-- **完整性**：覆盖乐器类型，但技法/曲目/录制条件覆盖可能不足。
-- **一致性**：不同录制条件会影响可比性，训练时需注意归一化与增强。
-- **时效性**：一次性数据。
-- **稳定性**：Zenodo 托管稳定。
+FolkMusic（China traditional music instrument dataset）是用于训练乐器识别模型并评估其性能的中国传统音乐音频数据集。数据集覆盖 15 种传统乐器：笛子（Flute）、洞箫（Dongxiao）、二胡（Erhu）、古琴（Guqin）、古筝（Guzheng）、葫芦丝（Hulusi）、柳琴（Liuqin）、琵琶（Pipa）、三弦（Sanxian）、笙（Sheng）、唢呐（Suona）、扬琴（Yangqin）、中阮（Zhongruan）、坠琴（Falling Qin），以及来源中仅标注为 Ba 的一种乐器。
+
+数据集由 Zhen Li、Hao Zhou、Shusong Xing、Binhui Wang 发布，版本 v1，公开日期为 2023-06-07，DOI 为 10.5281/zenodo.8012071。
+
+## 数据形态
+
+每段音乐以 MP3 文件保存，采用双声道录制，采样率 44100 Hz，单段时长 3 秒，每段由单一乐器演奏。全部内容打包为单个压缩文件 FolkMusic.zip，约 5.6 GB，MD5 校验值为 2cc1146dbf48dd014a0d698dd743d71b。
+
+## 访问与授权
+
+数据集在 Zenodo 上开放获取，许可协议为 CC BY 4.0（知识共享署名 4.0 国际），可通过记录页直接下载 FolkMusic.zip。
